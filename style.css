@@ -1,80 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f0f0;
-    overflow: hidden;
-    font-family: "Poppins", sans-serif;
-    font-weight: 200;
-    font-style: normal;
-    padding: 20px;
-}
-
-.container {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-/* Preview section */
-.preview {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-video, canvas {
-    width: 600px;
-    height: 500px;
-    border-radius: 25px;
-    border: 2px solid black;
-    background: white;
-    object-fit: cover;
-}
-
-.flash {
-    position: absolute;
-    width: 600px;
-    height: 500px;
-    background: white;
-    opacity: 0;
-    border-radius: 25px;
-    transition: opacity 0.1s;
-}
-
-/* Captured images section */
-.captured-images {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 500px;
-}
-
-.captured-images img, .placeholder {
-    width: 200px;
-    height: 150px;
-    border: 2px solid black;
-    border-radius: 25px;
-    background: gray;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    color: white;
-}
-
-button {
-    margin-top: 10px;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    width: 150px;
-}
-
 /* Responsive layout for mobile */
 @media (max-width: 768px) {
     body {
@@ -113,10 +36,11 @@ button {
         order: 2; /* Ensures captured photos come second */
     }
 
-    /* Make captured images smaller */
+    /* Maintain 4:3 aspect ratio */
     .captured-images img, .placeholder {
-        width: 80px;
-        height: 60px;
+        width: auto;
+        max-width: 120px;
+        aspect-ratio: 4 / 3;
         font-size: 18px;
     }
 
