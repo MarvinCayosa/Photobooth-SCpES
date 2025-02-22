@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Booth Template</title>
+    <style>
+         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .template-container {
+            position: relative;
+            width: 210px; /* Scaled-down preview size */
+            height: 590px;
+            overflow: hidden;
+        }
+        .photo-slot {
+            position: absolute;
+            width: 158px; /* Maintaining 1:1 ratio for preview */
+            height: 158px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-size: cover;
+            background-position: center;
+            object-fit: cover; /* Ensures the 1:1 crop effect */
+        }
+        .slot1 { top: 30px; }
+        .slot2 { top: 193px; }
+        .slot3 { top: 345px; }
+        .template {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('template.png') no-repeat center/contain;
+            pointer-events: none;
+            z-index: 1; /* Ensuring template is on top */
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="template-container">
+        <div class="photo-slot slot1" id="photo1"></div>
+        <div class="photo-slot slot2" id="photo2"></div>
+        <div class="photo-slot slot3" id="photo3"></div>
+        <div class="template"></div>
+    </div>
+
+    <div class="button-container">
+        <button onclick="downloadImage()">Download</button>
+        <button onclick="goBack()">Again</button>
+    </div>
+
+    <script>
+        function loadPhotos() {
+            const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+            if (images.length === 3) {
+                document.getElementById("photo1").style.backgroundImage = `url('${images[0]}')`;
+                document.getElementById("photo2").style.backgroundImage = `url('${images[1]}')`;
+                document.getElementById("photo3").style.backgroundImage = `url('${images[2]}')`;
+            }
+        }
+
+        function downloadImage() {
+            const originalWidth = 2284; // Scaled down from 4568
+            const originalHeight = 6458; // Scaled down from 12917
+            const canvas = document.createElement("canvas");
+            canvas.width = originalWidth;
+            canvas.height = originalHeight;
+            const ctx = canvas.getContext("2d");
+
+            const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+            const photoSize = 1730; // 1:1 Square cropping size (scaled down)
+            const photoPositions = [
+                { x: (originalWidth - photoSize) / 2, y: 300, width: photoSize, height: photoSize },
+                { x: (originalWidth - photoSize) / 2, y: 2050, width: photoSize, height: photoSize },
+                { x: (originalWidth - photoSize) / 2, y: 3750, width: photoSize, height: photoSize }
+            ];
+
+            let loadedImages = 0;
+            images.forEach((src, index) => {
+                if (index < 3) {
+                    const img = new Image();
+                    img.src = src;
+                    img.onload = () => {
+                        const aspectRatio = img.width / img.height;
+                        let cropSize = img.width < img.height ? img.width : img.height; // Make it square
+                        let cropX = (img.width - cropSize) / 2;
+                        let cropY = (img.height - cropSize) / 2;
+
+                        ctx.drawImage(img, cropX, cropY, cropSize, cropSize, photoPositions[index].x, photoPositions[index].y, photoSize, photoSize);
+                        loadedImages++;
+                        if (loadedImages === images.length) {
+                            drawTemplate();
+                        }
+                    };
+                }
+            });
+
+            function drawTemplate() {
+                const templateImg = new Image();
+                templateImg.src = 'template.png';
+                templateImg.onload = () => {
+                    ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
+                    let link = document.createElement("a");
+                    link.href = canvas.toDataURL("image/png", 0.8); /* Lower file size */
+                    link.download = "photobooth.png";
+                    link.click();
+                };
+            }
+        }
+
+        function goBack() {
+            window.location.href = "index.html";
+        }
+
+        window.onload = loadPhotos;
+    </script>
+</body>
+</html>

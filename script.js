@@ -3,6 +3,7 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 const capturedImages = document.getElementById('capturedImages');
 const startButton = document.getElementById('startButton');
+const proceedButton = document.getElementById('proceedButton');
 const flash = document.getElementById('flash');
 const shutterSound = document.getElementById('shutterSound');
 const beepSound = document.getElementById('beepSound');
@@ -17,6 +18,7 @@ async function startCapture() {
     captureCount = 0;
     resetPlaceholders();
     startButton.disabled = true;
+    proceedButton.style.display = "none";
     await countdownAndCapture(5);
 }
 
@@ -28,7 +30,7 @@ async function countdownAndCapture(seconds) {
         if (i > 1) {
             beepSound.currentTime = 0;
             beepSound.play();
-        } else if (i === 1) {
+        } else {
             countdownHigh.currentTime = 0;
             countdownHigh.play();
         }
@@ -56,6 +58,7 @@ function captureImage() {
     } else {
         startButton.innerText = "Retake Photos";
         startButton.disabled = false;
+        proceedButton.style.display = "block";
     }
 }
 
@@ -73,4 +76,15 @@ function resetPlaceholders() {
         placeholder.innerText = i + 1;
         capturedImages.replaceChild(placeholder, capturedImages.children[i]);
     }
+}
+
+function proceedToTemplate() {
+    const capturedData = [];
+    for (let i = 0; i < 3; i++) {
+        if (capturedImages.children[i].tagName === 'IMG') {
+            capturedData.push(capturedImages.children[i].src);
+        }
+    }
+    localStorage.setItem("capturedPhotos", JSON.stringify(capturedData));
+    window.location.href = "template.html";
 }
