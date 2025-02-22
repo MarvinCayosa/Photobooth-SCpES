@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Booth</title>
+    <link rel="stylesheet" href="style.css">
+  
+</head>
+    <body>
+        <div class="container">
+            <div class="captured-images" id="capturedImages">
+                <div class="placeholder">1</div>
+                <div class="placeholder">2</div>
+                <div class="placeholder">3</div>
+            </div>
+            <div class="preview">
+                <video id="video" autoplay></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+                <div class="flash" id="flash"></div>
+            
+            </div>
+
+            <button id="startButton" onclick="startCapture()">Start Capture</button>
+            <audio id="shutterSound" src="shutter.mp3"></audio>
+            <audio id="beepSound" src="countdown.mp3"></audio>
+            <audio id="countdownHigh" src="countdown high.mp3"></audio>
+        <script src="script.js"></script>
+    </body>
+</html>
