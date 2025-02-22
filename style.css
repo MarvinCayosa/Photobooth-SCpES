@@ -86,6 +86,13 @@ button {
     .container {
         flex-direction: column;
         gap: 10px;
+        align-items: center;
+    }
+
+    .preview {
+        width: 100%;
+        max-width: 400px;
+        order: 1; /* Ensures live preview comes first */
     }
 
     video, canvas, .flash {
@@ -95,21 +102,27 @@ button {
         max-height: 300px;
     }
 
+    /* Move captured images below the preview */
     .captured-images {
         flex-direction: row;
         justify-content: center;
         height: auto;
         flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 10px;
+        order: 2; /* Ensures captured photos come second */
     }
 
+    /* Make captured images smaller */
     .captured-images img, .placeholder {
-        width: 120px;
-        height: 90px;
-        font-size: 24px;
+        width: 80px;
+        height: 60px;
+        font-size: 18px;
     }
 
     button {
         width: 100%;
         max-width: 200px;
+        order: 3; /* Ensures captured photos come second */
     }
 }
