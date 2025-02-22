@@ -1,5 +1,80 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
+/* Responsive layout for all phones */
+@media (max-width: 1024px) {
+    body {
+        flex-direction: column;
+        height: auto;
+        overflow: auto;
+        padding: 10px;
+    }
+
+    .container {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .preview {
+        width: 100%;
+        max-width: 100%;
+        order: 1;
+    }
+
+    video, canvas, .flash {
+        width: 100%;
+        max-width: 90vw;
+        height: auto;
+        max-height: 70vh;
+    }
+
+    /* Move captured images below the preview */
+    .captured-images {
+        flex-direction: row;
+        justify-content: center;
+        height: auto;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 10px;
+        order: 2;
+    }
+
+    /* Maintain 4:3 aspect ratio */
+    .captured-images img, .placeholder {
+        width: auto;
+        max-width: 120px;
+        aspect-ratio: 4 / 3;
+        font-size: 18px;
+    }
+
+    button {
+        width: 100%;
+        max-width: 200px;
+        order: 3;
+    }
+}
+
+/* Extra small phones (under 480px) */
+@media (max-width: 480px) {
+    video, canvas, .flash {
+        max-width: 95vw;
+        max-height: 60vh;
+    }
+
+    .captured-images img, .placeholder {
+        max-width: 100px;
+        font-size: 14px;
+    }
+
+    button {
+        width: 90%;
+        max-width: 180px;
+    }
+}
+
+
+
 body {
     display: flex;
     justify-content: center;
@@ -79,75 +154,3 @@ button {
     width: 150px;
 }
 
-/* Responsive layout for all phones */
-@media (max-width: 1024px) {
-    body {
-        flex-direction: column;
-        height: auto;
-        overflow: auto;
-        padding: 10px;
-    }
-
-    .container {
-        flex-direction: column;
-        gap: 10px;
-        align-items: center;
-        width: 100%;
-    }
-
-    .preview {
-        width: 100%;
-        max-width: 100%;
-        order: 1;
-    }
-
-    video, canvas, .flash {
-        width: 100%;
-        max-width: 90vw;
-        height: auto;
-        max-height: 70vh;
-    }
-
-    /* Move captured images below the preview */
-    .captured-images {
-        flex-direction: row;
-        justify-content: center;
-        height: auto;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-top: 10px;
-        order: 2;
-    }
-
-    /* Maintain 4:3 aspect ratio */
-    .captured-images img, .placeholder {
-        width: auto;
-        max-width: 120px;
-        aspect-ratio: 4 / 3;
-        font-size: 18px;
-    }
-
-    button {
-        width: 100%;
-        max-width: 200px;
-        order: 3;
-    }
-}
-
-/* Extra small phones (under 480px) */
-@media (max-width: 480px) {
-    video, canvas, .flash {
-        max-width: 95vw;
-        max-height: 60vh;
-    }
-
-    .captured-images img, .placeholder {
-        max-width: 100px;
-        font-size: 14px;
-    }
-
-    button {
-        width: 90%;
-        max-width: 180px;
-    }
-}
