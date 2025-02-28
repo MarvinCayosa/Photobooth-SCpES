@@ -1,25 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 /* Apply Poppins to Everything */
 * {
-    font-family: "Poppins", sans-serif !important;
+    font-family: "Inter", sans-serif !important;
 }
 
 /* Ensure Bootstrap Buttons Use Poppins */
 .btn {
-    font-family: "Poppins", sans-serif !important;
+    font-family: "Inter", sans-serif !important;
 }
 
+@keyframes gradient-animation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f0f0f0;
     overflow: hidden;
-    font-family: "Poppins", sans-serif;
-    font-weight: 200;
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
     font-style: normal;
     padding: 20px;
 }
@@ -48,9 +58,9 @@ body {
 }
 
 video, canvas {
-    width: 640px;  /* 4:3 aspect ratio */
-    height: 480px; /* 4:3 aspect ratio */
-    border-radius: 10px;
+    width: 700px;  /* 4:3 aspect ratio */
+    height: 500px; /* 4:3 aspect ratio */
+    border-radius: 15px;
     border: 0.5px solid rgb(171, 171, 171);
     background: white;
     object-fit: cover;
@@ -63,7 +73,7 @@ video, canvas {
     height: 100%;
     background: white;
     opacity: 0;
-    border-radius: 25px;
+    border-radius: 10px;
     transition: opacity 0.1s;
 }
 
@@ -93,21 +103,22 @@ video, canvas {
 
 
 .action-tabs{
-    background-color: #333333bc;
+    background-color: transparent;
     border-radius: 10px;
-    padding: 10px;
+    padding: 0;
     display: flex;
 }
 
 
 /* Camera Dropdown Button */
 #cameraDropdown {
-    background: #343a40; /* Dark gray */
-    color: white;
+    background: transparent; /* Dark gray */
+    color: rgb(32, 32, 32);
     border: none;
     border-radius: 8px;
     padding: 12px 20px;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     margin: 0;
     transition: background 0.3s ease-in-out;
@@ -155,23 +166,40 @@ video, canvas {
 button {
     margin-top: 10px;
     padding: 10px;
-    font-size: 12px;
     cursor: pointer;    
 }
-#startButton, #proceedButton {
+#startButton, #proceedButton, #cancelButton {
     position: relative;
     font-size: 14px;
+    font-weight: 500;
     z-index: 1000; /* Ensure it's above other elements */
 }
 
-.icon-mirror{
-    width: 20px;
-    height: 20px;
-    fill: #d4d4d4;
+.icon{
+    width: 24px;
+    height: 24px;
     transition: all 0.2s ease-in-out;
 }
 
-#mirrorButton{
+.icon-mirror{
+    fill: #383838;
+    transition: all 0.2s ease-in-out;
+}
+.icon-settings{
+    stroke: #383838;
+}
+.icon-timer{
+    stroke: #383838;
+}
+
+.icon-grid{
+    stroke: #fdfdfd;
+}
+
+
+
+/* Spacing for Mirror, Timer, and Settings Buttons */
+#mirrorButton, #timerButton, #settingsButton {
     margin: 0;
     background: transparent;
     border: none;
@@ -179,11 +207,15 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
- 
 }
 
 #mirrorButton:hover .icon-mirror{
-    fill: #ffffff;
+    transform: translate(0, -2px);
+    fill: #171717;
+}
+#settingsButton:hover .icon-settings, #timerButton:hover .icon-timer{
+    stroke: #171717;
+    transform: translate(0, -2px);
 }
 
 .countdown-overlay {
@@ -196,4 +228,137 @@ button {
     display: none;
     opacity: 0;
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+/* Timer Container */
+.timer-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Timer Slider Wrapper (Hidden by Default) */
+.timer-slider-wrapper {
+    position: absolute;
+    top: 55px;
+    left: 50%;
+    transform: translateX(-50%);
+    transform-origin: top;
+    background: #333;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out, opacity 0.3s;
+}
+
+/* Show the slider when active */
+.timer-slider-wrapper.active {
+    transform: translateX(-50%);
+    opacity: 1;
+}
+
+/* Timer Slider */
+#timerSlider {
+    -webkit-appearance: none;
+    width: 120px;
+    height: 6px;
+    background: #ffffff;
+    border-radius: 5px;
+    outline: none;
+    transition: background 0.2s;
+}
+
+/* Slider Knob */
+#timerSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid #333;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Add labels below the slider */
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 120px;
+    color: white;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Prevent interaction */
+    display: none;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+
+.grid-overlay::before,
+.grid-overlay::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.5); /* Semi-transparent white lines */
+    top: 33.33%;
+    left: 0;
+}
+
+.grid-overlay::after {
+    top: 66.66%;
+}
+
+.grid-overlay div {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5); /* Semi-transparent white lines */
+}
+
+.grid-overlay div:nth-child(1) {
+    left: 33.33%;
+}
+
+.grid-overlay div:nth-child(2) {
+    left: 66.66%;
+}
+
+.grid-toggle-btn {
+    z-index: 2000;
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+.grid-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* Active State */
+.grid-toggle-btn.active {
+    background: rgba(17, 149, 96, 0.7); /* Greenish tint when active */
 }

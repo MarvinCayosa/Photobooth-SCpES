@@ -25,7 +25,7 @@ function toggleMirror() {
     });
 
     // Flip the mirror button icon
-    const mirrorIcon = document.querySelector("#mirrorButton .icon-mirror");
+    const mirrorIcon = document.querySelector("#mirrorButton .icon");
     mirrorIcon.style.transform = isMirrored ? "scaleX(-1)" : "scaleX(1)";
 }
 
@@ -35,26 +35,50 @@ navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
     video.srcObject = stream;
 });
 
+let isCapturing = false;
+let cancelCaptureFlag = false; // Flag to track cancellation
+
+// Get slider and map values
+const timerSlider = document.getElementById("timerSlider");
+const timerValues = { 1: 2, 2: 5, 3: 10 };
+let captureDelay = 5; // Default to 5 seconds
+
+// Update the timer value when the slider changes
+timerSlider.addEventListener("input", function () {
+    captureDelay = timerValues[this.value]; // Update global capture delay
+    console.log("Capture delay set to:", captureDelay, "seconds");
+});
+
+// Modify the capture function to use the selected timer
 async function startCapture() {
-    console.log("Start Capture Clicked!"); // Debugging
+    console.log("Start Capture Clicked! Capture Delay:", captureDelay); // Debugging
     captureCount = 0;
+    cancelCaptureFlag = false;
     resetPlaceholders();
     startButton.disabled = true;
     proceedButton.style.display = "none";
-    await countdownAndCapture(5);
+    cancelButton.style.display = "block"; // Show Cancel button
+    isCapturing = true;
+    await countdownAndCapture(captureDelay);
 }
 
+// Use `captureDelay` in the countdown function
 async function countdownAndCapture(seconds) {
-    if (captureCount >= 3) return;
-    startButton.innerText = `Capturing in ${seconds}...`;
+    if (!isCapturing || cancelCaptureFlag || captureCount >= 3) return;
+    startButton.innerText = `Capturing...`;
 
     const countdownOverlay = document.getElementById("countdownOverlay");
-    countdownOverlay.style.display = "block"; // Show countdown
+    countdownOverlay.style.display = "block";
 
     for (let i = seconds; i > 0; i--) {
+        if (cancelCaptureFlag) {
+            countdownOverlay.style.display = "none";
+            return;
+        }
+
         countdownOverlay.innerText = i;
         countdownOverlay.style.opacity = "1";
-        countdownOverlay.style.transform = "translate(-50%, -50%) scale(1.2)"; // Scale up slightly
+        countdownOverlay.style.transform = "translate(-50%, -50%) scale(1.2)";
 
         if (i > 1) {
             beepSound.currentTime = 0;
@@ -64,70 +88,94 @@ async function countdownAndCapture(seconds) {
             countdownHigh.play();
         }
 
-        // Wait for animation
         await new Promise(resolve => setTimeout(resolve, 800));
-
-        // Smooth shrinking animation
         countdownOverlay.style.transform = "translate(-50%, -50%) scale(1)";
         countdownOverlay.style.opacity = "0.5";
 
-        await new Promise(resolve => setTimeout(resolve, 200)); // Small pause
+        await new Promise(resolve => setTimeout(resolve, 200));
     }
 
-    countdownOverlay.style.display = "none"; // Hide countdown
+    countdownOverlay.style.display = "none";
     captureImage();
+}
+
+// Ensure the next capture uses the updated delay
+if (captureCount < 3) {
+    setTimeout(() => countdownAndCapture(captureDelay), 1000);
 }
 
 
 function captureImage() {
+    if (cancelCaptureFlag) return;
+
     flashEffect();
     shutterSound.currentTime = 0;
     shutterSound.play();
 
-    // Set canvas size
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // Flip context if mirroring is enabled
     if (isMirrored) {
         context.translate(canvas.width, 0);
         context.scale(-1, 1);
     }
 
-    // Draw the image on the canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Reset transformation to avoid affecting future drawings
     if (isMirrored) {
         context.setTransform(1, 0, 0, 1, 0, 0);
     }
 
-    // Create an image element
-    // Create an image element
     const img = document.createElement('img');
     img.src = canvas.toDataURL('image/png');
-    img.style.opacity = "0"; // Start invisible
-    img.style.transform = "scale(0.8)"; // Start slightly smaller
+    img.classList.add("captured-thumbnail");
+    img.style.opacity = "0";
+    img.style.transform = "scale(0.8)";
+
+    img.onclick = function() {
+        document.getElementById("modalImage").src = img.src;
+        new bootstrap.Modal(document.getElementById("imagePreviewModal")).show();
+    };
+
     capturedImages.replaceChild(img, capturedImages.children[captureCount]);
 
-    // Animate the image appearance
     setTimeout(() => {
         img.style.transition = "opacity 0.5s ease-in-out, transform 0.3s ease-in-out";
         img.style.opacity = "1";
-        img.style.transform = "scale(1)"; // Scale to normal size
+        img.style.transform = "scale(1)";
     }, 100);
-
 
     captureCount++;
 
     if (captureCount < 3) {
-        setTimeout(() => countdownAndCapture(5), 1000);
+        setTimeout(() => countdownAndCapture(captureDelay), 1000);
     } else {
+        isCapturing = false;
         startButton.innerText = "Retake Photos";
         startButton.disabled = false;
+        cancelButton.style.display = "none";
         proceedButton.style.display = "block";
     }
 }
+
+function cancelCapture() {
+    cancelCaptureFlag = true;
+    isCapturing = false;
+    startButton.innerText = "Start Capture";
+    startButton.disabled = false;
+    cancelButton.style.display = "none";
+    proceedButton.style.display = "none";
+    resetPlaceholders();
+}
+
+function resetPlaceholders() {
+    capturedImages.innerHTML = `
+        <div class="placeholder p-4 text-center">1</div>
+        <div class="placeholder p-4 text-center">2</div>
+        <div class="placeholder p-4 text-center">3</div>
+    `;
+}
+
 
 function flashEffect() {
     flash.style.opacity = "1";
@@ -227,3 +275,118 @@ async function startCamera(deviceId) {
 navigator.mediaDevices.getUserMedia({ video: true })
     .then(getCameras)
     .catch(error => console.error("Error accessing camera:", error));
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const capturedImagesContainer = document.getElementById("capturedImages");
+    let images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+    
+    function renderImages() {
+        capturedImagesContainer.innerHTML = "";
+        images.forEach((src, index) => {
+            let imgWrapper = document.createElement("div");
+            imgWrapper.classList.add("img-wrapper");
+            imgWrapper.setAttribute("draggable", true);
+            imgWrapper.dataset.index = index;
+            
+            let img = document.createElement("img");
+            img.src = src;
+            img.classList.add("captured-img");
+            img.addEventListener("click", () => openModal(src));
+            
+            imgWrapper.appendChild(img);
+            capturedImagesContainer.appendChild(imgWrapper);
+            
+            addDragEvents(imgWrapper);
+        });
+    }
+    
+    function addDragEvents(element) {
+        element.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", e.target.dataset.index);
+            e.target.classList.add("dragging");
+        });
+        
+        element.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.target.classList.add("drag-over");
+        });
+        
+        element.addEventListener("dragleave", (e) => {
+            e.target.classList.remove("drag-over");
+        });
+        
+        element.addEventListener("drop", (e) => {
+            e.preventDefault();
+            let draggedIndex = e.dataTransfer.getData("text/plain");
+            let targetIndex = e.target.closest(".img-wrapper").dataset.index;
+            
+            let temp = images[draggedIndex];
+            images.splice(draggedIndex, 1);
+            images.splice(targetIndex, 0, temp);
+            
+            localStorage.setItem("capturedPhotos", JSON.stringify(images));
+            renderImages();
+        });
+        
+        element.addEventListener("dragend", (e) => {
+            e.target.classList.remove("dragging");
+        });
+    }
+    
+    function openModal(imageSrc) {
+        let modal = document.getElementById("imageModal");
+        let modalImg = document.getElementById("modalImage");
+        modalImg.src = imageSrc;
+        modal.style.display = "block";
+    }
+    
+    document.getElementById("closeModal").addEventListener("click", () => {
+        document.getElementById("imageModal").style.display = "none";
+    });
+    
+    renderImages();
+});
+
+
+
+function toggleTimerSlider() {
+    const sliderWrapper = document.getElementById("timerSliderWrapper");
+    sliderWrapper.classList.toggle("active");
+}
+
+// Map slider values to actual timer seconds
+
+timerSlider.addEventListener("input", function () {
+    const selectedTime = timerValues[this.value];
+    document.getElementById("timerDuration").value = selectedTime;
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const gridOverlay = document.querySelector(".grid-overlay");
+
+    for (let i = 0; i < 2; i++) {
+        const line = document.createElement("div");
+        gridOverlay.appendChild(line);
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const gridOverlay = document.querySelector(".grid-overlay");
+    const gridToggleButton = document.getElementById("gridToggleButton");
+
+    // Ensure grid is OFF at start
+    gridOverlay.style.display = "none";
+    gridToggleButton.classList.remove("active");
+
+    gridToggleButton.addEventListener("click", function () {
+        const isGridVisible = gridOverlay.style.display !== "none";
+        gridOverlay.style.display = isGridVisible ? "none" : "block";
+        gridToggleButton.classList.toggle("active", !isGridVisible);
+    });
+});

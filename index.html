@@ -20,29 +20,64 @@
     <script src="script.js" defer></script>
 </head>
 <body>
+   
+
     <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="row w-100">
             <div class="col-md-8">
-                
-                <div class="action-tabs text-center d-flex justify-content-between">
+
+                <!-- CAMERA OPTIONS -->
+                <div class="action-tabs text-center d-flex justify-content-between align-items-center">
                     <div class="dropdown">
                         <button class="btn btn-custom dropdown-toggle" type="button" id="cameraDropdown" data-bs-toggle="dropdown">
                             Select Camera
                         </button>
                         <ul class="dropdown-menu" id="cameraList"></ul>
                     </div>
-                    
-                    <button id="mirrorButton" class="btn btn-light" onclick="toggleMirror()">
-                        <svg class="icon-mirror" fill="currentColor">
-                            <use xlink:href="icons.svg#icon-mirror"></use>
-                        </svg>
-                    </button>
+                
+                    <div class="d-flex gap-1">
+                        <button id="mirrorButton" class="btn" onclick="toggleMirror()">
+                            <svg class="icon icon-mirror" fill="currentColor">
+                                <use xlink:href="icons.svg#icon-mirror"></use>
+                            </svg>
+                        </button>
+                
+                        <!-- Timer with Slide Bar -->
+                        <div class="timer-container">
+                            <button id="timerButton" class="btn" onclick="toggleTimerSlider()">
+                                <svg class="icon icon-timer" fill="currentColor">
+                                    <use xlink:href="icons.svg#icon-timer"></use>
+                                </svg>
+                            </button>
+                            <div id="timerSliderWrapper" class="timer-slider-wrapper">
+                                <input type="range" id="timerSlider" min="1" max="3" step="1" value="2">
+                                <div class="slider-labels">
+                                    <span>2s</span><span>5s</span><span>10s</span>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <button id="settingsButton" class="btn" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                            <svg class="icon icon-settings" fill="currentColor">
+                                <use xlink:href="icons.svg#icon-settings"></use>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+                
                 
 
                 <!-- Camera Preview -->
                 <div class="preview d-flex justify-content-center position-relative">
-                    <video id="video" autoplay class="w-100 rounded border"></video>
+                  
+                    <video id="video" autoplay class="w-100"></video>
+                    <button id="gridToggleButton" class="grid-toggle-btn">
+                        <svg class="icon icon-grid" fill="currentColor">
+                            <use xlink:href="icons.svg#icon-grid"></use>
+                        </svg>
+                    </button>
+                    
+                    <div class="grid-overlay"></div>
                     <canvas id="canvas" style="display:none;"></canvas>
                     <div class="flash" id="flash"></div>
                     <div id="countdownOverlay" class="countdown-overlay"></div>
@@ -51,8 +86,10 @@
 
                 <div class="text-center mt-3 d-flex justify-content-center gap-2">
                     <button id="startButton" type="button" class="btn btn-primary" onclick="startCapture()">Start Capture</button>
+                    <button id="cancelButton" type="button" class="btn btn-danger" style="display:none;" onclick="cancelCapture()">Cancel</button>
                     <button id="proceedButton" type="button" class="btn btn-success" style="display:none;" onclick="proceedToTemplate()">Proceed</button>
                 </div>
+                
                 
 
             </div>
@@ -73,8 +110,36 @@
     <audio id="beepSound" src="countdown.mp3"></audio>
     <audio id="countdownHigh" src="countdown high.mp3"></audio>
 
+    <!-- Settings Modal -->
+    <div class="modal fade settings-modal " id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-check-label mt-3">
+                        <input type="checkbox" id="gridOverlayToggle" class="form-check-input"> Show Grid Overlay
+                    </label>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
+    <!-- Image Preview Modal -->
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                    <img id="modalImage" src="" class="img-fluid rounded" alt="Captured Image">
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
