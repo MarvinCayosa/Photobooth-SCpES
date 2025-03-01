@@ -390,3 +390,36 @@ document.addEventListener("DOMContentLoaded", function () {
         gridToggleButton.classList.toggle("active", !isGridVisible);
     });
 });
+
+
+
+const themeLink = document.getElementById("theme-link");
+const themeButton = document.getElementById("themeButton");
+const themeIcon = themeButton.querySelector("use"); // Selects the <use> inside <svg>
+
+function toggleTheme() {
+    const currentTheme = themeLink.getAttribute("href");
+
+    if (currentTheme === "style.css") {
+        themeLink.setAttribute("href", "dark-style.css");
+        localStorage.setItem("theme", "dark");
+        themeIcon.setAttribute("xlink:href", "icons.svg#icon-sun"); // Change to sun icon
+    } else {
+        themeLink.setAttribute("href", "style.css");
+        localStorage.setItem("theme", "light");
+        themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon"); // Change to moon icon
+    }
+}
+
+// Apply saved theme and icon on page load
+document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+        themeLink.setAttribute("href", "dark-style.css");
+        themeIcon.setAttribute("xlink:href", "icons.svg#icon-sun"); // Ensure correct icon
+    } else {
+        themeLink.setAttribute("href", "style.css");
+        themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon"); // Ensure correct icon
+    }
+});

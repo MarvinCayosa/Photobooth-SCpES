@@ -28,7 +28,7 @@ body {
     align-items: center;
     min-height: 100vh;
     overflow: hidden;
-    background-color: #F8F8FF;
+    background-color: #191919;
     font-family: "Inter", sans-serif;
     font-weight: 400;
     font-style: normal;
@@ -65,6 +65,7 @@ body {
     opacity: 0.5;
     animation: background-zoom 5s ease-in-out infinite, gradient-animation 15s ease infinite;
     transition: all 0.3s ease-in-out;
+    filter: invert(1) drop-shadow(5px 5px 10px rgba(255, 255, 255, 0.2));
 }
 
 
@@ -103,7 +104,10 @@ body {
     border: none !important;
     filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.2)); /* Soft shadow */
 }
-
+.bottom-left, .upper-right {
+    opacity: 0.5;
+    filter: invert(1);
+}
 /* Ensure content stays above */
 .container {
     position: relative;
@@ -114,7 +118,7 @@ body {
     font-size: 24px;
     font-weight: 800;
     margin-bottom: 10px;
-    color: #383838;
+    color: #FFFAFA;
 }
 
 
@@ -146,8 +150,8 @@ video, canvas {
     width: 700px;  /* 4:3 aspect ratio */
     height: 500px; /* 4:3 aspect ratio */
     border-radius: 15px;
-    border: 0.5px solid rgb(171, 171, 171);
-    background: white;
+    border: 0.5px solid rgba(88, 88, 88, 0.584);
+    background: FFFAFA;
     object-fit: cover;
     max-width: 100%;
 }
@@ -181,7 +185,7 @@ video, canvas {
     align-items: center;
     justify-content: center;
     font-size: 48px;
-    color: white;
+    color: #FFFAFA;
     object-fit: cover;
     flex-shrink: 0; /* Prevent height shrinking */
 }
@@ -202,7 +206,7 @@ video, canvas {
 /* Camera Dropdown Button */
 #cameraDropdown {
     background: transparent; /* Dark gray */
-    color: rgb(32, 32, 32);
+    color: #FFFAFA;
     border: none;
     border-radius: 8px;
     padding: 0;
@@ -233,7 +237,7 @@ video, canvas {
     margin: 0;
     padding: 12px 15px;
     font-size: 12px;
-    color: #343a40;
+    color: #FFFAFA;
     transition: background 0.2s ease-in-out, color 0.2s;
     text-align: left;
 }
@@ -263,7 +267,6 @@ button {
     font-weight: 500;
     z-index: 1000; /* Ensure it's above other elements */
 }
-
 .icon{
     width: 20px;
     height: 20px;
@@ -271,26 +274,26 @@ button {
 }
 
 .icon-mirror{
-    fill: #383838;
+    fill: #efefef;
     transition: all 0.2s ease-in-out;
 }
 
 .icon-moon{
     width: 18px;
     height: 18px;
-    fill: #383838;
+    fill: #efefef;
     transition: all 0.2s ease-in-out;
 }
 
 .icon-settings{
-    stroke: #383838;
+    stroke: #efefef;
 }
 .icon-timer{
-    stroke: #383838;
+    stroke: #efefef;
 }
 
 .icon-camera{
-    stroke: #383838;
+    stroke: #efefef;
 
 }
 .icon-grid{
@@ -327,10 +330,10 @@ button {
 
 #mirrorButton:hover .icon-mirror, #themeButton:hover .icon-moon{
     transform: translate(0, -2px);
-    fill: #171717;
+    fill: #ffffff;
 }
 #settingsButton:hover .icon-settings, #timerButton:hover .icon-timer{
-    stroke: #171717;
+    stroke: #ffffff;
     transform: translate(0, -2px);
 }
 
@@ -478,23 +481,3 @@ button {
 .grid-toggle-btn.active {
     background: rgba(17, 149, 96, 0.7); /* Greenish tint when active */
 }
-
-
-.theme-toggle-btn {
-    z-index: 2000;
-    background: none;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s ease-in-out;
-}
-.theme-toggle-btn.active {
-    fill: #efefef;
-    background: rgba(50, 50, 50, 0.7); /* Greenish tint when active */
-}
-
