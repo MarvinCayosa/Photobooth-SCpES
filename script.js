@@ -52,6 +52,9 @@ timerSlider.addEventListener("input", function () {
 // Modify the capture function to use the selected timer
 async function startCapture() {
     console.log("Start Capture Clicked! Capture Delay:", captureDelay); // Debugging
+    // Change button appearance
+    startButton.classList.add("capturing");
+    startButton.innerText = "Capturing...";
     captureCount = 0;
     cancelCaptureFlag = false;
     resetPlaceholders();
@@ -151,7 +154,12 @@ function captureImage() {
         setTimeout(() => countdownAndCapture(captureDelay), 1000);
     } else {
         isCapturing = false;
-        startButton.innerText = "Retake Photos";
+        startButton.innerHTML = `
+            <svg class="icon icon-reset" fill="currentColor">
+                <use xlink:href="icons.svg#icon-reset"></use>
+            </svg> Retake Photos
+        `;
+        startButton.classList.remove("capturing");
         startButton.disabled = false;
         cancelButton.style.display = "none";
         proceedButton.style.display = "block";
@@ -161,12 +169,21 @@ function captureImage() {
 function cancelCapture() {
     cancelCaptureFlag = true;
     isCapturing = false;
-    startButton.innerText = "Start Capture";
+    
+    startButton.innerHTML = `
+        <svg class="icon icon-start" fill="currentColor">
+            <use xlink:href="icons.svg#icon-start"></use>
+        </svg> Start Capture
+    `;
+    startButton.classList.remove("capturing");
+    startButton.classList.add("btn-start"); // Ensure it keeps original styling
     startButton.disabled = false;
+    
     cancelButton.style.display = "none";
     proceedButton.style.display = "none";
     resetPlaceholders();
 }
+
 
 function resetPlaceholders() {
     capturedImages.innerHTML = `
@@ -394,32 +411,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 const themeLink = document.getElementById("theme-link");
-const themeButton = document.getElementById("themeButton");
-const themeIcon = themeButton.querySelector("use"); // Selects the <use> inside <svg>
+    const themeButton = document.getElementById("themeButton");
+    const themeIcon = themeButton ? themeButton.querySelector("use") : null; // Avoid errors
 
-function toggleTheme() {
-    const currentTheme = themeLink.getAttribute("href");
+    function toggleTheme() {
+        const currentTheme = themeLink.getAttribute("href");
 
-    if (currentTheme === "style.css") {
-        themeLink.setAttribute("href", "dark-style.css");
-        localStorage.setItem("theme", "dark");
-        themeIcon.setAttribute("xlink:href", "icons.svg#icon-sun"); // Change to sun icon
-    } else {
-        themeLink.setAttribute("href", "style.css");
-        localStorage.setItem("theme", "light");
-        themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon"); // Change to moon icon
+        if (currentTheme === "style.css") {
+            themeLink.setAttribute("href", "dark-style.css");
+            localStorage.setItem("theme", "dark");
+            if (themeIcon) themeIcon.setAttribute("xlink:href", "icons.svg#icon-sun");
+        } else {
+            themeLink.setAttribute("href", "style.css");
+            localStorage.setItem("theme", "light");
+            if (themeIcon) themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon");
+        }
     }
-}
 
-// Apply saved theme and icon on page load
-document.addEventListener("DOMContentLoaded", () => {
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme === "dark") {
-        themeLink.setAttribute("href", "dark-style.css");
-        themeIcon.setAttribute("xlink:href", "icons.svg#icon-sun"); // Ensure correct icon
-    } else {
-        themeLink.setAttribute("href", "style.css");
-        themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon"); // Ensure correct icon
-    }
-});
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+            themeLink.setAttribute("href", "dark-style.css");
+            if (themeIcon) themeIcon.setAttribute("xlink:href", "icons.svg#icon-sun");
+        } else {
+            themeLink.setAttribute("href", "style.css");
+            if (themeIcon) themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon");
+        }
+    });

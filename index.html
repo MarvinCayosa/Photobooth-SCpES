@@ -103,9 +103,16 @@
                 
 
                 <div class="text-center mt-3 d-flex justify-content-center gap-2">
-                    <button id="startButton" type="button" class="btn btn-primary" onclick="startCapture()">Start Capture</button>
-                    <button id="cancelButton" type="button" class="btn btn-danger" style="display:none;" onclick="cancelCapture()">Cancel</button>
-                    <button id="proceedButton" type="button" class="btn btn-success" style="display:none;" onclick="proceedToTemplate()">Proceed</button>
+                    <button id="startButton" type="button" class="btn btn-start" onclick="startCapture()">
+                        <svg class="icon icon-start" fill="currentColor">
+                            <use xlink:href="icons.svg#icon-start"></use>
+                        </svg> Start Capture</button>
+                    <button id="cancelButton" type="button" class="btn btn-cancel" style="display:none;" onclick="cancelCapture()">Cancel</button>
+                    <button id="proceedButton" type="button" class="btn btn-proceed" style="display:none;" onclick="proceedToTemplate()">  
+                        <svg class="icon icon-check" fill="currentColor">
+                            <use xlink:href="icons.svg#icon-check"></use>
+                        </svg> Proceed
+                    </button>
                 </div>
                 
                 
