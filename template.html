@@ -244,49 +244,71 @@
         }
 
         function downloadImage() {
-            const originalWidth = 2284;
-            const originalHeight = 6458;
-            const canvas = document.createElement("canvas");
-            canvas.width = originalWidth;
-            canvas.height = originalHeight;
-            const ctx = canvas.getContext("2d");
+    const originalWidth = 2284;
+    const originalHeight = 6458;
+    const canvas = document.createElement("canvas");
+    canvas.width = originalWidth;
+    canvas.height = originalHeight;
+    const ctx = canvas.getContext("2d");
 
-            const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
-            const photoWidth = 2000;
-            const photoHeight = 1500;
-            const photoPositions = [
-                { x: (originalWidth - photoWidth) / 2, y: 495, width: photoWidth, height: photoHeight },
-                { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
-                { x: (originalWidth - photoWidth) / 2, y: 3550, width: photoWidth, height: photoHeight }
-            ];
+    const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+    const photoWidth = 2000;
+    const photoHeight = 1500;
+    const photoPositions = [
+        { x: (originalWidth - photoWidth) / 2, y: 495, width: photoWidth, height: photoHeight },
+        { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
+        { x: (originalWidth - photoWidth) / 2, y: 3550, width: photoWidth, height: photoHeight }
+    ];
 
-            let loadedImages = 0;
-            images.forEach((src, index) => {
-                if (index < 3) {
-                    const img = new Image();
-                    img.src = src;
-                    img.onload = () => {
-                        ctx.drawImage(img, photoPositions[index].x, photoPositions[index].y, photoWidth, photoHeight);
-                        loadedImages++;
-                        if (loadedImages === images.length) {
-                            drawTemplate();
-                        }
-                    };
+    let loadedImages = 0;
+    images.forEach((src, index) => {
+        if (index < 3) {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                const imgRatio = img.width / img.height;
+                const targetRatio = photoWidth / photoHeight;
+
+                let drawWidth, drawHeight, sx, sy;
+                if (imgRatio > targetRatio) {
+                    // Image is wider than target, crop the sides
+                    drawHeight = img.height;
+                    drawWidth = drawHeight * targetRatio;
+                    sx = (img.width - drawWidth) / 2;
+                    sy = 0;
+                } else {
+                    // Image is taller than target, crop the top and bottom
+                    drawWidth = img.width;
+                    drawHeight = drawWidth / targetRatio;
+                    sx = 0;
+                    sy = (img.height - drawHeight) / 2;
                 }
-            });
 
-            function drawTemplate() {
-                const templateImg = new Image();
-                templateImg.src = currentTemplate;
-                templateImg.onload = () => {
-                    ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
-                    let link = document.createElement("a");
-                    link.href = canvas.toDataURL("image/png", 1.0);
-                    link.download = "photobooth.png";
-                    link.click();
-                };
-            }
+                ctx.drawImage(img, sx, sy, drawWidth, drawHeight, 
+                    photoPositions[index].x, photoPositions[index].y, 
+                    photoWidth, photoHeight);
+                
+                loadedImages++;
+                if (loadedImages === images.length) {
+                    drawTemplate();
+                }
+            };
         }
+    });
+
+    function drawTemplate() {
+        const templateImg = new Image();
+        templateImg.src = currentTemplate;
+        templateImg.onload = () => {
+            ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
+            let link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png", 1.0);
+            link.download = "photobooth.png";
+            link.click();
+        };
+    }
+}
+
 
         function goBack() {
             window.location.href = "index.html";

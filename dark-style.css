@@ -86,10 +86,6 @@ body {
   opacity: 0.5;
 }
 
-.bottom-left,
-.upper-right {
-  display: none;
-}
 
 /* Border SVG */
 .bottom-left {
@@ -112,6 +108,10 @@ body {
   flex-shrink: 0;
   border: none !important;
   filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.2)); /* Soft shadow */
+}
+
+.bottom-left, .upper-right{
+  filter: invert();
 }
 
 /* Ensure content stays above */

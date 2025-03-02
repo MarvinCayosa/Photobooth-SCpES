@@ -85,10 +85,7 @@ body {
   opacity: 0.3;
 }
 
-.bottom-left,
-.upper-right {
-  display: none;
-}
+
 
 /* Border SVG */
 .bottom-left {
