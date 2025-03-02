@@ -238,8 +238,8 @@ canvas {
 /* Dropdown Items */
 .dropdown-item {
   margin: 0;
-  padding: 12px 15px;
-  font-size: 12px;
+  padding: 8px 10px;
+  font-size: 14px;
   color: #343a40;
   transition: background 0.2s ease-in-out, color 0.2s;
   text-align: left;
@@ -253,8 +253,9 @@ canvas {
 
 /* Highlight Selected Camera */
 .dropdown-item.active {
-  background: #ffffff28;
-  color: rgb(243, 243, 243);
+  background: none;
+  font-weight: 800;
+  color: #e5e5e5;
 }
 
 /* Buttons */

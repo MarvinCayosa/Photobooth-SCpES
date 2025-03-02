@@ -58,6 +58,8 @@
         #btn-template1 { background: white; }
         #btn-template2 { background: black; }
         #btn-template3 { background: #ff9c8a; }
+        #btn-template4 { background: #ff0000; }
+        #btn-template5 { background: #fbffd4; }
         .active-template { border: 5px solid rgb(131, 224, 255); }
 
         .template-container {
@@ -87,9 +89,9 @@
             background-position: center;
             cursor: grab;
         }
-        .slot1 { top: 69px; }
+        .slot1 { top: 65px; }
         .slot2 { top: 220px; }
-        .slot3 { top: 380px; }
+        .slot3 { top: 375px; }
 
         .template {
             position: absolute;
@@ -170,6 +172,9 @@
                 <button class="template-btn" onclick="changeTemplate('template1.png')" id="btn-template1"></button>
                 <button class="template-btn" onclick="changeTemplate('template2.png')" id="btn-template2"></button>
                 <button class="template-btn" onclick="changeTemplate('template3.png')" id="btn-template3"></button>
+                <button class="template-btn" onclick="changeTemplate('template4.png')" id="btn-template4"></button>
+                <button class="template-btn" onclick="changeTemplate('template5.png')" id="btn-template5"></button>
+
             </div>
             <div class="button-container">
                 <button class="btn btn-download" onclick="downloadImage()">Download</button>
@@ -241,6 +246,8 @@
             if (templateSrc === 'template1.png') document.getElementById('btn-template1').classList.add('active-template');
             if (templateSrc === 'template2.png') document.getElementById('btn-template2').classList.add('active-template');
             if (templateSrc === 'template3.png') document.getElementById('btn-template3').classList.add('active-template');
+            if (templateSrc === 'template4.png') document.getElementById('btn-template4').classList.add('active-template');
+            if (templateSrc === 'template5.png') document.getElementById('btn-template5').classList.add('active-template');
         }
 
         function downloadImage() {
@@ -255,9 +262,9 @@
     const photoWidth = 2000;
     const photoHeight = 1500;
     const photoPositions = [
-        { x: (originalWidth - photoWidth) / 2, y: 495, width: photoWidth, height: photoHeight },
+        { x: (originalWidth - photoWidth) / 2, y: 450, width: photoWidth, height: photoHeight },
         { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
-        { x: (originalWidth - photoWidth) / 2, y: 3550, width: photoWidth, height: photoHeight }
+        { x: (originalWidth - photoWidth) / 2, y: 3545, width: photoWidth, height: photoHeight }
     ];
 
     let loadedImages = 0;
