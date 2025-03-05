@@ -385,60 +385,80 @@
     
         // ✅ Process & Upload Image
         function downloadImage() {
-            const originalWidth = 2284;
-            const originalHeight = 6458;
-            const canvas = document.createElement("canvas");
-            canvas.width = originalWidth;
-            canvas.height = originalHeight;
-            const ctx = canvas.getContext("2d");
-    
-            const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
-            const photoWidth = 2000;
-            const photoHeight = 1500;
-            const photoPositions = [
-                { x: (originalWidth - photoWidth) / 2, y: 450, width: photoWidth, height: photoHeight },
-                { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
-                { x: (originalWidth - photoWidth) / 2, y: 3545, width: photoWidth, height: photoHeight }
-            ];
-    
-            let loadedImages = 0;
-            images.forEach((src, index) => {
-                const img = new Image();
-                img.src = src;
-                img.onload = () => {
-                    ctx.drawImage(img, photoPositions[index].x, photoPositions[index].y, photoWidth, photoHeight);
-                    loadedImages++;
-                    if (loadedImages === images.length) {
-                        drawTemplate();
-                    }
-                };
-            });
-    
-            function drawTemplate() {
-                const templateImg = new Image();
-                templateImg.src = currentTemplate;
-                templateImg.onload = () => {
-                    ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
-    
-                    // ✅ Convert canvas to Blob
-                    canvas.toBlob(async (blob) => {
-                        const file = new File([blob], "photobooth.png", { type: "image/png" });
-    
-                        // ✅ Save locally
-                        let link = document.createElement("a");
-                        link.href = URL.createObjectURL(blob);
-                        link.download = "photobooth.png";
-                        link.click();
-    
-                        // ✅ Upload after saving
-                        setTimeout(async () => {
-                            await uploadToGoogleDrive(file);
-                        }, 1000);
-                    }, "image/png");
-                };
+    const originalWidth = 2284;
+    const originalHeight = 6458;
+    const canvas = document.createElement("canvas");
+    canvas.width = originalWidth;
+    canvas.height = originalHeight;
+    const ctx = canvas.getContext("2d");
+
+    const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+    const photoWidth = 2000;
+    const photoHeight = 1500;
+    const photoPositions = [
+        { x: (originalWidth - photoWidth) / 2, y: 450, width: photoWidth, height: photoHeight },
+        { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
+        { x: (originalWidth - photoWidth) / 2, y: 3545, width: photoWidth, height: photoHeight }
+    ];
+
+    let loadedImages = 0;
+    images.forEach((src, index) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            const imgAspect = img.width / img.height;
+            const targetAspect = photoWidth / photoHeight;
+
+            let sx, sy, sWidth, sHeight;
+
+            if (imgAspect > targetAspect) {
+                // Image is wider than target, crop sides
+                sHeight = img.height;
+                sWidth = sHeight * targetAspect;
+                sx = (img.width - sWidth) / 2;
+                sy = 0;
+            } else {
+                // Image is taller than target, crop top & bottom
+                sWidth = img.width;
+                sHeight = sWidth / targetAspect;
+                sx = 0;
+                sy = (img.height - sHeight) / 2;
             }
-        }
-    
+
+            // Draw cropped image
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, photoPositions[index].x, photoPositions[index].y, photoWidth, photoHeight);
+            loadedImages++;
+            if (loadedImages === images.length) {
+                drawTemplate();
+            }
+        };
+    });
+
+    function drawTemplate() {
+        const templateImg = new Image();
+        templateImg.src = currentTemplate;
+        templateImg.onload = () => {
+            ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
+
+            // Convert canvas to Blob
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "photobooth.png", { type: "image/png" });
+
+                // Save locally
+                let link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "photobooth.png";
+                link.click();
+
+                // Upload after saving
+                setTimeout(async () => {
+                    await uploadToGoogleDrive(file);
+                }, 1000);
+            }, "image/png");
+        };
+    }
+}
+
         // ✅ Upload "photobooth.png" to Google Drive
         async function uploadToGoogleDrive(imageFile) {
             const folderId = "11EwrjP7y9yRxVGcxW_we20zI4Q-5vCSW";
