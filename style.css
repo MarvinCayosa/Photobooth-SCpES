@@ -265,7 +265,7 @@ button {
 #proceedButton,
 #cancelButton {
   position: relative;
-  font-size: 14px;
+  font-size: 19px;
   font-weight: 500;
   z-index: 1000; /* Ensure it's above other elements */
 }
@@ -275,7 +275,7 @@ button {
   cursor: default;
 }
 .btn-start {
-  background: #007bff;
+  background: #e01818;
   color: white;
   border: none;
   border-radius: 20px;
@@ -288,7 +288,7 @@ button {
 
 .btn-start:hover {
   color: white;
-  background: #6bb3ff;
+  background: #ff6b6b;
 }
 .btn-cancel {
   background: #fa4444;
