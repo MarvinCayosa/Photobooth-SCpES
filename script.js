@@ -388,13 +388,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const gridOverlay = document.querySelector(".grid-overlay");
 
     if (!localStorage.getItem("userLoggedIn")) {
-        window.location.href = "login.html"; // Redirect to login page
+        window.location.href = "index.html"; // Redirect to login page
     }
     
     function logout() {
         alert("Logging out...");
         localStorage.clear(); // Clear stored session data
-        window.location.href = "login.html"; // Redirect to login page
+        window.location.href = "index.html"; // Redirect to login page
     }
     
     // Manual Logout Button

@@ -372,7 +372,7 @@
 
             
             if (!localStorage.getItem("userLoggedIn")) {
-                window.location.href = "login.html"; // Redirect to login page
+                window.location.href = "index.html"; // Redirect to login page
             }
 
 
@@ -380,7 +380,7 @@
             function logout() {
                 alert("Logging out...");
                 localStorage.clear(); // Clear stored session data
-                window.location.href = "login.html"; // Redirect to login page
+                window.location.href = "index.html"; // Redirect to login page
             }
 
             // Manual Logout Button
@@ -664,7 +664,7 @@ async function uploadToGoogleDrive(imageFile) {
 
         // ✅ Function to Reset and Go Back to Index Page
         function goBack() {
-        window.location.href = "index.html" ;
+        window.location.href = "main.html" ;
         }
 
     </script>
