@@ -402,6 +402,13 @@ document.addEventListener("DOMContentLoaded", function () {
         logout();
     });
 
+    setTimeout(function () {
+        if (document.readyState !== "complete") {
+            alert("System encountered an issue. Logging out...");
+            logout();
+        }
+    }, 50); // Checks after 5 seconds
+
     for (let i = 0; i < 2; i++) {
         const line = document.createElement("div");
         gridOverlay.appendChild(line);
