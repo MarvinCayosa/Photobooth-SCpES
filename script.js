@@ -407,7 +407,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("System encountered an issue. Logging out...");
             logout();
         }
-    }, 50); // Checks after 5 seconds
+    }, 5000); // Checks after 5 seconds
 
     for (let i = 0; i < 2; i++) {
         const line = document.createElement("div");
