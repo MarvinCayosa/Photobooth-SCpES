@@ -38,6 +38,20 @@
             }
         }
 
+        function logout() {
+                alert("Logging out...");
+                localStorage.clear(); // Clear stored session data
+                window.location.href = "index.html"; // Redirect to login page
+            }
+
+            // Auto Logout if Script Fails
+            setTimeout(function () {
+                if (document.readyState !== "complete") {
+                    alert("System encountered an issue. Logging out...");
+                    logout();
+                }
+            }, 500); // Checks after 5 seconds
+
         window.onload = checkLoginStatus;
     </script>
     
