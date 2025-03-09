@@ -301,21 +301,6 @@ navigator.mediaDevices.getUserMedia({ video: true })
     document.addEventListener("DOMContentLoaded", function () {
     const capturedImagesContainer = document.getElementById("capturedImages");
     let images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
-
-    if (!localStorage.getItem("userLoggedIn")) {
-        window.location.href = "login.html"; // Redirect to login page
-    }
-    
-    function logout() {
-        alert("Logging out...");
-        localStorage.clear(); // Clear stored session data
-        window.location.href = "login.html"; // Redirect to login page
-    }
-    
-    // Manual Logout Button
-    logoutButton.addEventListener("click", function () {
-        logout();
-    });
     
     function renderImages() {
         capturedImagesContainer.innerHTML = "";
@@ -401,6 +386,21 @@ timerSlider.addEventListener("input", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
     const gridOverlay = document.querySelector(".grid-overlay");
+
+    if (!localStorage.getItem("userLoggedIn")) {
+        window.location.href = "login.html"; // Redirect to login page
+    }
+    
+    function logout() {
+        alert("Logging out...");
+        localStorage.clear(); // Clear stored session data
+        window.location.href = "login.html"; // Redirect to login page
+    }
+    
+    // Manual Logout Button
+    logoutButton.addEventListener("click", function () {
+        logout();
+    });
 
     for (let i = 0; i < 2; i++) {
         const line = document.createElement("div");
