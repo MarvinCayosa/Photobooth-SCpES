@@ -28,12 +28,13 @@ function toggleMirror() {
     const mirrorIcon = document.querySelector("#mirrorButton .icon");
     mirrorIcon.style.transform = isMirrored ? "scaleX(-1)" : "scaleX(1)";
 }
-
-
-
 navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
     video.srcObject = stream;
 });
+
+
+
+
 
 let isCapturing = false;
 let cancelCaptureFlag = false; // Flag to track cancellation
@@ -300,6 +301,21 @@ navigator.mediaDevices.getUserMedia({ video: true })
     document.addEventListener("DOMContentLoaded", function () {
     const capturedImagesContainer = document.getElementById("capturedImages");
     let images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+
+    if (!localStorage.getItem("userLoggedIn")) {
+        window.location.href = "login.html"; // Redirect to login page
+    }
+    
+    function logout() {
+        alert("Logging out...");
+        localStorage.clear(); // Clear stored session data
+        window.location.href = "login.html"; // Redirect to login page
+    }
+    
+    // Manual Logout Button
+    logoutButton.addEventListener("click", function () {
+        logout();
+    });
     
     function renderImages() {
         capturedImagesContainer.innerHTML = "";
@@ -390,6 +406,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const line = document.createElement("div");
         gridOverlay.appendChild(line);
     }
+    
 });
 
 

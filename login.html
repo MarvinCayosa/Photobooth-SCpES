@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - Google Accounts</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        let accessToken = localStorage.getItem("googleAccessToken") || "";
+
+        function signInWithGoogle() {
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: "654676077812-h48jkkjumjraq8u76so7544dui1heheb.apps.googleusercontent.com",
+                scope: "https://www.googleapis.com/auth/drive.file",
+                callback: (response) => {
+                    if (response.access_token) {
+                        accessToken = response.access_token;
+                        localStorage.setItem("googleAccessToken", accessToken);
+                        document.getElementById("userInfo").innerText = "✅ Signed in!";
+                        document.getElementById("googleSignIn").classList.add("hidden");
+                        console.log("✅ OAuth Token:", accessToken);
+                        localStorage.setItem("userLoggedIn", "true"); 
+                        window.location.href = "index.html";
+                    } else {
+                        console.error("❌ Login failed!");
+                    }
+                },
+            });
+            client.requestAccessToken();
+        }
+
+        function checkLoginStatus() {
+            if (accessToken) {
+                document.getElementById("googleSignIn").classList.add("hidden");
+                document.getElementById("userInfo").innerText = "You are already logged in";
+                console.log("🔄 Auto-logged in with saved token.");
+                setTimeout(() => window.location.href = "index.html", 1000);
+            }
+        }
+
+        window.onload = checkLoginStatus;
+    </script>
+    
+    <style>
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+/* Apply Poppins to Everything */
+* {
+  font-family: "Inter", sans-serif !important;
+}
+
+/* Ensure Bootstrap Buttons Use Poppins */
+.btn {
+  font-family: "Inter", sans-serif !important;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: #f8f8ff;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  padding: 20px;
+}
+
+/* Background Container */
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: -3; /* Ensures it stays in the background */
+}
+
+@keyframes background-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025); /* Slightly zoom in */
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+  animation: background-zoom 5s ease-in-out infinite,
+    gradient-animation 15s ease infinite;
+  transition: all 0.3s ease-in-out;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .login-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+        .login-container img {
+            width: 75px;
+            margin-bottom: 20px;
+        }
+        .login-container h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #202124;
+        }
+        .login-container p {
+            color: #5f6368;
+            margin-bottom: 20px;
+        }
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            background-color: #fff;
+            color: #5f6368;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .google-btn img {
+            width: 18px;
+            margin-right: 10px;
+        }
+        .google-btn:hover {
+            background-color: #f1f3f4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-container">
+        <img src="bg.png" class="bg" alt="Background Image">
+        <div class="elipse"></div>
+        <svg class="border bottom-left" fill="currentColor">
+            <use xlink:href="icons.svg#wave-1"></use>
+        </svg>
+        <svg class="border upper-right" fill="currentColor">
+            <use xlink:href="icons.svg#wave-2"></use>
+        </svg>
+    </div>
+    
+    <div class="login-container">
+        <img src="logo.png" alt="Google Logo">
+        <h2>Sign in</h2>
+        <p>to use SCpES Photobooth</p>
+        <button class="google-btn" id="googleSignIn" onclick="signInWithGoogle()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/48px-Google_%22G%22_logo.svg.png?20230822192911" alt="Google Icon"> Sign in with Google
+        </button>
+        <p id="userInfo"></p>
+    </div>
+</body>
+</html>

@@ -189,17 +189,18 @@
         display: none;
     }
 
-     #settingsPanel {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        width: 200px;
-        text-align: center;
-    }
+#settingsPanel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 600px;
+    text-align: center;
+}
 
     #settingsButton {
         position: fixed;
@@ -270,7 +271,7 @@
         </div>
     </div>
 
-    <button id="settingsButton">⚙ Settings</button>
+    <button id="settingsButton">Setup</button>
 
 
     <div class="background-container">
@@ -313,9 +314,10 @@
                 <button class="btn btn-again" onclick="goBack()">Again</button>
                 <!-- ✅ Settings Panel (Hidden by Default) -->
                 <div id="settingsPanel" class="hidden">
-                    <h3>Settings</h3>
+                    <h3>Google Account</h3>
                     <p id="userInfo"></p>
                     <button id="googleSignIn">Sign in with Google</button>
+                    <button id="logoutButton">Logout</button>
                     <button id="closeSettings">Close</button>
                 </div>
 
@@ -352,7 +354,56 @@
             } else {
                 themeLink.setAttribute("href", "style.css");
             }
-        });
+
+            const settingsButton = document.getElementById("settingsButton");
+            const settingsPanel = document.getElementById("settingsPanel");
+            const closeSettings = document.getElementById("closeSettings");
+            const logoutButton = document.getElementById("logoutButton");
+
+            // Open Settings Panel
+            settingsButton.addEventListener("click", function () {
+                settingsPanel.classList.remove("hidden");
+            });
+
+            // Close Settings Panel
+            closeSettings.addEventListener("click", function () {
+                settingsPanel.classList.add("hidden");
+            });
+
+            
+            if (!localStorage.getItem("userLoggedIn")) {
+                window.location.href = "login.html"; // Redirect to login page
+            }
+
+
+            // Logout Function
+            function logout() {
+                alert("Logging out...");
+                localStorage.clear(); // Clear stored session data
+                window.location.href = "login.html"; // Redirect to login page
+            }
+
+            // Manual Logout Button
+            logoutButton.addEventListener("click", function () {
+                logout();
+            });
+
+            // Auto Logout if Script Fails
+            setTimeout(function () {
+                if (document.readyState !== "complete") {
+                    alert("System encountered an issue. Logging out...");
+                    logout();
+                }
+            }, 5000); // Checks after 5 seconds
+               
+
+        
+        
+        }
+
+                
+            
+            );
     </script>
     
     
@@ -395,7 +446,7 @@
         function checkLoginStatus() {
             if (accessToken) {
                 document.getElementById("googleSignIn").classList.add("hidden");
-                document.getElementById("userInfo").innerText = "All set!✅";
+                document.getElementById("userInfo").innerText = "You are already logged in";
                 console.log("🔄 Auto-logged in with saved token.");
             }
         }

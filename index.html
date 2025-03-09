@@ -37,6 +37,7 @@
             <h1 class="title text-start ">PhotoBooth UE-SCpES</h1>
             <div class="col-md-8">
 
+
                 <!-- Camera Options -->
                 <div class="action-tabs text-center d-flex justify-content-between align-items-center">
                     <div class="dropdown">
@@ -111,7 +112,7 @@
                     <button id="proceedButton" type="button" class="btn btn-proceed" style="display:none;" onclick="proceedToTemplate()">  
                         <svg class="icon icon-check" fill="currentColor">
                             <use xlink:href="icons.svg#icon-check"></use>
-                        </svg> Proceed
+                        </svg> Next
                     </button>
                 </div>
                 
@@ -148,8 +149,10 @@
                     <label class="form-check-label mt-3">
                         <input type="checkbox" id="gridOverlayToggle" class="form-check-input"> Show Grid Overlay
                     </label>
+                
                     
                 </div>
+                <label">  <button id="logoutButton">Logout</button></label>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary">Save Changes</button>
