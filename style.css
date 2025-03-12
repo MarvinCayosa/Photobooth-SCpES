@@ -265,7 +265,7 @@ button {
 #proceedButton,
 #cancelButton {
   position: relative;
-  font-size: 19px;
+  font-size: 14px;
   font-weight: 500;
   z-index: 1000; /* Ensure it's above other elements */
 }
@@ -335,6 +335,7 @@ button {
   width: 15px;
   height: 15px;
   fill: white;
+  margin-right: 5px;
   transition: all 0.2s ease-in-out;
 }
 
