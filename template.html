@@ -180,7 +180,22 @@
         cursor: pointer;
         width: 100%;
         margin-top: 15px;
+        animation: blink 2s infinite;
     }
+
+    @keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+    }
+
+
 
     .close-btn:hover {
         background: #0056b3;
