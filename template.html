@@ -29,7 +29,6 @@
             width: 80%;
         }
         
-
         .template-selection {
             display: flex;
             height: 100%;
@@ -47,6 +46,8 @@
         .template-buttons {
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
+            max-width: 300px;
         }
 
         .template-btn {
@@ -55,14 +56,23 @@
             border-radius: 50%;
             cursor: pointer;
             border: 3px solid #606460;
+            transition: transform 0.2s ease, border 0.2s ease;
         }
+        
+        .template-btn:hover {
+            transform: scale(1.1);
+        }
+        
         #btn-template1 { background: white; }
         #btn-template2 { background: black; }
         #btn-template3 { background: #c8b6b3; }
         #btn-template4 { background: #ff0000; }
         #btn-template5 { background: #fbffd4; }
-        #btn-template7 { background:rgb(80, 122, 229); }
-        .active-template { border: 5px solid rgb(131, 224, 255); }
+        #btn-template7 { background: rgb(80, 122, 229); }
+        #btn-template8 { background: rgb(121, 204, 243); }
+        #btn-template9 { background: rgb(216, 161, 57); }
+        #btn-template10 { background: rgb(31, 33, 50); }
+        .active-template { border: 5px solid rgba(50, 50, 50, 0.327); }
 
         .template-container {
             position: relative;
@@ -81,6 +91,7 @@
             gap: 10px; /* Add spacing between buttons */
             margin-top: 5px; /* Add some spacing from the template */
         }
+        
         .photo-slot {
             position: absolute;
             width: 210px;
@@ -90,7 +101,20 @@
             background-size: cover;
             background-position: center;
             cursor: grab;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 1; /* Ensure photos are below the template */
         }
+        
+        .photo-slot:hover {
+            transform: translateX(-50%) scale(1.02);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .photo-slot.dragging {
+            opacity: 0.7;
+            z-index: 10;
+        }
+        
         .slot1 { top: 65px; }
         .slot2 { top: 220px; }
         .slot3 { top: 375px; }
@@ -103,11 +127,8 @@
             height: 100%;
             background: url('template1.png') no-repeat center/contain;
             pointer-events: none;
-            z-index: 1;
-          
+            z-index: 2; /* Ensure template is on top of photos */
         }
-
-     
 
         .btn-download{
             padding: 10px 20px;
@@ -142,153 +163,187 @@
         }
 
         .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-    }
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
 
-    .modal-content {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        max-width: 350px;
-        width: 90%;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
 
-    #qrCodeContainer {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 20px 0;
-    }
+        #qrCodeContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
 
-    .close-btn {
-        background: #e11f1f;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 100%;
-        margin-top: 15px;
-        animation: blink 2s infinite;
-    }
+        .close-btn {
+            background: #e11f1f;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
 
-    @keyframes blink {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-    }
+        .close-btn:hover {
+            background: #c71d1d;
+        }
 
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
 
+        .close-btn:hover {
+            background: #0056b3;
+        }
 
-    .close-btn:hover {
-        background: #0056b3;
-    }
+        .hidden {
+            display: none;
+        }
 
-    .hidden {
-        display: none;
-    }
+        #settingsPanel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 600px;
+            text-align: center;
+        }
 
-#settingsPanel {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    width: 600px;
-    text-align: center;
-}
+        #settingsButton {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    #settingsButton {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #545656;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+        #settingsButton:hover {
+            scale: 1.1;
+        }
 
-    #closeSettings {
-        margin-top: 10px;
-        background: red;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+        #closeSettings {
+            margin-top: 10px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    #progressDialog {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
-    width: 300px;
-    text-align: center;
-    z-index: 1000;
-}
+        #progressDialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+            width: 300px;
+            text-align: center;
+            z-index: 1000;
+        }
 
-#progressDialog p {
-    margin-bottom: 10px;
-}
+        #progressDialog p {
+            margin-bottom: 10px;
+        }
 
-#progressBarContainer {
-    width: 100%;
-    background: #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-}
+        #progressBarContainer {
+            width: 100%;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-#progressBar {
-    width: 0%;
-    height: 10px;
-    background: linear-gradient(to right, #ff512f, #dd2476);
-    border-radius: 5px;
-    transition: width 0.3s ease-in-out;
-}
-
-    
+        #progressBar {
+            width: 0%;
+            height: 10px;
+            background: linear-gradient(to right, #ff512f, #dd2476);
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+        
+        /* Drag and drop indicator */
+        .drag-over {
+            border: 2px dashed #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        /* Photo slot highlight when dragging */
+        .photo-slot.drag-highlight {
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        /* Image container for preview modal */
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+            margin: 0 auto;
+            border-radius: 8px;
+            cursor: grab;
+        }
+        
+        #modalImage {
+            transition: transform 0.2s ease;
+            max-width: 100%;
+            max-height: 60vh;
+        }
     </style>
 </head>
 <body>
-    <!-- ✅ QR Code Modal -->
+    <!-- QR Code Modal -->
     <div id="qrModal" class="modal">
         <div class="modal-content">
             <h2>Scan to Download</h2>
             <div id="qrCodeContainer"></div>
-            <button class="close-btn" onclick="closeQRModal()">ONE MORE</button>
+            <button class="close-btn" onclick="closeQRModal()">Close</button>
         </div>
     </div>
 
-    <button id="settingsButton">Setup</button>
-
+    <button id="settingsButton">     
+        <svg class="icon icon-settings-google" fill="currentColor">
+        <use xlink:href="icons.svg#icon-settings"></use>
+    </svg></button>
 
     <div class="background-container">
         <img src="bg.png" class="bg" alt="Background Image">
@@ -304,32 +359,38 @@
     <div class="container">
         <div>
             <div class="template-container" id="photo-booth">
-                <div class="photo-slot slot1" id="photo1" draggable="true"></div>
-                <div class="photo-slot slot2" id="photo2" draggable="true"></div>
-                <div class="photo-slot slot3" id="photo3" draggable="true"></div>
+                <!-- Photos are placed below the template -->
+                <div class="photo-slot slot1" id="photo1" draggable="true" data-index="0"></div>
+                <div class="photo-slot slot2" id="photo2" draggable="true" data-index="1"></div>
+                <div class="photo-slot slot3" id="photo3" draggable="true" data-index="2"></div>
+                <!-- Template is on top of photos -->
                 <div class="template" id="template-image"></div>
             </div>
-    
-       
         </div>
     
         <!-- Template Selection Buttons -->
         <div class="template-selection">
             <h1 class="temp-title">Make it Yours!</h1>
             <div class="template-buttons">
-                <button class="template-btn" onclick="changeTemplate('template7.png')" id="btn-template7"></button>
-                <!-- <button class="template-btn" onclick="changeTemplate('template4.png')" id="btn-template4"></button>
-                <button class="template-btn" onclick="changeTemplate('template2.png')" id="btn-template2"></button>
-                <button class="template-btn" onclick="changeTemplate('template3.png')" id="btn-template3"></button>
-                <button class="template-btn" onclick="changeTemplate('template4.png')" id="btn-template4"></button>
-                <button class="template-btn" onclick="changeTemplate('template5.png')" id="btn-template5"></button> -->
-
+                <button class="template-btn active-template" onclick="changeTemplate('template1.png')" id="btn-template1" data-template="template1.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template2.png')" id="btn-template2" data-template="template2.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template3.png')" id="btn-template3" data-template="template3.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template4.png')" id="btn-template4" data-template="template4.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template5.png')" id="btn-template5" data-template="template5.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template7.png')" id="btn-template7" data-template="template7.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template8.png')" id="btn-template8" data-template="template8.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template9.png')" id="btn-template9" data-template="template9.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template10.png')" id="btn-template10" data-template="template10.png"></button>
             </div>
+            
+            <p class="mt-3 mb-1">Drag photos to rearrange them!</p>
+            
             <div class="button-container">
                 <button class="btn btn-download" onclick="downloadImage()">Finish</button>
                 <div id="qrCodeContainer" class="mt-3"></div>
                 <button class="btn btn-again" onclick="goBack()">Again</button>
-                <!-- ✅ Settings Panel (Hidden by Default) -->
+                
+                <!-- Settings Panel (Hidden by Default) -->
                 <div id="settingsPanel" class="hidden">
                     <h3>Google Account</h3>
                     <p id="userInfo"></p>
@@ -342,19 +403,9 @@
                 <div id="progressDialog">
                     <div class="progress-box">
                         <p>Preparing your Photo QR</p>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" id="progressBar"></div>
+                        <div id="progressBarContainer">
+                            <div id="progressBar"></div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- ✅ QR Code Modal -->
-                <div id="qrModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-btn" onclick="closeQRModal()">&times;</span>
-                        <h2>Scan to Access Image</h2>
-                        <div id="qrCodeContainer"></div>
-                        
                     </div>
                 </div>
             </div>
@@ -386,12 +437,10 @@
             closeSettings.addEventListener("click", function () {
                 settingsPanel.classList.add("hidden");
             });
-
             
             if (!localStorage.getItem("userLoggedIn")) {
                 window.location.href = "index.html"; // Redirect to login page
             }
-
 
             // Logout Function
             function logout() {
@@ -412,17 +461,77 @@
                     logout();
                 }
             }, 5000); // Checks after 5 seconds
-               
-
-        
-        
-        }
-
-                
             
-            );
+            // Set up drag and drop for photo slots
+            setupDragAndDrop();
+        });
+        
+        // Set up drag and drop functionality
+        function setupDragAndDrop() {
+            const photoSlots = document.querySelectorAll('.photo-slot');
+            
+            photoSlots.forEach(slot => {
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
+            });
+        }
+        
+        let draggedSlot = null;
+        
+        function handleDragStart(e) {
+            draggedSlot = this;
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', this.dataset.index);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            this.classList.add('drag-highlight');
+            return false;
+        }
+        
+        function handleDragLeave(e) {
+            this.classList.remove('drag-highlight');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-highlight');
+            
+            if (draggedSlot !== this) {
+                // Get the source and target indices
+                const sourceIndex = parseInt(draggedSlot.dataset.index);
+                const targetIndex = parseInt(this.dataset.index);
+                
+                // Swap background images
+                const tempBg = this.style.backgroundImage;
+                this.style.backgroundImage = draggedSlot.style.backgroundImage;
+                draggedSlot.style.backgroundImage = tempBg;
+                
+                // Update the photos array in localStorage
+                const photos = JSON.parse(localStorage.getItem('capturedPhotos')) || [];
+                if (photos.length >= 2) {
+                    const temp = photos[sourceIndex];
+                    photos[sourceIndex] = photos[targetIndex];
+                    photos[targetIndex] = temp;
+                    localStorage.setItem('capturedPhotos', JSON.stringify(photos));
+                }
+            }
+            
+            return false;
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.photo-slot').forEach(slot => {
+                slot.classList.remove('drag-highlight');
+            });
+        }
     </script>
-    
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -430,7 +539,7 @@
         let accessToken = localStorage.getItem("googleAccessToken") || "";
         let currentTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
     
-        // ✅ Show/Hide Settings Panel
+        // Show/Hide Settings Panel
         document.getElementById("settingsButton").addEventListener("click", function () {
             document.getElementById("settingsPanel").classList.toggle("hidden");
         });
@@ -439,7 +548,7 @@
             document.getElementById("settingsPanel").classList.add("hidden");
         });
     
-        // ✅ Google OAuth Login
+        // Google OAuth Login
         function signInWithGoogle() {
             const client = google.accounts.oauth2.initTokenClient({
                 client_id: "654676077812-h48jkkjumjraq8u76so7544dui1heheb.apps.googleusercontent.com",
@@ -459,7 +568,7 @@
             client.requestAccessToken();
         }
     
-        // ✅ Hide sign-in button if already logged in
+        // Hide sign-in button if already logged in
         function checkLoginStatus() {
             if (accessToken) {
                 document.getElementById("googleSignIn").classList.add("hidden");
@@ -468,17 +577,19 @@
             }
         }
     
-        // ✅ Load Photos (Fix: Ensure they appear correctly)
+        // Load Photos
         function loadPhotos() {
             const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
-            if (images.length === 3) {
-                document.getElementById("photo1").style.backgroundImage = `url('${images[0]}')`;
-                document.getElementById("photo2").style.backgroundImage = `url('${images[1]}')`;
-                document.getElementById("photo3").style.backgroundImage = `url('${images[2]}')`;
+            if (images.length > 0) {
+                for (let i = 0; i < Math.min(images.length, 3); i++) {
+                    if (images[i]) {
+                        document.getElementById(`photo${i+1}`).style.backgroundImage = `url('${images[i]}')`;
+                    }
+                }
             }
         }
     
-        // ✅ Change Template
+        // Change Template
         function changeTemplate(templateSrc) {
             console.log("Template changed to:", templateSrc);
             currentTemplate = templateSrc;
@@ -486,190 +597,190 @@
     
             document.getElementById("template-image").style.backgroundImage = `url('${templateSrc}')`;
     
-            // ✅ Highlight selected template button
+            // Highlight selected template button
             document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
-            document.querySelector(`.template-btn[data-template='${templateSrc}']`)?.classList.add("active-template");
+            document.querySelector(`[data-template="${templateSrc}"]`).classList.add("active-template");
         }
     
-        // ✅ Load saved template on page refresh
+        // Load saved template on page refresh
         function loadSelectedTemplate() {
             let savedTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
             document.getElementById("template-image").style.backgroundImage = `url('${savedTemplate}')`;
+            
+            // Highlight the correct template button
+            document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
+            document.querySelector(`[data-template="${savedTemplate}"]`).classList.add("active-template");
         }
     
-        // ✅ Process & Upload Image
+        // Process & Upload Image with optimization
         function downloadImage() {
-    const originalWidth = 2284;
-    const originalHeight = 6458;
-    const canvas = document.createElement("canvas");
-    canvas.width = originalWidth;
-    canvas.height = originalHeight;
-    const ctx = canvas.getContext("2d");
+            const originalWidth = 2284;
+            const originalHeight = 6458;
+            const canvas = document.createElement("canvas");
+            canvas.width = originalWidth;
+            canvas.height = originalHeight;
+            const ctx = canvas.getContext("2d");
 
-    const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
-    const photoWidth = 2000;
-    const photoHeight = 1500;
-    const photoPositions = [
-        { x: (originalWidth - photoWidth) / 2, y: 450, width: photoWidth, height: photoHeight },
-        { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
-        { x: (originalWidth - photoWidth) / 2, y: 3545, width: photoWidth, height: photoHeight }
-    ];
+            const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+            const photoWidth = 2000;
+            const photoHeight = 1500;
+            const photoPositions = [
+                { x: (originalWidth - photoWidth) / 2, y: 450, width: photoWidth, height: photoHeight },
+                { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
+                { x: (originalWidth - photoWidth) / 2, y: 3545, width: photoWidth, height: photoHeight }
+            ];
 
-    let loadedImages = 0;
-    images.forEach((src, index) => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => {
-            const imgAspect = img.width / img.height;
-            const targetAspect = photoWidth / photoHeight;
+            let loadedImages = 0;
+            
+            // First draw the photos
+            images.forEach((src, index) => {
+                if (!src) return; // Skip null entries
+                
+                const img = new Image();
+                img.src = src;
+                img.onload = () => {
+                    const imgAspect = img.width / img.height;
+                    const targetAspect = photoWidth / photoHeight;
 
-            let sx, sy, sWidth, sHeight;
+                    let sx, sy, sWidth, sHeight;
 
-            if (imgAspect > targetAspect) {
-                // Image is wider than target, crop sides
-                sHeight = img.height;
-                sWidth = sHeight * targetAspect;
-                sx = (img.width - sWidth) / 2;
-                sy = 0;
-            } else {
-                // Image is taller than target, crop top & bottom
-                sWidth = img.width;
-                sHeight = sWidth / targetAspect;
-                sx = 0;
-                sy = (img.height - sHeight) / 2;
+                    if (imgAspect > targetAspect) {
+                        // Image is wider than target, crop sides
+                        sHeight = img.height;
+                        sWidth = sHeight * targetAspect;
+                        sx = (img.width - sWidth) / 2;
+                        sy = 0;
+                    } else {
+                        // Image is taller than target, crop top & bottom
+                        sWidth = img.width;
+                        sHeight = sWidth / targetAspect;
+                        sx = 0;
+                        sy = (img.height - sHeight) / 2;
+                    }
+
+                    // Draw cropped image
+                    ctx.drawImage(img, sx, sy, sWidth, sHeight, photoPositions[index].x, photoPositions[index].y, photoWidth, photoHeight);
+                    loadedImages++;
+                    
+                    // After all images are loaded, draw the template on top
+                    if (loadedImages === images.filter(img => img !== null).length) {
+                        drawTemplate();
+                    }
+                };
+            });
+
+            function drawTemplate() {
+                const templateImg = new Image();
+                templateImg.src = currentTemplate;
+                templateImg.onload = () => {
+                    // Draw template on top of the photos
+                    ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
+
+                    // Convert canvas to Blob with quality optimization (0.8 = 80% quality)
+                    canvas.toBlob(async (blob) => {
+                        // Create optimized file (reduced by ~20%)
+                        const file = new File([blob], "photobooth.png", { type: "image/png" });
+
+                        // Save locally
+                        let link = document.createElement("a");
+                        link.href = URL.createObjectURL(blob);
+                        link.download = "photobooth.png";
+                        link.click();
+
+                        // Upload after saving
+                        setTimeout(async () => {
+                            await uploadToGoogleDrive(file);
+                        }, 1000);
+                    }, "image/jpeg", 0.8); // Use JPEG with 80% quality for smaller file size
+                };
             }
-
-            // Draw cropped image
-            ctx.drawImage(img, sx, sy, sWidth, sHeight, photoPositions[index].x, photoPositions[index].y, photoWidth, photoHeight);
-            loadedImages++;
-            if (loadedImages === images.length) {
-                drawTemplate();
-            }
-        };
-    });
-
-    function drawTemplate() {
-        const templateImg = new Image();
-        templateImg.src = currentTemplate;
-        templateImg.onload = () => {
-            ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
-
-            // Convert canvas to Blob
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], "photobooth.png", { type: "image/png" });
-
-                // Save locally
-                let link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = "photobooth.png";
-                link.click();
-
-                // Upload after saving
-                setTimeout(async () => {
-                    await uploadToGoogleDrive(file);
-                }, 1000);
-            }, "image/png");
-        };
-    }
-}
-
-function showProgressDialog() {
-        const dialog = document.getElementById("progressDialog");
-        if (dialog) {
-            dialog.style.display = "flex";
-        } else {
-            console.error("progressDialog not found!");
         }
-    }
 
-    function hideProgressDialog() {
-        const dialog = document.getElementById("progressDialog");
-        if (dialog) {
-            dialog.style.display = "none";
+        function showProgressDialog() {
+            const progressDialog = document.getElementById("progressDialog");
+            const progressBar = document.getElementById("progressBar");
+            
+            if (progressDialog && progressBar) {
+                progressDialog.style.display = "block";
+                progressBar.style.width = "0%"; // Reset progress
+            }
         }
-    }
 
-    function showProgressDialog() {
-    const progressDialog = document.getElementById("progressDialog");
-    const progressBar = document.getElementById("progressBar");
-    
-    if (progressDialog && progressBar) {
-        progressDialog.style.display = "block";
-        progressBar.style.width = "0%"; // Reset progress
-    }
-}
-
-async function uploadToGoogleDrive(imageFile) {
-    const folderId = "1AlJMgXUysE6bIG9imjwoWpDIdV91kBQB";
-    showProgressDialog();
-
-    const metadata = {
-        name: "photobooth.png",
-        mimeType: "image/png",
-        parents: [folderId]
-    };
-
-    const formData = new FormData();
-    formData.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
-    formData.append("file", imageFile);
-
-    try {
-        console.log("📤 Uploading photobooth.png to Google Drive...");
-        
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", true);
-        xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
-        xhr.setRequestHeader("Accept", "application/json");
-
-        // **Track upload progress**
-        xhr.upload.onprogress = function (event) {
-            if (event.lengthComputable) {
-                let percentComplete = (event.loaded / event.total) * 100;
-                document.getElementById("progressBar").style.width = percentComplete + "%";
+        function hideProgressDialog() {
+            const dialog = document.getElementById("progressDialog");
+            if (dialog) {
+                dialog.style.display = "none";
             }
-        };
+        }
 
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                const result = JSON.parse(xhr.responseText);
-                console.log("✅ Upload successful:", result);
+        async function uploadToGoogleDrive(imageFile) {
+            const folderId = "1AlJMgXUysE6bIG9imjwoWpDIdV91kBQB";
+            showProgressDialog();
+
+            const metadata = {
+                name: "photobooth.png",
+                mimeType: "image/png",
+                parents: [folderId]
+            };
+
+            const formData = new FormData();
+            formData.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
+            formData.append("file", imageFile);
+
+            try {
+                console.log("📤 Uploading photobooth.png to Google Drive...");
+                
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", true);
+                xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
+                xhr.setRequestHeader("Accept", "application/json");
+
+                // Track upload progress
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        let percentComplete = (event.loaded / event.total) * 100;
+                        document.getElementById("progressBar").style.width = percentComplete + "%";
+                    }
+                };
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const result = JSON.parse(xhr.responseText);
+                        console.log("✅ Upload successful:", result);
+                        hideProgressDialog();
+                        showQRModal(`https://drive.google.com/uc?id=${result.id}`);
+                    } else {
+                        console.error("❌ Upload failed:", xhr.responseText);
+                        hideProgressDialog();
+                        alert("Upload failed. Please try again.");
+                    }
+                };
+
+                xhr.onerror = function () {
+                    console.error("⚠ Error uploading to Google Drive.");
+                    hideProgressDialog();
+                    alert("An error occurred while uploading. Please try again.");
+                };
+
+                xhr.send(formData);
+            } catch (error) {
+                console.error("⚠ Error:", error);
                 hideProgressDialog();
-                showQRModal(`https://drive.google.com/uc?id=${result.id}`);
-            } else {
-                console.error("❌ Upload failed:", xhr.responseText);
-                hideProgressDialog();
-                alert("Upload failed. Please try again.");
+                alert("An error occurred while uploading. Please try again.");
             }
-        };
+        }
 
-        xhr.onerror = function () {
-            console.error("⚠ Error uploading to Google Drive.");
-            hideProgressDialog();
-            alert("An error occurred while uploading. Please try again.");
-        };
+        function showQRModal(url) {
+            document.getElementById("qrCodeContainer").innerHTML = "";
+            new QRCode(document.getElementById("qrCodeContainer"), { text: url, width: 250, height: 250 });
+            document.getElementById("qrModal").style.display = "flex";
+        }
 
-        xhr.send(formData);
-    } catch (error) {
-        console.error("⚠ Error:", error);
-        hideProgressDialog();
-        alert("An error occurred while uploading. Please try again.");
-    }
-}
+        function closeQRModal() {
+            document.getElementById("qrModal").style.display = "none";
+            goBack();   
+        }
 
-
-    function showQRModal(url) {
-        document.getElementById("qrCodeContainer").innerHTML = "";
-        new QRCode(document.getElementById("qrCodeContainer"), { text: url, width: 250, height: 250 });
-        document.getElementById("qrModal").style.display = "flex";
-    }
-
-    function closeQRModal() {
-        document.getElementById("qrModal").style.display = "none";
-        goBack();   
-
-    }
-
-    
         window.onload = function () {
             checkLoginStatus();
             loadPhotos();
@@ -679,13 +790,10 @@ async function uploadToGoogleDrive(imageFile) {
     
         document.getElementById("googleSignIn").addEventListener("click", signInWithGoogle);
 
-        // ✅ Function to Reset and Go Back to Index Page
+        // Function to Reset and Go Back to Index Page
         function goBack() {
-        window.location.href = "main.html" ;
+            window.location.href = "main.html";
         }
-
     </script>
-    
-    
 </body>
 </html>
