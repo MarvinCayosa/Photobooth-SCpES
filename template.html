@@ -17,7 +17,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link id="theme-link" rel="stylesheet" href="style.css">
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="script.js" defer></script>
     <title>Photo Booth Template</title>
     <style>
         .container {
@@ -103,6 +102,8 @@
             cursor: grab;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             z-index: 1; /* Ensure photos are below the template */
+            touch-action: none; /* Prevent browser handling of touch events */
+            user-select: none; /* Prevent text selection during drag */
         }
         
         .photo-slot:hover {
@@ -113,6 +114,8 @@
         .photo-slot.dragging {
             opacity: 0.7;
             z-index: 10;
+            cursor: grabbing;
+            transition: none; /* Remove transition during drag for better responsiveness */
         }
         
         .slot1 { top: 65px; }
@@ -328,6 +331,18 @@
             max-width: 100%;
             max-height: 60vh;
         }
+        
+        /* Photo positioning within slots */
+        .photo-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -360,9 +375,9 @@
         <div>
             <div class="template-container" id="photo-booth">
                 <!-- Photos are placed below the template -->
-                <div class="photo-slot slot1" id="photo1" draggable="true" data-index="0"></div>
-                <div class="photo-slot slot2" id="photo2" draggable="true" data-index="1"></div>
-                <div class="photo-slot slot3" id="photo3" draggable="true" data-index="2"></div>
+                <div class="photo-slot slot1" id="photo1" data-index="0"></div>
+                <div class="photo-slot slot2" id="photo2" data-index="1"></div>
+                <div class="photo-slot slot3" id="photo3" data-index="2"></div>
                 <!-- Template is on top of photos -->
                 <div class="template" id="template-image"></div>
             </div>
@@ -372,12 +387,12 @@
         <div class="template-selection">
             <h1 class="temp-title">Make it Yours!</h1>
             <div class="template-buttons">
-                <button class="template-btn active-template" onclick="changeTemplate('template1.png')" id="btn-template1" data-template="template1.png"></button>
+                  <!--<button class="template-btn active-template" onclick="changeTemplate('template1.png')" id="btn-template1" data-template="template1.png"></button>
                 <button class="template-btn" onclick="changeTemplate('template2.png')" id="btn-template2" data-template="template2.png"></button>
                 <button class="template-btn" onclick="changeTemplate('template3.png')" id="btn-template3" data-template="template3.png"></button>
                 <button class="template-btn" onclick="changeTemplate('template4.png')" id="btn-template4" data-template="template4.png"></button>
                 <button class="template-btn" onclick="changeTemplate('template5.png')" id="btn-template5" data-template="template5.png"></button>
-                <button class="template-btn" onclick="changeTemplate('template7.png')" id="btn-template7" data-template="template7.png"></button>
+                <button class="template-btn" onclick="changeTemplate('template7.png')" id="btn-template7" data-template="template7.png"></button> -->
                 <button class="template-btn" onclick="changeTemplate('template8.png')" id="btn-template8" data-template="template8.png"></button>
                 <button class="template-btn" onclick="changeTemplate('template9.png')" id="btn-template9" data-template="template9.png"></button>
                 <button class="template-btn" onclick="changeTemplate('template10.png')" id="btn-template10" data-template="template10.png"></button>
@@ -462,128 +477,148 @@
                 }
             }, 5000); // Checks after 5 seconds
             
-            // Set up drag and drop for photo slots
+            // Set up drag and drop functionality
             setupDragAndDrop();
         });
         
-        // Set up drag and drop functionality
-        function setupDragAndDrop() {
+        // Variables for photo positioning
+        let activePhotoSlot = null;
+        let isDragging = false;
+        let startX, startY;
+        let offsetX = 0, offsetY = 0;
+        let photoPositions = {};
+        
+        // Set up improved photo interaction
+        function setupPhotoInteraction() {
             const photoSlots = document.querySelectorAll('.photo-slot');
             
             photoSlots.forEach(slot => {
-                slot.addEventListener('dragstart', handleDragStart);
-                slot.addEventListener('dragover', handleDragOver);
-                slot.addEventListener('dragleave', handleDragLeave);
-                slot.addEventListener('drop', handleDrop);
-                slot.addEventListener('dragend', handleDragEnd);
-            });
-        }
-        
-        let draggedSlot = null;
-        
-        function handleDragStart(e) {
-            draggedSlot = this;
-            this.classList.add('dragging');
-            e.dataTransfer.setData('text/plain', this.dataset.index);
-            e.dataTransfer.effectAllowed = 'move';
-        }
-        
-        function handleDragOver(e) {
-            e.preventDefault();
-            this.classList.add('drag-highlight');
-            return false;
-        }
-        
-        function handleDragLeave(e) {
-            this.classList.remove('drag-highlight');
-        }
-        
-        function handleDrop(e) {
-            e.preventDefault();
-            this.classList.remove('drag-highlight');
-            
-            if (draggedSlot !== this) {
-                // Get the source and target indices
-                const sourceIndex = parseInt(draggedSlot.dataset.index);
-                const targetIndex = parseInt(this.dataset.index);
+                // Initialize photo positions tracking
+                photoPositions[slot.id] = { x: 0, y: 0 };
                 
-                // Swap background images
-                const tempBg = this.style.backgroundImage;
-                this.style.backgroundImage = draggedSlot.style.backgroundImage;
-                draggedSlot.style.backgroundImage = tempBg;
+                // Add event listeners for both mouse and touch
+                slot.addEventListener('mousedown', startDrag);
+                slot.addEventListener('touchstart', startDrag, { passive: false });
                 
-                // Update the photos array in localStorage
-                const photos = JSON.parse(localStorage.getItem('capturedPhotos')) || [];
-                if (photos.length >= 2) {
-                    const temp = photos[sourceIndex];
-                    photos[sourceIndex] = photos[targetIndex];
-                    photos[targetIndex] = temp;
-                    localStorage.setItem('capturedPhotos', JSON.stringify(photos));
-                }
-            }
-            
-            return false;
-        }
-        
-        function handleDragEnd(e) {
-            this.classList.remove('dragging');
-            document.querySelectorAll('.photo-slot').forEach(slot => {
-                slot.classList.remove('drag-highlight');
-            });
-        }
-    </script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script>
-        let accessToken = localStorage.getItem("googleAccessToken") || "";
-        let currentTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
-    
-        // Show/Hide Settings Panel
-        document.getElementById("settingsButton").addEventListener("click", function () {
-            document.getElementById("settingsPanel").classList.toggle("hidden");
-        });
-    
-        document.getElementById("closeSettings").addEventListener("click", function () {
-            document.getElementById("settingsPanel").classList.add("hidden");
-        });
-    
-        // Google OAuth Login
-        function signInWithGoogle() {
-            const client = google.accounts.oauth2.initTokenClient({
-                client_id: "654676077812-h48jkkjumjraq8u76so7544dui1heheb.apps.googleusercontent.com",
-                scope: "https://www.googleapis.com/auth/drive.file",
-                callback: (response) => {
-                    if (response.access_token) {
-                        accessToken = response.access_token;
-                        localStorage.setItem("googleAccessToken", accessToken);
-                        document.getElementById("userInfo").innerText = "✅ Signed in!";
-                        document.getElementById("googleSignIn").classList.add("hidden");
-                        console.log("✅ OAuth Token:", accessToken);
-                    } else {
-                        console.error("❌ Login failed!");
+                // Add click event for photo selection
+                slot.addEventListener('click', function(e) {
+                    if (!isDragging) {
+                        // If not dragging, handle as a click to select photo
+                        swapPhotos(this);
                     }
-                },
+                });
             });
-            client.requestAccessToken();
+            
+            // Global event listeners
+            document.addEventListener('mousemove', moveDrag);
+            document.addEventListener('touchmove', moveDrag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
         }
-    
-        // Hide sign-in button if already logged in
-        function checkLoginStatus() {
-            if (accessToken) {
-                document.getElementById("googleSignIn").classList.add("hidden");
-                document.getElementById("userInfo").innerText = "You are already logged in";
-                console.log("🔄 Auto-logged in with saved token.");
+        
+        function startDrag(e) {
+            // Prevent default behavior
+            e.preventDefault();
+            
+            // Only proceed if the target is a photo slot
+            if (!e.target.classList.contains('photo-slot')) return;
+            
+            isDragging = true;
+            activePhotoSlot = e.target;
+            activePhotoSlot.classList.add('dragging');
+            
+            // Get current position
+            const currentPosition = photoPositions[activePhotoSlot.id] || { x: 0, y: 0 };
+            
+            // Get start position for both mouse and touch events
+            if (e.type === 'touchstart') {
+                startX = e.touches[0].clientX - currentPosition.x;
+                startY = e.touches[0].clientY - currentPosition.y;
+            } else {
+                startX = e.clientX - currentPosition.x;
+                startY = e.clientY - currentPosition.y;
             }
         }
-    
-        // Load Photos
+        
+        function moveDrag(e) {
+            if (!isDragging || !activePhotoSlot) return;
+            
+            // Prevent default behavior
+            e.preventDefault();
+            
+            // Get current position based on event type
+            let clientX, clientY;
+            if (e.type === 'touchmove') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
+            // Calculate new position
+            const newX = clientX - startX;
+            const newY = clientY - startY;
+            
+            // Get slot dimensions for boundary calculation
+            const slotRect = activePhotoSlot.getBoundingClientRect();
+            const slotWidth = slotRect.width;
+            const slotHeight = slotRect.height;
+            
+            // Calculate the background image dimensions
+            const bgImg = window.getComputedStyle(activePhotoSlot).backgroundImage;
+            
+            if (bgImg && bgImg !== 'none') {
+                // Create a temporary image to get dimensions
+                const img = new Image();
+                img.src = bgImg.replace(/url$$['"]?(.*?)['"]?$$/i, '$1');
+                
+                // Calculate maximum allowed movement to keep image within bounds
+                const maxX = Math.max(0, (img.width - slotWidth) / 2);
+                const maxY = Math.max(0, (img.height - slotHeight) / 2);
+                
+                // Constrain movement within boundaries
+                offsetX = Math.max(-maxX, Math.min(maxX, newX));
+                offsetY = Math.max(-maxY, Math.min(maxY, newY));
+                
+                // Update background position
+                activePhotoSlot.style.backgroundPosition = `calc(50% + ${offsetX}px) calc(50% + ${offsetY}px)`;
+                
+                // Store the position
+                photoPositions[activePhotoSlot.id] = { x: offsetX, y: offsetY };
+            }
+        }
+        
+        function endDrag() {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            
+            if (activePhotoSlot) {
+                activePhotoSlot.classList.remove('dragging');
+                activePhotoSlot = null;
+            }
+        }
+        
+        // Function to swap photos between slots
+        function swapPhotos(targetSlot) {
+            // Implementation for photo swapping if needed
+            // This would be used if you want to implement a click-to-swap feature
+        }
+        
+        // Load Photos with position support
         function loadPhotos() {
             const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
             if (images.length > 0) {
                 for (let i = 0; i < Math.min(images.length, 3); i++) {
                     if (images[i]) {
-                        document.getElementById(`photo${i+1}`).style.backgroundImage = `url('${images[i]}')`;
+                        const photoSlot = document.getElementById(`photo${i+1}`);
+                        photoSlot.style.backgroundImage = `url('${images[i]}')`;
+                        photoSlot.style.backgroundSize = 'cover';
+                        photoSlot.style.backgroundPosition = 'center';
+                        
+                        // Initialize position tracking
+                        photoPositions[photoSlot.id] = { x: 0, y: 0 };
                     }
                 }
             }
@@ -609,7 +644,10 @@
             
             // Highlight the correct template button
             document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
-            document.querySelector(`[data-template="${savedTemplate}"]`).classList.add("active-template");
+            const templateButton = document.querySelector(`[data-template="${savedTemplate}"]`);
+            if (templateButton) {
+                templateButton.classList.add("active-template");
+            }
         }
     
         // Process & Upload Image with optimization
@@ -656,6 +694,14 @@
                         sHeight = sWidth / targetAspect;
                         sx = 0;
                         sy = (img.height - sHeight) / 2;
+                    }
+
+                    // Apply the position offset from the UI if available
+                    const slotPosition = photoPositions[activePhotoSlot?.id] || { x: 0, y: 0 };
+                    if (slotPosition.x || slotPosition.y) {
+                        // Adjust source coordinates based on user positioning
+                        sx += slotPosition.x;
+                        sy += slotPosition.y;
                     }
 
                     // Draw cropped image
@@ -781,19 +827,213 @@
             goBack();   
         }
 
+        let accessToken = localStorage.getItem("googleAccessToken") || "";
+        let currentTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
+
         window.onload = function () {
-            checkLoginStatus();
             loadPhotos();
             loadSelectedTemplate();
             document.getElementById("progressDialog").style.display = "none";
+            
+            // Check login status for Google Drive
+            if (accessToken) {
+                document.getElementById("googleSignIn").classList.add("hidden");
+                document.getElementById("userInfo").innerText = "You are already logged in";
+            }
         };
     
+        // Google OAuth Login
+        function signInWithGoogle() {
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: "654676077812-h48jkkjumjraq8u76so7544dui1heheb.apps.googleusercontent.com",
+                scope: "https://www.googleapis.com/auth/drive.file",
+                callback: (response) => {
+                    if (response.access_token) {
+                        accessToken = response.access_token;
+                        localStorage.setItem("googleAccessToken", accessToken);
+                        document.getElementById("userInfo").innerText = "✅ Signed in!";
+                        document.getElementById("googleSignIn").classList.add("hidden");
+                    }
+                },
+            });
+            client.requestAccessToken();
+        }
+        
         document.getElementById("googleSignIn").addEventListener("click", signInWithGoogle);
 
         // Function to Reset and Go Back to Index Page
         function goBack() {
             window.location.href = "main.html";
         }
-    </script>
+
+        // Set up drag and drop functionality for both mouse and touch
+        function setupDragAndDrop() {
+        const photoSlots = document.querySelectorAll('.photo-slot');
+            
+// Variables for drag and drop
+let draggedSlot = null;
+let dragStartY = 0;
+let originalPositions = [];
+let isReordering = false;
+let currentDragY = 0;
+let slotHeight = 0;
+
+// Set up drag and drop functionality for both mouse and touch
+function setupDragAndDrop() {
+    const photoSlots = document.querySelectorAll('.photo-slot');
+    photoSlots.forEach(slot => {
+        // Remove draggable attribute as we'll handle dragging manually
+        slot.removeAttribute('draggable');
+        
+        // Mouse events
+        slot.addEventListener('mousedown', startReorderDrag);
+        
+        // Touch events
+        slot.addEventListener('touchstart', startReorderDrag, { passive: false });
+    });
+    
+    // Global event listeners
+    document.addEventListener('mousemove', moveReorderDrag);
+    document.addEventListener('mouseup', endReorderDrag);
+    document.addEventListener('touchmove', moveReorderDrag, { passive: false });
+    document.addEventListener('touchend', endReorderDrag);
+}
+    
+    photoSlots.forEach(slot => {
+        // Remove draggable attribute as we'll handle dragging manually
+        slot.removeAttribute('draggable');
+        
+        // Mouse events
+        slot.addEventListener('mousedown', startReorderDrag);
+        
+        // Touch events
+        slot.addEventListener('touchstart', startReorderDrag, { passive: false });
+    });
+    
+    // Global event listeners
+    document.addEventListener('mousemove', moveReorderDrag);
+    document.addEventListener('mouseup', endReorderDrag);
+    document.addEventListener('touchmove', moveReorderDrag, { passive: false });
+    document.addEventListener('touchend', endReorderDrag);
+}
+
+function startReorderDrag(e) {
+    // Prevent default behavior to avoid scrolling on touch devices
+    e.preventDefault();
+    
+    // Only proceed if we clicked/touched a photo slot
+    if (!e.target.classList.contains('photo-slot')) return;
+    
+    isReordering = true;
+    draggedSlot = e.target;
+    draggedSlot.classList.add('dragging');
+    
+    // Store the starting position
+    dragStartY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+    currentDragY = dragStartY;
+    
+    // Store original positions of all slots for reference
+    const slots = document.querySelectorAll('.photo-slot');
+    originalPositions = [];
+    slots.forEach(slot => {
+        originalPositions.push({
+            element: slot,
+            rect: slot.getBoundingClientRect(),
+            index: parseInt(slot.dataset.index)
+        });
+    });
+    
+    // Get slot height for calculations
+    slotHeight = draggedSlot.offsetHeight;
+}
+
+function moveReorderDrag(e) {
+    if (!isReordering || !draggedSlot) return;
+    
+    // Prevent default to avoid scrolling while dragging
+    e.preventDefault();
+    
+    // Get current position
+    const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+    const deltaY = clientY - dragStartY;
+    
+    // Move the dragged element
+    draggedSlot.style.transform = `translateX(-50%) translateY(${deltaY}px)`;
+    currentDragY = clientY;
+    
+    // Check if we should swap with another slot
+    checkForSwap(clientY);
+}
+
+function checkForSwap(currentY) {
+    // Find which slot we're hovering over
+    for (let i = 0; i < originalPositions.length; i++) {
+        const slot = originalPositions[i];
+        
+        // Skip the slot we're dragging
+        if (slot.element === draggedSlot) continue;
+        
+        const slotRect = slot.rect;
+        
+        // Check if the current position is within this slot's bounds
+        if (currentY >= slotRect.top && currentY <= slotRect.bottom) {
+            // We're hovering over this slot, swap if needed
+            const draggedIndex = parseInt(draggedSlot.dataset.index);
+            const targetIndex = slot.index;
+            
+            if (draggedIndex !== targetIndex) {
+                swapSlots(draggedIndex, targetIndex);
+                return;
+            }
+        }
+    }
+}
+
+function swapSlots(sourceIndex, targetIndex) {
+    const slots = document.querySelectorAll('.photo-slot');
+    const sourceSlot = document.querySelector(`.photo-slot[data-index="${sourceIndex}"]`);
+    const targetSlot = document.querySelector(`.photo-slot[data-index="${targetIndex}"]`);
+    
+    // Swap background images
+    const tempBg = targetSlot.style.backgroundImage;
+    targetSlot.style.backgroundImage = sourceSlot.style.backgroundImage;
+    sourceSlot.style.backgroundImage = tempBg;
+    
+    // Update the photos array in localStorage
+    const photos = JSON.parse(localStorage.getItem('capturedPhotos')) || [];
+    if (photos.length >= 2) {
+        const temp = photos[sourceIndex];
+        photos[sourceIndex] = photos[targetIndex];
+        photos[targetIndex] = temp;
+        localStorage.setItem('capturedPhotos', JSON.stringify(photos));
+    }
+    
+    // Update our tracking array
+    originalPositions.forEach(pos => {
+        if (pos.index === sourceIndex) {
+            pos.index = targetIndex;
+        } else if (pos.index === targetIndex) {
+            pos.index = sourceIndex;
+        }
+    });
+    
+    // Update data-index attributes
+    sourceSlot.dataset.index = targetIndex;
+    targetSlot.dataset.index = sourceIndex;
+}
+
+function endReorderDrag(e) {
+    if (!isReordering) return;
+    
+    isReordering = false;
+    
+    if (draggedSlot) {
+        // Reset the transform
+        draggedSlot.style.transform = 'translateX(-50%)';
+        draggedSlot.classList.remove('dragging');
+        draggedSlot = null;
+    }
+}
+</script>
 </body>
 </html>
