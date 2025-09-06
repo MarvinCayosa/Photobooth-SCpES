@@ -771,8 +771,12 @@
         </div>
     </div>
 
+    <script src="shared-login.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Check if user is logged in first
+            checkLoginStatus();
+            
             const themeLink = document.getElementById("theme-link");
             const savedTheme = localStorage.getItem("theme");
 
@@ -780,11 +784,6 @@
                 themeLink.setAttribute("href", "dark-style.css");
             } else {
                 themeLink.setAttribute("href", "style.css");
-            }
-
-            // Check if user is logged in
-            if (!localStorage.getItem("userLoggedIn")) {
-                window.location.href = "index.html";
             }
             
             // Load settings and update format availability
@@ -831,8 +830,18 @@
         }
 
         function confirmLogout() {
-            // Clear all stored data and logout
-            localStorage.clear();
+            console.log("🚪 Confirming logout...");
+            
+            // Clear authentication data but preserve some settings
+            localStorage.removeItem("userLoggedIn");
+            localStorage.removeItem("googleAccessToken");
+            
+            // Keep format settings and theme preferences
+            // localStorage.removeItem("selectedFormat"); // Keep format selection
+            // localStorage.removeItem("theme"); // Keep theme preference
+            // localStorage.removeItem("formatSettings"); // Keep format settings
+            
+            console.log("✅ Logout completed, redirecting to login page");
             window.location.href = "index.html";
         }
 
@@ -937,25 +946,7 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const themeLink = document.getElementById("theme-link");
-            const savedTheme = localStorage.getItem("theme");
-            const themeButton = document.getElementById("themeButton");
-            const themeIcon = themeButton.querySelector("use");
-
-            if (savedTheme === "dark") {
-                themeLink.setAttribute("href", "dark-style.css");
-                themeIcon.setAttribute("xlink:href", "icons.svg#icon-sun");
-            } else {
-                themeLink.setAttribute("href", "style.css");
-                themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon");
-            }
-
-            // Check if user is logged in
-            if (!localStorage.getItem("userLoggedIn")) {
-                window.location.href = "index.html";
-            }
-        });
+        // This duplicate DOMContentLoaded listener has been removed to prevent conflicts
 
         // Add hover sound effect (optional)
         document.querySelectorAll('.format-option').forEach(option => {

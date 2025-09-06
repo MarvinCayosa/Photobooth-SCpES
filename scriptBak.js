@@ -7,7 +7,7 @@
     // ✅ Google OAuth Login
     function signInWithGoogle() {
         const client = google.accounts.oauth2.initTokenClient({
-            client_id: "654676077812-h48jkkjumjraq8u76so7544dui1heheb.apps.googleusercontent.com",
+            client_id: "1050323234175-b5apn028urg40cqvmavnefprcfbfbqp6.apps.googleusercontent.com",
             scope: "https://www.googleapis.com/auth/drive.file",
             callback: (response) => {
                 if (response.access_token) {

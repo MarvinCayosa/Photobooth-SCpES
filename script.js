@@ -1,3 +1,7 @@
+// Google Drive integration variables
+let accessToken = localStorage.getItem("googleAccessToken") || "";
+let currentTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
+
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
@@ -15,6 +19,35 @@ const countdownHigh = document.getElementById('countdownHigh');
 let captureCount = 0;
 
 let isMirrored = true; // Default to mirrored
+
+// Google OAuth Login
+function signInWithGoogle() {
+    const client = google.accounts.oauth2.initTokenClient({
+        client_id: "1050323234175-b5apn028urg40cqvmavnefprcfbfbqp6.apps.googleusercontent.com",
+        scope: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive",
+        callback: (response) => {
+            if (response.access_token) {
+                accessToken = response.access_token;
+                localStorage.setItem("googleAccessToken", accessToken);
+                document.getElementById("userInfo").innerText = "✅ Signed in!";
+                document.getElementById("googleSignIn").classList.add("hidden");
+                console.log("✅ OAuth Token:", accessToken);
+            } else {
+                console.error("❌ Login failed!");
+            }
+        },
+    });
+    client.requestAccessToken();
+}
+
+// Hide sign-in button if already logged in
+function checkLoginStatus() {
+    if (accessToken) {
+        document.getElementById("googleSignIn").classList.add("hidden");
+        document.getElementById("userInfo").innerText = "✅ Signed in!";
+        console.log("🔄 Auto-logged in with saved token.");
+    }
+}
 
 // Mirror toggle functionality
 function toggleMirror() {
@@ -310,6 +343,250 @@ function proceedToTemplate() {
     window.location.href = "template.html";
 }
 
+// Template management functions
+function changeTemplate(templateSrc) {
+    console.log("Template changed to:", templateSrc);
+    currentTemplate = templateSrc;
+    localStorage.setItem("selectedTemplate", templateSrc);
+
+    document.getElementById("template-image").style.backgroundImage = `url('${templateSrc}')`;
+
+    // Highlight selected template button
+    document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
+    document.querySelector(`.template-btn[data-template='${templateSrc}']`)?.classList.add("active-template");
+}
+
+// Ensure template is loaded on page refresh
+function loadSelectedTemplate() {
+    let savedTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
+    document.getElementById("template-image").style.backgroundImage = `url('${savedTemplate}')`;
+}
+
+// Load Photos (Fix: Ensure they appear correctly)
+function loadPhotos() {
+    const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+    if (images.length === 3) {
+        document.getElementById("photo1").style.backgroundImage = `url('${images[0]}')`;
+        document.getElementById("photo2").style.backgroundImage = `url('${images[1]}')`;
+        document.getElementById("photo3").style.backgroundImage = `url('${images[2]}')`;
+    }
+}
+
+// Process & Upload Image
+function downloadImage() {
+    const originalWidth = 2284;
+    const originalHeight = 6458;
+    const canvas = document.createElement("canvas");
+    canvas.width = originalWidth;
+    canvas.height = originalHeight;
+    const ctx = canvas.getContext("2d");
+
+    const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+    const photoWidth = 2000;
+    const photoHeight = 1500;
+    const photoPositions = [
+        { x: (originalWidth - photoWidth) / 2, y: 450 },
+        { x: (originalWidth - photoWidth) / 2, y: 2000 },
+        { x: (originalWidth - photoWidth) / 2, y: 3545 }
+    ];
+
+    let loadedImages = 0;
+    images.forEach((src, index) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            ctx.drawImage(img, photoPositions[index].x, photoPositions[index].y, photoWidth, photoHeight);
+            loadedImages++;
+            if (loadedImages === images.length) {
+                drawTemplate();
+            }
+        };
+    });
+
+    function drawTemplate() {
+        const templateImg = new Image();
+        templateImg.src = currentTemplate;
+        templateImg.onload = () => {
+            ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
+
+            // Convert canvas to Blob
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "photobooth.png", { type: "image/png" });
+
+                // Save locally
+                let link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "photobooth.png";
+                link.click();
+
+                // Upload after saving
+                setTimeout(async () => {
+                    await uploadToGoogleDrive(file);
+                }, 1000);
+            }, "image/png");
+        };
+    }
+}
+
+// Upload "photobooth.png" to Google Drive
+async function uploadToGoogleDrive(imageFile) {
+    const folderId = "11EwrjP7y9yRxVGcxW_we20zI4Q-5vCSW";
+
+    try {
+        console.log("📤 Uploading photobooth.png to Google Drive...");
+        
+        // Show progress dialog if available
+        const progressDialog = document.getElementById("progressDialog");
+        if (progressDialog) {
+            progressDialog.style.display = "block";
+            updateProgress(10, "Preparing upload...");
+        }
+        
+        // First, create the file metadata
+        const metadata = {
+            name: `photobooth-${Date.now()}.png`,
+            mimeType: "image/png",
+            parents: [folderId]
+        };
+
+        updateProgress(20, "Creating file...");
+
+        // Create the file using the Drive API
+        const createResponse = await fetch("https://www.googleapis.com/drive/v3/files", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(metadata)
+        });
+
+        if (!createResponse.ok) {
+            throw new Error(`Failed to create file: ${createResponse.status} ${createResponse.statusText}`);
+        }
+
+        const fileData = await createResponse.json();
+        const fileId = fileData.id;
+        
+        console.log("📁 File created with ID:", fileId);
+
+        updateProgress(50, "Uploading image...");
+
+        // Now upload the file content
+        const uploadResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+            method: "PATCH",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "image/png"
+            },
+            body: imageFile
+        });
+
+        if (!uploadResponse.ok) {
+            throw new Error(`Failed to upload file: ${uploadResponse.status} ${uploadResponse.statusText}`);
+        }
+
+        const uploadResult = await uploadResponse.json();
+        console.log("✅ Upload successful:", uploadResult);
+        
+        updateProgress(80, "Making file public...");
+        
+        // Make the file publicly accessible and show QR code
+        await makeFilePublicAndShowQR(fileId);
+        
+        updateProgress(90, "Generating QR code...");
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        updateProgress(100, "Complete!");
+        
+        // Hide progress dialog after a short delay
+        setTimeout(() => {
+            if (progressDialog) {
+                progressDialog.style.display = "none";
+            }
+        }, 1000);
+        
+    } catch (error) {
+        console.error("⚠ Error uploading to Google Drive:", error);
+        
+        // Hide progress dialog on error
+        const progressDialog = document.getElementById("progressDialog");
+        if (progressDialog) {
+            progressDialog.style.display = "none";
+        }
+        
+        if (error.message.includes("401") || error.message.includes("403")) {
+            // Token expired or invalid
+            accessToken = "";
+            localStorage.removeItem("googleAccessToken");
+            alert("Your Google session has expired. Please sign in again and try uploading.");
+        } else {
+            alert(`Upload failed: ${error.message}. Please check your connection and try again.`);
+        }
+    }
+}
+
+// Update progress bar and text (for script.js)
+function updateProgress(percentage, message) {
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.querySelector("#progressDialog p");
+    
+    if (progressBar) {
+        progressBar.style.width = percentage + "%";
+    }
+    
+    if (progressText) {
+        progressText.textContent = message;
+    }
+    
+    console.log(`📊 Progress: ${percentage}% - ${message}`);
+}
+
+// Make uploaded file publicly accessible and show QR code
+async function makeFilePublicAndShowQR(fileId) {
+    try {
+        const permissionData = {
+            role: "reader",
+            type: "anyone"
+        };
+
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(permissionData)
+        });
+
+        if (response.ok) {
+            console.log("✅ File made publicly accessible");
+            // Generate the public download URL
+            const publicUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            showQRModal(publicUrl);
+        } else {
+            console.error("❌ Failed to make file public:", response.statusText);
+            // Still show QR with direct link even if permission setting failed
+            showQRModal(`https://drive.google.com/file/d/${fileId}/view`);
+        }
+    } catch (error) {
+        console.error("Error making file public:", error);
+        // Fallback to direct Google Drive link
+        showQRModal(`https://drive.google.com/file/d/${fileId}/view`);
+    }
+}
+
+// QR Code Modal functions
+function showQRModal(url) {
+    document.getElementById("qrCodeContainer").innerHTML = "";
+    new QRCode(document.getElementById("qrCodeContainer"), { text: url, width: 128, height: 128 });
+    document.getElementById("qrModal").style.display = "flex";
+}
+
+function closeQRModal() {
+    document.getElementById("qrModal").style.display = "none";
+}
+
 let cameraDropdown = document.getElementById("cameraDropdown");
 let cameraList = document.getElementById("cameraList");
 let currentStream = null;
@@ -532,6 +809,7 @@ document.addEventListener("DOMContentLoaded", function () {
 const themeLink = document.getElementById("theme-link");
     const themeButton = document.getElementById("themeButton");
     const themeIcon = themeButton ? themeButton.querySelector("use") : null; // Avoid errors
+    const logoutButton = document.getElementById("logoutButton");
 
     function toggleTheme() {
         const currentTheme = themeLink.getAttribute("href");
@@ -557,3 +835,18 @@ const themeLink = document.getElementById("theme-link");
             if (themeIcon) themeIcon.setAttribute("xlink:href", "icons.svg#icon-moon");
         }
     });
+
+// Initialize Google Drive functionality
+window.onload = function () {
+    checkLoginStatus();
+    loadPhotos();
+    loadSelectedTemplate();
+};
+
+// Add event listener for Google Sign In button
+document.addEventListener("DOMContentLoaded", function() {
+    const googleSignInBtn = document.getElementById("googleSignIn");
+    if (googleSignInBtn) {
+        googleSignInBtn.addEventListener("click", signInWithGoogle);
+    }
+});
