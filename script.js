@@ -4,32 +4,33 @@ const context = canvas.getContext('2d');
 const capturedImages = document.getElementById('capturedImages');
 const startButton = document.getElementById('startButton');
 const proceedButton = document.getElementById('proceedButton');
+const pauseButton = document.getElementById('pauseButton');
+const resumeButton = document.getElementById('resumeButton');
+const resetButton = document.getElementById('resetButton');
+const retakeButton = document.getElementById('retakeButton');
 const flash = document.getElementById('flash');
 const shutterSound = document.getElementById('shutterSound');
 const beepSound = document.getElementById('beepSound');
 const countdownHigh = document.getElementById('countdownHigh');
 let captureCount = 0;
 
-let isMirrored = false;
+let isMirrored = true; // Default to mirrored
 
+// Mirror toggle functionality
 function toggleMirror() {
     isMirrored = !isMirrored;
-
-    // Flip the video preview
-    const video = document.getElementById("video");
-    video.style.transform = isMirrored ? "scaleX(-1)" : "scaleX(1)";
-
-    // Flip all captured images
-    document.querySelectorAll("#capturedImages img").forEach(img => {
-        img.style.transform = isMirrored ? "scaleX(-1)" : "scaleX(1)";
-    });
-
-    // Flip the mirror button icon
-    const mirrorIcon = document.querySelector("#mirrorButton .icon");
-    mirrorIcon.style.transform = isMirrored ? "scaleX(-1)" : "scaleX(1)";
+    if (isMirrored) {
+        video.style.transform = "scaleX(-1)";
+    } else {
+        video.style.transform = "scaleX(1)";
+    }
 }
+
+// Initialize camera with default mirror
 navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
     video.srcObject = stream;
+    // Apply mirror effect by default
+    video.style.transform = "scaleX(-1)";
 });
 
 
@@ -37,6 +38,7 @@ navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
 
 
 let isCapturing = false;
+let isPaused = false; // Flag to track pause state
 let cancelCaptureFlag = false; // Flag to track cancellation
 
 // Get slider and map values
@@ -58,10 +60,16 @@ async function startCapture() {
     startButton.innerText = "Capturing...";
     captureCount = 0;
     cancelCaptureFlag = false;
+    isPaused = false;
     resetPlaceholders();
     startButton.disabled = true;
     proceedButton.style.display = "none";
-    cancelButton.style.display = "block"; // Show Cancel button
+    
+    // Show Pause button instead of Cancel
+    const pauseButton = document.getElementById('pauseButton');
+    pauseButton.style.display = "block";
+    pauseButton.innerHTML = "Pause";
+    
     isCapturing = true;
     await countdownAndCapture(captureDelay);
 }
@@ -69,13 +77,13 @@ async function startCapture() {
 // Use `captureDelay` in the countdown function
 async function countdownAndCapture(seconds) {
     if (!isCapturing || cancelCaptureFlag || captureCount >= 3) return;
-    startButton.innerText = `Capturing...`;
+    startButton.innerText = `Capturing... (${captureCount + 1}/3)`;
 
     const countdownOverlay = document.getElementById("countdownOverlay");
     countdownOverlay.style.display = "block";
 
     for (let i = seconds; i > 0; i--) {
-        if (cancelCaptureFlag) {
+        if (cancelCaptureFlag || isPaused) {
             countdownOverlay.style.display = "none";
             return;
         }
@@ -100,12 +108,9 @@ async function countdownAndCapture(seconds) {
     }
 
     countdownOverlay.style.display = "none";
-    captureImage();
-}
-
-// Ensure the next capture uses the updated delay
-if (captureCount < 3) {
-    setTimeout(() => countdownAndCapture(captureDelay), 1000);
+    if (!isPaused && !cancelCaptureFlag) {
+        captureImage();
+    }
 }
 
 
@@ -154,23 +159,116 @@ function captureImage() {
     if (captureCount < 3) {
         setTimeout(() => countdownAndCapture(captureDelay), 1000);
     } else {
+        // All 3 photos captured - show Retake and Next buttons
         isCapturing = false;
+        isPaused = false;
+        
+        const pauseButton = document.getElementById('pauseButton');
+        const resetButton = document.getElementById('resetButton');
+        
+        pauseButton.style.display = "none";
+        if (resetButton) resetButton.style.display = "none";
+        
+        // Show Retake and Next buttons
         startButton.innerHTML = `
             <svg class="icon icon-reset" fill="currentColor">
                 <use xlink:href="icons.svg#icon-reset"></use>
-            </svg> Retake Photos
+            </svg> Retake
         `;
         startButton.classList.remove("capturing");
         startButton.disabled = false;
-        cancelButton.style.display = "none";
+        
+        proceedButton.innerHTML = `
+            <svg class="icon icon-next" fill="currentColor">
+                <use xlink:href="icons.svg#icon-next"></use>
+            </svg> Next
+        `;
         proceedButton.style.display = "block";
     }
+}
+
+// Pause/Resume/Reset functions
+function pauseCapture() {
+    isPaused = true;
+    isCapturing = false;
+    
+    const pauseButton = document.getElementById('pauseButton');
+    const resumeButton = document.getElementById('resumeButton');
+    const resetButton = document.getElementById('resetButton');
+    
+    // Hide start button during pause
+    startButton.style.display = "none";
+    
+    // Hide pause button, show resume and reset buttons
+    pauseButton.style.display = "none";
+    resumeButton.style.display = "block";
+    resetButton.style.display = "block";
+    
+    // Hide countdown overlay
+    const countdownOverlay = document.getElementById("countdownOverlay");
+    countdownOverlay.style.display = "none";
+}
+
+function resumeCapture() {
+    isPaused = false;
+    isCapturing = true;
+    
+    const pauseButton = document.getElementById('pauseButton');
+    const resumeButton = document.getElementById('resumeButton');
+    const resetButton = document.getElementById('resetButton');
+    
+    // Update start button states
+    startButton.classList.add("capturing");
+    startButton.innerText = `Capturing... (${captureCount + 1}/3)`;
+    startButton.disabled = true;
+    startButton.style.display = "block";
+    
+    // Show pause button, hide resume and reset buttons
+    pauseButton.style.display = "block";
+    resumeButton.style.display = "none";
+    resetButton.style.display = "none";
+    
+    // Continue capture process
+    setTimeout(() => countdownAndCapture(captureDelay), 500);
+}
+
+function resetCapture() {
+    cancelCaptureFlag = true;
+    isCapturing = false;
+    isPaused = false;
+    captureCount = 0;
+    
+    const pauseButton = document.getElementById('pauseButton');
+    const resetButton = document.getElementById('resetButton');
+    
+    startButton.innerHTML = `
+        <svg class="icon icon-start" fill="currentColor">
+            <use xlink:href="icons.svg#icon-start"></use>
+        </svg> Start Capture
+    `;
+    startButton.classList.remove("capturing");
+    startButton.disabled = false;
+    
+    pauseButton.style.display = "none";
+    resetButton.style.display = "none";
+    proceedButton.style.display = "none";
+    
+    resetPlaceholders();
+    
+    // Hide countdown overlay
+    const countdownOverlay = document.getElementById("countdownOverlay");
+    countdownOverlay.style.display = "none";
+    
+    // Reset the flag after a brief delay
+    setTimeout(() => {
+        cancelCaptureFlag = false;
+    }, 100);
 }
 
 function cancelCapture() {
     cancelCaptureFlag = true;
     isCapturing = false;
-    
+    captureCount = 0; // FIX: Reset capture count so resume works
     startButton.innerHTML = `
         <svg class="icon icon-start" fill="currentColor">
             <use xlink:href="icons.svg#icon-start"></use>
@@ -194,21 +292,11 @@ function resetPlaceholders() {
     `;
 }
 
-
 function flashEffect() {
     flash.style.opacity = "1";
     setTimeout(() => {
         flash.style.opacity = "0";
     }, 100);
-}
-
-function resetPlaceholders() {
-    for (let i = 0; i < 3; i++) {
-        let placeholder = document.createElement('div');
-        placeholder.className = 'placeholder';
-        placeholder.innerText = i + 1;
-        capturedImages.replaceChild(placeholder, capturedImages.children[i]);
-    }
 }
 
 function proceedToTemplate() {
@@ -284,6 +372,8 @@ async function startCamera(deviceId) {
         };
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
+        // Apply mirror effect based on current state
+        video.style.transform = isMirrored ? "scaleX(-1)" : "scaleX(1)";
     } catch (error) {
         console.error("Error starting camera:", error);
     }
@@ -291,7 +381,12 @@ async function startCamera(deviceId) {
 
 // Initialize camera selection on page load
 navigator.mediaDevices.getUserMedia({ video: true })
-    .then(getCameras)
+    .then(stream => {
+        video.srcObject = stream;
+        // Apply mirror effect based on default state (mirrored by default)
+        video.style.transform = isMirrored ? "scaleX(-1)" : "scaleX(1)";
+        return getCameras();
+    })
     .catch(error => console.error("Error accessing camera:", error));
 
 

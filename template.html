@@ -20,6 +20,73 @@
     <script src="script.js" defer></script>
     <title>Photo Booth Template</title>
     <style>
+        #backButton {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: #333;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #backButton:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        #backButton:active {
+            transform: translateY(0);
+        }
+
+        #themeButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: #333;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #themeButton:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        #themeButton:active {
+            transform: translateY(0);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
         .container {
             display: flex;
             justify-content: center;
@@ -46,7 +113,9 @@
 
         .template-buttons {
             display: flex;
+            flex-wrap: wrap;
             gap: 15px;
+            max-width: 350px; /* Limit width to fit 5 buttons per row */
         }
 
         .template-btn {
@@ -54,7 +123,28 @@
             height: 50px;
             border-radius: 50%;
             cursor: pointer;
-            border: 3px solid #606460;
+            transition: all 0.3s ease;
+            transform: scale(1);
+             border: 4px solid #7878782f;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .template-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            border-color: #4a90e2;
+            z-index: 10;
+            position: relative;
+        }
+
+        .template-btn.active-template {
+            border: 4px solid #6b7b87;
+            transform: scale(1.05);
+        }
+
+        .template-btn.active-template:hover {
+            transform: scale(1.15);
+        
         }
         #btn-template1 { background: white; }
         #btn-template2 { background: black; }
@@ -62,12 +152,11 @@
         #btn-template4 { background: #ff0000; }
         #btn-template5 { background: #fbffd4; }
         #btn-template7 { background:rgb(80, 122, 229); }
-        .active-template { border: 5px solid rgb(131, 224, 255); }
 
         .template-container {
             position: relative;
-            width: 230px;
-            height: 690px;
+            width: 315px;
+            height: 560px;
             overflow: hidden;
             background: transparent;
             filter: drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.223)); /* Soft shadow */
@@ -83,7 +172,7 @@
         }
         .photo-slot {
             position: absolute;
-            width: 210px;
+            width: 263px;
             height: 150px;
             left: 50%;
             transform: translateX(-50%);
@@ -91,9 +180,9 @@
             background-position: center;
             cursor: grab;
         }
-        .slot1 { top: 65px; }
-        .slot2 { top: 220px; }
-        .slot3 { top: 375px; }
+        .slot1 { top: 26px; }
+        .slot2 { top: 189px; }
+        .slot3 { top: 350px; }
 
         .template {
             position: absolute;
@@ -101,7 +190,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('template1.png') no-repeat center/contain;
+            background: url('TechCon_Template.png') no-repeat center/contain;
             pointer-events: none;
             z-index: 1;
           
@@ -149,9 +238,29 @@
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         justify-content: center;
         align-items: center;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    body.modal-open {
+        overflow: hidden;
+    }
+
+    body.modal-open > *:not(.modal) {
+        filter: blur(3px);
+        transition: filter 0.3s ease;
+    }
+
+    body:not(.modal-open) > * {
+        filter: none;
+        transition: filter 0.3s ease;
     }
 
     .modal-content {
@@ -278,6 +387,16 @@
     </style>
 </head>
 <body>
+    <!-- Back Button -->
+    <button id="backButton" onclick="goBack()">←</button>
+    
+    <!-- Theme Toggle Button -->
+    <button id="themeButton" onclick="toggleTheme()">
+        <svg class="icon icon-moon" fill="currentColor">
+            <use xlink:href="icons.svg#icon-moon"></use>
+        </svg>
+    </button>
+    
     <!-- ✅ QR Code Modal -->
     <div id="qrModal" class="modal">
         <div class="modal-content">
@@ -317,18 +436,17 @@
         <div class="template-selection">
             <h1 class="temp-title">Make it Yours!</h1>
             <div class="template-buttons">
-                <button class="template-btn" onclick="changeTemplate('template7.png')" id="btn-template7"></button>
-                <!-- <button class="template-btn" onclick="changeTemplate('template4.png')" id="btn-template4"></button>
-                <button class="template-btn" onclick="changeTemplate('template2.png')" id="btn-template2"></button>
-                <button class="template-btn" onclick="changeTemplate('template3.png')" id="btn-template3"></button>
-                <button class="template-btn" onclick="changeTemplate('template4.png')" id="btn-template4"></button>
-                <button class="template-btn" onclick="changeTemplate('template5.png')" id="btn-template5"></button> -->
+                <button class="template-btn" onclick="changeTemplate('TechCon_Template.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template7"></button>
+                <!-- <button class="template-btn" onclick="changeTemplate('template4.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template4"></button>
+                <button class="template-btn" onclick="changeTemplate('template2.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template2"></button>
+                <button class="template-btn" onclick="changeTemplate('template3.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template3"></button>
+                <button class="template-btn" onclick="changeTemplate('template4.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template4"></button>
+                <button class="template-btn" onclick="changeTemplate('template5.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template5"></button> -->
 
             </div>
             <div class="button-container">
                 <button class="btn btn-download" onclick="downloadImage()">Finish</button>
                 <div id="qrCodeContainer" class="mt-3"></div>
-                <button class="btn btn-again" onclick="goBack()">Again</button>
                 <!-- ✅ Settings Panel (Hidden by Default) -->
                 <div id="settingsPanel" class="hidden">
                     <h3>Google Account</h3>
@@ -428,7 +546,23 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
         let accessToken = localStorage.getItem("googleAccessToken") || "";
-        let currentTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
+        const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+        
+        // Helper function to get correct template path
+        function getTemplatePath(templateName) {
+            if (selectedFormat === "old") {
+                return `classic_templates/${templateName}`;
+            } else {
+                return `stories_template/${templateName}`;
+            }
+        }
+        
+        // Get default template based on format
+        function getDefaultTemplate() {
+            return selectedFormat === "old" ? "template1.png" : "TechCon_Template.png";
+        }
+        
+        let currentTemplate = localStorage.getItem("selectedTemplate") || getDefaultTemplate();
     
         // ✅ Show/Hide Settings Panel
         document.getElementById("settingsButton").addEventListener("click", function () {
@@ -462,19 +596,84 @@
         // ✅ Hide sign-in button if already logged in
         function checkLoginStatus() {
             if (accessToken) {
-                document.getElementById("googleSignIn").classList.add("hidden");
-                document.getElementById("userInfo").innerText = "You are already logged in";
-                console.log("🔄 Auto-logged in with saved token.");
+                // Verify token is still valid
+                verifyToken();
+            } else {
+                document.getElementById("userInfo").innerText = "Please sign in to upload to Google Drive";
+                document.getElementById("googleSignIn").classList.remove("hidden");
+            }
+        }
+        
+        // ✅ Verify if the current token is still valid
+        async function verifyToken() {
+            try {
+                const response = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`);
+                if (response.ok) {
+                    document.getElementById("googleSignIn").classList.add("hidden");
+                    document.getElementById("userInfo").innerText = "✅ Signed in and ready to upload!";
+                    console.log("🔄 Token is valid.");
+                } else {
+                    // Token expired or invalid
+                    console.log("❌ Token expired, clearing stored token");
+                    accessToken = "";
+                    localStorage.removeItem("googleAccessToken");
+                    document.getElementById("userInfo").innerText = "Session expired. Please sign in again.";
+                    document.getElementById("googleSignIn").classList.remove("hidden");
+                }
+            } catch (error) {
+                console.error("Error verifying token:", error);
+                accessToken = "";
+                localStorage.removeItem("googleAccessToken");
+                document.getElementById("userInfo").innerText = "Please sign in to upload to Google Drive";
+                document.getElementById("googleSignIn").classList.remove("hidden");
             }
         }
     
         // ✅ Load Photos (Fix: Ensure they appear correctly)
         function loadPhotos() {
             const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+            console.log("Loading photos:", images); // Debug log
+            
             if (images.length === 3) {
-                document.getElementById("photo1").style.backgroundImage = `url('${images[0]}')`;
-                document.getElementById("photo2").style.backgroundImage = `url('${images[1]}')`;
-                document.getElementById("photo3").style.backgroundImage = `url('${images[2]}')`;
+                // Wait for DOM to be ready, then load photos
+                const attemptLoad = () => {
+                    const photo1 = document.getElementById("photo1");
+                    const photo2 = document.getElementById("photo2");
+                    const photo3 = document.getElementById("photo3");
+                    
+                    console.log("Photo elements found:", photo1, photo2, photo3); // Debug log
+                    
+                    if (photo1 && photo2 && photo3) {
+                        // Clear any existing background images first
+                        photo1.style.backgroundImage = "";
+                        photo2.style.backgroundImage = "";
+                        photo3.style.backgroundImage = "";
+                        
+                        // Force a small delay to ensure clearing takes effect
+                        setTimeout(() => {
+                            photo1.style.backgroundImage = `url('${images[0]}')`;
+                            photo2.style.backgroundImage = `url('${images[1]}')`;
+                            photo3.style.backgroundImage = `url('${images[2]}')`;
+                            
+                            // Ensure proper background properties for photo display
+                            [photo1, photo2, photo3].forEach(element => {
+                                element.style.backgroundSize = "cover";
+                                element.style.backgroundPosition = "center";
+                                element.style.backgroundRepeat = "no-repeat";
+                            });
+                            
+                            console.log("Photos loaded successfully"); // Debug log
+                        }, 10);
+                    } else {
+                        console.error("Photo elements not found in DOM"); // Debug log
+                        // Retry after a short delay if elements not found
+                        setTimeout(attemptLoad, 50);
+                    }
+                };
+                
+                attemptLoad();
+            } else {
+                console.warn("Not enough photos found:", images.length); // Debug log
             }
         }
     
@@ -484,44 +683,85 @@
             currentTemplate = templateSrc;
             localStorage.setItem("selectedTemplate", templateSrc);
     
-            document.getElementById("template-image").style.backgroundImage = `url('${templateSrc}')`;
+            const templatePath = getTemplatePath(templateSrc);
+            document.getElementById("template-image").style.backgroundImage = `url('${templatePath}')`;
     
             // ✅ Highlight selected template button
             document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
             document.querySelector(`.template-btn[data-template='${templateSrc}']`)?.classList.add("active-template");
+            
+            // Load photos immediately when template changes (no delay)
+            loadPhotos();
+            
+            // Force a second load after a short delay to ensure photos appear
+            setTimeout(() => {
+                loadPhotos();
+            }, 50);
         }
     
         // ✅ Load saved template on page refresh
         function loadSelectedTemplate() {
-            let savedTemplate = localStorage.getItem("selectedTemplate") || "template1.png";
-            document.getElementById("template-image").style.backgroundImage = `url('${savedTemplate}')`;
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            let savedTemplate = localStorage.getItem("selectedTemplate") || getDefaultTemplate();
+            
+            // For Stories format, ensure we have a default template selected
+            if (selectedFormat === "new" && !localStorage.getItem("selectedTemplate")) {
+                savedTemplate = "TechCon_Template.png";
+                localStorage.setItem("selectedTemplate", savedTemplate);
+                
+                // Automatically trigger template selection to show it as active and load photos
+                setTimeout(() => {
+                    changeTemplate(savedTemplate);
+                }, 50);
+            } else if (selectedFormat === "old" && !localStorage.getItem("selectedTemplate")) {
+                savedTemplate = "template1.png";
+                localStorage.setItem("selectedTemplate", savedTemplate);
+                
+                // Automatically trigger template selection
+                setTimeout(() => {
+                    changeTemplate(savedTemplate);
+                }, 50);
+            }
+            
+            const templatePath = getTemplatePath(savedTemplate);
+            document.getElementById("template-image").style.backgroundImage = `url('${templatePath}')`;
+            
+            // Ensure the correct template button is highlighted
+            setTimeout(() => {
+                document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
+                document.querySelector(`.template-btn[data-template='${savedTemplate}']`)?.classList.add("active-template");
+            }, 100);
         }
     
         // ✅ Process & Upload Image
         function downloadImage() {
-    const originalWidth = 2284;
-    const originalHeight = 6458;
+            // Check if user is signed in before processing
+            if (!accessToken) {
+                alert("Please sign in with Google first to upload your photo.");
+                document.getElementById("settingsPanel").classList.remove("hidden");
+                return;
+            }
+            
+    const settings = getDownloadSettings();
     const canvas = document.createElement("canvas");
-    canvas.width = originalWidth;
-    canvas.height = originalHeight;
+    canvas.width = settings.originalWidth;
+    canvas.height = settings.originalHeight;
     const ctx = canvas.getContext("2d");
 
     const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
-    const photoWidth = 2000;
-    const photoHeight = 1500;
-    const photoPositions = [
-        { x: (originalWidth - photoWidth) / 2, y: 450, width: photoWidth, height: photoHeight },
-        { x: (originalWidth - photoWidth) / 2, y: 2000, width: photoWidth, height: photoHeight },
-        { x: (originalWidth - photoWidth) / 2, y: 3545, width: photoWidth, height: photoHeight }
-    ];
-
+    
+    if (images.length !== 3) {
+        alert("Please capture 3 photos before downloading.");
+        return;
+    }
+    
     let loadedImages = 0;
     images.forEach((src, index) => {
         const img = new Image();
         img.src = src;
         img.onload = () => {
             const imgAspect = img.width / img.height;
-            const targetAspect = photoWidth / photoHeight;
+            const targetAspect = settings.photoWidth / settings.photoHeight;
 
             let sx, sy, sWidth, sHeight;
 
@@ -540,35 +780,55 @@
             }
 
             // Draw cropped image
-            ctx.drawImage(img, sx, sy, sWidth, sHeight, photoPositions[index].x, photoPositions[index].y, photoWidth, photoHeight);
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, 
+                settings.photoPositions[index].x, 
+                settings.photoPositions[index].y, 
+                settings.photoWidth, 
+                settings.photoHeight);
             loadedImages++;
             if (loadedImages === images.length) {
                 drawTemplate();
             }
         };
+        
+        img.onerror = () => {
+            console.error("Failed to load image:", src);
+            alert("Failed to load photos. Please try again.");
+        };
     });
 
     function drawTemplate() {
+        const settings = getDownloadSettings();
         const templateImg = new Image();
-        templateImg.src = currentTemplate;
+        templateImg.src = getTemplatePath(currentTemplate);
         templateImg.onload = () => {
-            ctx.drawImage(templateImg, 0, 0, originalWidth, originalHeight);
+            ctx.drawImage(templateImg, 0, 0, settings.originalWidth, settings.originalHeight);
 
             // Convert canvas to Blob
             canvas.toBlob(async (blob) => {
-                const file = new File([blob], "photobooth.png", { type: "image/png" });
+                if (!blob) {
+                    alert("Failed to generate image. Please try again.");
+                    return;
+                }
+                
+                const file = new File([blob], `photobooth-${Date.now()}.png`, { type: "image/png" });
 
-                // Save locally
+                // Save locally first
                 let link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = "photobooth.png";
+                link.download = `photobooth-${Date.now()}.png`;
                 link.click();
 
-                // Upload after saving
+                // Upload to Google Drive after local save
                 setTimeout(async () => {
                     await uploadToGoogleDrive(file);
                 }, 1000);
-            }, "image/png");
+            }, "image/png", 0.95); // High quality
+        };
+        
+        templateImg.onerror = () => {
+            console.error("Failed to load template:", getTemplatePath(currentTemplate));
+            alert("Failed to load template. Please try again.");
         };
     }
 }
@@ -601,10 +861,19 @@ function showProgressDialog() {
 
 async function uploadToGoogleDrive(imageFile) {
     const folderId = "1AlJMgXUysE6bIG9imjwoWpDIdV91kBQB";
+    
+    // Check if we have a valid token
+    if (!accessToken) {
+        hideProgressDialog();
+        alert("Please sign in with Google first to upload your photo.");
+        document.getElementById("settingsPanel").classList.remove("hidden");
+        return;
+    }
+    
     showProgressDialog();
 
     const metadata = {
-        name: "photobooth.png",
+        name: `photobooth-${Date.now()}.png`,
         mimeType: "image/png",
         parents: [folderId]
     };
@@ -626,6 +895,7 @@ async function uploadToGoogleDrive(imageFile) {
             if (event.lengthComputable) {
                 let percentComplete = (event.loaded / event.total) * 100;
                 document.getElementById("progressBar").style.width = percentComplete + "%";
+                console.log(`Upload progress: ${percentComplete.toFixed(1)}%`);
             }
         };
 
@@ -634,25 +904,85 @@ async function uploadToGoogleDrive(imageFile) {
                 const result = JSON.parse(xhr.responseText);
                 console.log("✅ Upload successful:", result);
                 hideProgressDialog();
-                showQRModal(`https://drive.google.com/uc?id=${result.id}`);
-            } else {
-                console.error("❌ Upload failed:", xhr.responseText);
+                
+                // Make the file publicly accessible
+                makeFilePublic(result.id);
+                
+            } else if (xhr.status === 401) {
+                console.error("❌ Token expired or invalid:", xhr.responseText);
                 hideProgressDialog();
-                alert("Upload failed. Please try again.");
+                
+                // Clear invalid token
+                accessToken = "";
+                localStorage.removeItem("googleAccessToken");
+                
+                alert("Your Google session has expired. Please sign in again and try uploading.");
+                document.getElementById("settingsPanel").classList.remove("hidden");
+                document.getElementById("googleSignIn").classList.remove("hidden");
+                document.getElementById("userInfo").innerText = "Session expired. Please sign in again.";
+                
+            } else {
+                console.error("❌ Upload failed:", xhr.status, xhr.responseText);
+                hideProgressDialog();
+                alert(`Upload failed (Error ${xhr.status}). Please check your connection and try again.`);
             }
         };
 
         xhr.onerror = function () {
-            console.error("⚠ Error uploading to Google Drive.");
+            console.error("⚠ Network error uploading to Google Drive.");
             hideProgressDialog();
-            alert("An error occurred while uploading. Please try again.");
+            alert("Network error occurred. Please check your internet connection and try again.");
         };
 
+        xhr.ontimeout = function () {
+            console.error("⚠ Upload timed out.");
+            hideProgressDialog();
+            alert("Upload timed out. Please try again.");
+        };
+
+        // Set timeout to 60 seconds
+        xhr.timeout = 60000;
+        
         xhr.send(formData);
+        
     } catch (error) {
         console.error("⚠ Error:", error);
         hideProgressDialog();
-        alert("An error occurred while uploading. Please try again.");
+        alert("An unexpected error occurred. Please try again.");
+    }
+}
+
+// ✅ Make uploaded file publicly accessible
+async function makeFilePublic(fileId) {
+    try {
+        const permissionData = {
+            role: "reader",
+            type: "anyone"
+        };
+
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(permissionData)
+        });
+
+        if (response.ok) {
+            console.log("✅ File made publicly accessible");
+            // Generate the public download URL
+            const publicUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            showQRModal(publicUrl);
+        } else {
+            console.error("❌ Failed to make file public:", response.statusText);
+            // Still show QR with direct link even if permission setting failed
+            showQRModal(`https://drive.google.com/file/d/${fileId}/view`);
+        }
+    } catch (error) {
+        console.error("Error making file public:", error);
+        // Fallback to direct Google Drive link
+        showQRModal(`https://drive.google.com/file/d/${fileId}/view`);
     }
 }
 
@@ -660,20 +990,48 @@ async function uploadToGoogleDrive(imageFile) {
     function showQRModal(url) {
         document.getElementById("qrCodeContainer").innerHTML = "";
         new QRCode(document.getElementById("qrCodeContainer"), { text: url, width: 250, height: 250 });
-        document.getElementById("qrModal").style.display = "flex";
+        
+        const modal = document.getElementById("qrModal");
+        document.body.classList.add("modal-open");
+        modal.classList.add("show");
+        modal.style.display = "flex";
     }
 
     function closeQRModal() {
-        document.getElementById("qrModal").style.display = "none";
+        const modal = document.getElementById("qrModal");
+        document.body.classList.remove("modal-open");
+        modal.classList.remove("show");
+        modal.style.display = "none";
         goBack();   
-
     }
 
     
         window.onload = function () {
+            applyFormatSettings(); // Apply format settings first (generates buttons)
             checkLoginStatus();
-            loadPhotos();
-            loadSelectedTemplate();
+            
+            // Load template and photos immediately without delays
+            loadSelectedTemplate(); // This will auto-select default for Stories
+            
+            // Load photos immediately after template setup
+            setTimeout(() => {
+                loadPhotos();
+                
+                // Force immediate photo reload for Stories format
+                const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+                if (selectedFormat === "new") {
+                    // Ensure TechCon template is active and photos are loaded
+                    changeTemplate("TechCon_Template.png");
+                    
+                    setTimeout(() => {
+                        const firstStoriesBtn = document.getElementById("btn-stories1");
+                        if (firstStoriesBtn) {
+                            firstStoriesBtn.classList.add("active-template");
+                        }
+                    }, 100);
+                }
+            }, 50);
+            
             document.getElementById("progressDialog").style.display = "none";
         };
     
@@ -684,6 +1042,161 @@ async function uploadToGoogleDrive(imageFile) {
         window.location.href = "main.html" ;
         }
 
+        // ✅ Generate template buttons based on selected format
+        function generateTemplateButtons() {
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            const templateButtonsContainer = document.querySelector(".template-buttons");
+            
+            // Clear existing buttons
+            templateButtonsContainer.innerHTML = "";
+            
+            if (selectedFormat === "old") {
+                // Classic templates (template1.png to template7.png)
+                const classicTemplates = [
+                    { name: "template1.png", color: "white" },
+                    { name: "template2.png", color: "black" },
+                    { name: "template3.png", color: "#c8b6b3" },
+                    { name: "template4.png", color: "#ff0000" },
+                    { name: "template5.png", color: "#fbffd4" },
+                    { name: "template6.png", color: "#4a90e2" },
+                    { name: "template7.png", color: "rgb(80, 122, 229)" }
+                ];
+                
+                classicTemplates.forEach((template, index) => {
+                    const button = document.createElement("button");
+                    button.className = "template-btn";
+                    button.setAttribute("data-template", template.name);
+                    button.onclick = () => {
+                        changeTemplate(template.name);
+                        // Force immediate photo load
+                        setTimeout(() => loadPhotos(), 0);
+                    };
+                    button.id = `btn-template${index + 1}`;
+                    button.style.background = template.color;
+                    button.style.border = "3px solid #606460";
+                    templateButtonsContainer.appendChild(button);
+                });
+            } else {
+                // Stories & Social templates (only 2 actual templates)
+                const storiesTemplates = [
+                    { name: "TechCon_Template.png", color: "rgb(80, 122, 229)" },
+                    { name: "template1_169.png", color: "#4a90e2" }
+                ];
+                
+                storiesTemplates.forEach((template, index) => {
+                    const button = document.createElement("button");
+                    button.className = "template-btn";
+                    button.setAttribute("data-template", template.name);
+                    button.onclick = () => {
+                        changeTemplate(template.name);
+                        // Force immediate photo load
+                        setTimeout(() => loadPhotos(), 0);
+                    };
+                    button.id = `btn-stories${index + 1}`;
+                    button.style.background = template.color;
+            
+                    templateButtonsContainer.appendChild(button);
+                });
+            }
+        }
+        
+        // ✅ Dynamic Format Configuration
+        function applyFormatSettings() {
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            const templateContainer = document.getElementById("photo-booth");
+            const photoSlots = document.querySelectorAll(".photo-slot");
+            const templateImage = document.getElementById("template-image");
+            
+            // Generate appropriate template buttons
+            generateTemplateButtons();
+            
+            if (selectedFormat === "old") {
+                // Apply old format settings
+                templateContainer.style.width = "230px";
+                templateContainer.style.height = "690px";
+                
+                // Update photo slots for old format
+                photoSlots.forEach((slot, index) => {
+                    slot.style.width = "210px";
+                    slot.style.height = "150px";
+                });
+                
+                // Position slots for old format
+                document.querySelector(".slot1").style.top = "65px";
+                document.querySelector(".slot2").style.top = "220px";
+                document.querySelector(".slot3").style.top = "375px";
+                
+                // Set old template image
+                const defaultOldTemplate = "template1.png";
+                templateImage.style.backgroundImage = `url('${getTemplatePath(defaultOldTemplate)}')`;
+                currentTemplate = defaultOldTemplate;
+                localStorage.setItem("selectedTemplate", defaultOldTemplate);
+                
+                // Update template button
+                document.getElementById("btn-template7").onclick = () => changeTemplate(defaultOldTemplate);
+                
+            } else {
+                // Apply new format settings (current default)
+                templateContainer.style.width = "315px";
+                templateContainer.style.height = "560px";
+                
+                // Update photo slots for new format
+                photoSlots.forEach((slot, index) => {
+                    slot.style.width = "263px";
+                    slot.style.height = "150px";
+                });
+                
+                // Position slots for new format
+                document.querySelector(".slot1").style.top = "26px";
+                document.querySelector(".slot2").style.top = "189px";
+                document.querySelector(".slot3").style.top = "350px";
+                
+                // Set new template image
+                const defaultNewTemplate = "TechCon_Template.png";
+                templateImage.style.backgroundImage = `url('${getTemplatePath(defaultNewTemplate)}')`;
+                currentTemplate = defaultNewTemplate;
+                localStorage.setItem("selectedTemplate", defaultNewTemplate);
+                
+                // Force immediate photo loading for Stories format
+                setTimeout(() => {
+                    loadPhotos();
+                }, 50);
+                
+                // Update template button
+                document.getElementById("btn-template7").onclick = () => changeTemplate('TechCon_Template.png');
+            }
+        }
+
+        // ✅ Update Download Function to Handle Both Formats
+        function getDownloadSettings() {
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            
+            if (selectedFormat === "old") {
+                return {
+                    originalWidth: 2284,
+                    originalHeight: 6458, 
+                    photoWidth: 2000,
+                    photoHeight: 1500,
+                    photoPositions: [
+                        { x: 142, y: 450, width: 2000, height: 1500 }, // Centered positions for old format
+                        { x: 142, y: 2000, width: 2000, height: 1500 },
+                        { x: 142, y: 3545, width: 2000, height: 1500 }
+                    ]
+                };
+            } else {
+                return {
+                    originalWidth: 1575, // 315 * 5
+                    originalHeight: 2800, // 560 * 5
+                    photoWidth: 1315, // 263 * 5
+                    photoHeight: 750, // 150 * 5
+                    photoPositions: [
+                        { x: 130, y: 130, width: 1315, height: 750 }, // 26 * 5
+                        { x: 130, y: 945, width: 1315, height: 750 }, // 189 * 5
+                        { x: 130, y: 1750, width: 1315, height: 750 } // 350 * 5
+                    ]
+                };
+            }
+        }
     </script>
     
     

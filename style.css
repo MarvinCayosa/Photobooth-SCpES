@@ -323,6 +323,58 @@ button {
   background: #07c640;
 }
 
+/* New capture control buttons */
+.btn-warning {
+  background: #ff8c00;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-warning:hover {
+  color: white;
+  background: #ff7b00;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-success:hover {
+  color: white;
+  background: #218838;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-secondary:hover {
+  color: white;
+  background: #5a6268;
+}
+
 .icon {
   width: 20px;
   height: 20px;

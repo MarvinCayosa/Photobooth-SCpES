@@ -326,6 +326,61 @@ button {
   background: #07c640;
 }
 
+/* New capture control buttons - Dark theme */
+.btn-warning {
+  background: #ff8c00;
+  color: white;
+  border: 1px solid #ff7b00;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-warning:hover {
+  color: white;
+  background: #ff7b00;
+  border-color: #ff6a00;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+  border: 1px solid #1e7e34;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-success:hover {
+  color: white;
+  background: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: 1px solid #545b62;
+  border-radius: 20px;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-secondary:hover {
+  color: white;
+  background: #5a6268;
+  border-color: #494f54;
+}
+
 .icon {
   width: 20px;
   height: 20px;
@@ -573,4 +628,325 @@ button {
   font-size: 30px;
   font-weight: 700;
   color: #fcfcfc;
+}
+
+/* ========================================
+   DARK MODE - FORMAT SELECTION PAGE
+======================================== */
+
+/* Format Selection Container */
+.format-selection-container .format-option {
+  background: rgba(30, 30, 35, 0.95);
+  border: 3px solid rgba(60, 60, 70, 0.6);
+  color: #e0e0e0;
+}
+
+.format-selection-container .format-option:hover {
+  background: rgba(35, 35, 45, 0.95);
+  border: 3px solid rgba(131, 224, 255, 0.8);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* Page titles and text */
+.page-title {
+  color: #f0f0f0 !important;
+}
+
+.page-subtitle {
+  color: #b0b0b0 !important;
+}
+
+.format-title {
+  color: #f0f0f0 !important;
+}
+
+.format-description {
+  color: #c0c0c0 !important;
+}
+
+/* Preview backgrounds for dark mode */
+.old-format-preview,
+.new-format-preview {
+  background-color: #2a2a2a !important;
+  border: 1px solid rgba(60, 60, 70, 0.5);
+}
+
+/* Badge styling for dark mode */
+.badge {
+  background: #e74c3c !important;
+  color: white;
+}
+
+.new-badge {
+  background: #27ae60 !important;
+}
+
+/* Back button dark mode */
+#backButton {
+  background: rgba(40, 40, 45, 0.9) !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(60, 60, 70, 0.5);
+}
+
+#backButton:hover {
+  background: rgba(50, 50, 55, 1) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   DARK MODE - MAIN CAMERA PAGE
+======================================== */
+
+/* Camera preview and containers */
+.preview {
+  border: 2px solid rgba(60, 60, 70, 0.6);
+  border-radius: 12px;
+  background: rgba(20, 20, 25, 0.8);
+}
+
+/* Action tabs and buttons */
+.action-tabs {
+  background: rgba(30, 30, 35, 0.8);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(60, 60, 70, 0.5);
+}
+
+.btn-custom,
+.dropdown-toggle {
+  background: rgba(40, 40, 45, 0.9) !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(60, 60, 70, 0.6) !important;
+}
+
+.btn-custom:hover,
+.dropdown-toggle:hover {
+  background: rgba(50, 50, 55, 1) !important;
+  border-color: rgba(80, 80, 90, 0.8) !important;
+}
+
+/* Captured images area */
+.captured-images .placeholder {
+  background: rgba(30, 30, 35, 0.8);
+  color: #b0b0b0;
+  border: 2px dashed rgba(60, 60, 70, 0.6);
+}
+
+.captured-thumbnail {
+  border: 2px solid rgba(60, 60, 70, 0.6);
+  border-radius: 8px;
+}
+
+/* Format indicator for dark mode */
+.format-indicator {
+  background: rgba(102, 126, 234, 0.9) !important;
+  color: white;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.format-indicator.classic {
+  background: rgba(255, 107, 107, 0.9) !important;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+/* Buttons */
+.btn-start {
+  background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+  border: none !important;
+  color: white !important;
+}
+
+.btn-start:hover {
+  background: linear-gradient(135deg, #229954, #27ae60) !important;
+  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.3);
+}
+
+.btn-cancel {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  border: none !important;
+  color: white !important;
+}
+
+.btn-proceed {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  border: none !important;
+  color: white !important;
+}
+
+/* ========================================
+   DARK MODE - TEMPLATE PAGE
+======================================== */
+
+/* Template container */
+.template-container {
+  background: rgba(20, 20, 25, 0.9);
+  border: 2px solid rgba(60, 60, 70, 0.6);
+  border-radius: 16px;
+}
+
+/* Template selection area */
+.template-selection {
+  background: rgba(30, 30, 35, 0.8);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(60, 60, 70, 0.5);
+}
+
+.template-selection h1 {
+  color: #f0f0f0 !important;
+}
+
+/* Template buttons */
+.template-btn {
+  border: 3px solid rgba(60, 60, 70, 0.8) !important;
+  transition: all 0.3s ease;
+}
+
+.template-btn:hover {
+  border-color: rgba(131, 224, 255, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.active-template {
+  border: 5px solid rgba(131, 224, 255, 0.9) !important;
+}
+
+/* Download and action buttons */
+.btn-download {
+  background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+  border: none !important;
+  color: white !important;
+}
+
+.btn-download:hover {
+  background: linear-gradient(135deg, #229954, #27ae60) !important;
+  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.3);
+}
+
+/* Photo slots */
+.photo-slot {
+  border: 2px solid rgba(60, 60, 70, 0.6);
+  border-radius: 8px;
+  background: rgba(25, 25, 30, 0.8);
+}
+
+/* Modal styling for dark mode */
+.modal-content {
+  background: rgba(30, 30, 35, 0.95) !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(60, 60, 70, 0.6);
+}
+
+/* Settings panel */
+#settingsPanel {
+  background: rgba(30, 30, 35, 0.95) !important;
+  color: #e0e0e0 !important;
+  border: 2px solid rgba(60, 60, 70, 0.6);
+  border-radius: 12px;
+}
+
+/* QR Modal */
+#qrModal .modal-content {
+  background: rgba(30, 30, 35, 0.98) !important;
+  border: 2px solid rgba(60, 60, 70, 0.8);
+}
+
+#qrModal h2 {
+  color: #f0f0f0 !important;
+}
+
+/* Progress dialog */
+#progressDialog {
+  background: rgba(30, 30, 35, 0.98) !important;
+  color: #e0e0e0 !important;
+  border: 2px solid rgba(60, 60, 70, 0.8);
+}
+
+/* ========================================
+   DARK MODE - LOGIN/INDEX PAGE
+======================================== */
+
+/* Login form styling */
+.login-form {
+  background: rgba(30, 30, 35, 0.95) !important;
+  border: 2px solid rgba(60, 60, 70, 0.6);
+  border-radius: 16px;
+}
+
+.login-form h1,
+.login-form h2 {
+  color: #f0f0f0 !important;
+}
+
+.form-control {
+  background: rgba(40, 40, 45, 0.8) !important;
+  border: 1px solid rgba(60, 60, 70, 0.6) !important;
+  color: #e0e0e0 !important;
+}
+
+.form-control:focus {
+  background: rgba(45, 45, 50, 0.9) !important;
+  border-color: rgba(131, 224, 255, 0.8) !important;
+  box-shadow: 0 0 0 0.2rem rgba(131, 224, 255, 0.25);
+  color: #f0f0f0 !important;
+}
+
+.form-control::placeholder {
+  color: #999 !important;
+}
+
+/* Login button */
+.btn-primary {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  border: none !important;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2980b9, #21618c) !important;
+}
+
+/* ========================================
+   UNIVERSAL DARK MODE IMPROVEMENTS
+======================================== */
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(30, 30, 35, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(60, 60, 70, 0.8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(80, 80, 90, 0.9);
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(131, 224, 255, 0.3);
+  color: #f0f0f0;
+}
+
+/* Input focus glow */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(131, 224, 255, 0.5);
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+.btn,
+input,
+select,
+.format-option,
+.template-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
