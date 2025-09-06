@@ -50,20 +50,26 @@
         }
 
         .format-indicator {
-            background: rgba(102, 126, 234, 0.9);
+            background: rgba(102, 126, 234, 0.9) !important;
             backdrop-filter: blur(10px);
-            color: white;
-            padding: 8px 16px;
+            color: white !important;
+            padding: 8px 16px !important;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 12px !important;
+            font-weight: 600 !important;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
             transition: all 0.3s ease;
-            display: inline-block;
+            display: inline-block !important;
             margin-left: 15px;
             vertical-align: middle;
+            min-width: 120px;
+            text-align: center !important;
+            white-space: nowrap;
+            visibility: visible !important;
+            opacity: 1 !important;
+            line-height: 1.2 !important;
         }
 
         .format-indicator.classic {
@@ -71,8 +77,14 @@
             box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
         }
 
+        .format-indicator.stories {
+            background: rgba(102, 126, 234, 0.9);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
         .format-indicator:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
         }
     </style>
 
@@ -95,9 +107,9 @@
 
     <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="row w-100">
-            <h1 class="title text-start">
+            <h1 class="title text-start d-flex align-items-center">
                 PhotoBooth UE-SCpES
-                <span id="formatIndicator" class="format-indicator"></span>
+                <span id="formatIndicator" class="format-indicator">Loading...</span>
             </h1>
             <div class="col-md-8">
 
@@ -226,7 +238,7 @@
                 
                     
                 </div>
-                <label">  <button id="logoutButton">Logout</button></label>
+                <button id="logoutButton">Logout</button>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary">Save Changes</button>
@@ -244,16 +256,27 @@
         </div>
     </div>
 
+    <script src="shared-login.js"></script>
     <script>
         // Check if format is selected, if not redirect to format selection
         document.addEventListener("DOMContentLoaded", () => {
+            // Check if user is logged in first
+            checkLoginStatus();
+            
             const selectedFormat = localStorage.getItem("selectedFormat");
             if (!selectedFormat) {
                 window.location.href = "format-selection.html";
             }
             
             // Display current format selection
+            console.log("🚀 DOM loaded, calling updateFormatIndicator...");
             updateFormatIndicator();
+            
+            // Also call it after a short delay to ensure DOM is fully ready
+            setTimeout(() => {
+                console.log("⏰ Delayed call to updateFormatIndicator...");
+                updateFormatIndicator();
+            }, 100);
         });
         
         // Function to go back to format selection
@@ -263,19 +286,90 @@
         
         // Function to update format indicator
         function updateFormatIndicator() {
-            const selectedFormat = localStorage.getItem("selectedFormat");
+            let selectedFormat = localStorage.getItem("selectedFormat");
             const indicator = document.getElementById("formatIndicator");
             
+            console.log("🔍 Updating format indicator:", selectedFormat);
+            console.log("🔍 Indicator element:", indicator);
+            
+            if (!indicator) {
+                console.error("❌ Format indicator element not found!");
+                return;
+            }
+            
+            // Set default format if none is selected
+            if (!selectedFormat) {
+                selectedFormat = "new"; // Default to Stories & Social
+                localStorage.setItem("selectedFormat", selectedFormat);
+                console.log("🔧 No format selected, setting default to Stories & Social");
+            }
+            
+            // Clear any existing classes
+            indicator.classList.remove("classic", "stories");
+            
+            // Set the text content
             if (selectedFormat === "old") {
                 indicator.textContent = "Classic Portrait";
+                indicator.innerHTML = "Classic Portrait"; // Also set innerHTML
                 indicator.classList.add("classic");
-                indicator.classList.remove("stories");
+                console.log("✅ Format indicator set to Classic Portrait");
             } else {
                 indicator.textContent = "Stories & Social";
+                indicator.innerHTML = "Stories & Social"; // Also set innerHTML
                 indicator.classList.add("stories");
-                indicator.classList.remove("classic");
+                console.log("✅ Format indicator set to Stories & Social");
             }
+            
+            // Force visibility with multiple approaches
+            indicator.style.display = "inline-block";
+            indicator.style.visibility = "visible";
+            indicator.style.opacity = "1";
+            indicator.style.color = "white";
+            indicator.style.fontSize = "12px";
+            indicator.style.fontWeight = "600";
+            indicator.style.textAlign = "center";
+            indicator.style.lineHeight = "1.2";
+            
+            // Force a reflow to ensure styles are applied
+            indicator.offsetHeight;
+            
+            console.log("🔍 Final indicator text:", indicator.textContent);
+            console.log("🔍 Final indicator innerHTML:", indicator.innerHTML);
+            console.log("🔍 Final indicator classes:", indicator.className);
+            console.log("🔍 Final indicator computed styles:", window.getComputedStyle(indicator).color);
         }
+
+        // Debug function to test format indicator
+        window.testFormatIndicator = function() {
+            console.log("🧪 Testing format indicator...");
+            updateFormatIndicator();
+        };
+
+        // Debug function to set format for testing
+        window.setFormat = function(format) {
+            console.log("🔧 Setting format to:", format);
+            localStorage.setItem("selectedFormat", format);
+            updateFormatIndicator();
+        };
+
+        // Debug function to force show text
+        window.forceShowText = function() {
+            const indicator = document.getElementById("formatIndicator");
+            if (indicator) {
+                indicator.textContent = "TEST TEXT";
+                indicator.innerHTML = "TEST TEXT";
+                indicator.style.color = "white";
+                indicator.style.fontSize = "14px";
+                indicator.style.fontWeight = "bold";
+                console.log("🔧 Forced text display");
+            }
+        };
+
+        // Try to update format indicator immediately
+        console.log("🚀 Script loaded, attempting immediate format update...");
+        setTimeout(() => {
+            updateFormatIndicator();
+        }, 50);
     </script>
 
 </body>
