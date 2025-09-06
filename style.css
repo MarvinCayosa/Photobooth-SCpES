@@ -28,7 +28,7 @@ body {
   align-items: center;
   min-height: 100vh;
   overflow: hidden;
-  background-color: #f8f8ff;
+  background-color: #0d0d00;
   font-family: "Inter", sans-serif;
   font-weight: 400;
   font-style: normal;
@@ -89,25 +89,11 @@ body {
 
 /* Border SVG */
 .bottom-left {
-  position: absolute;
-  bottom: -5px;
-  left: -5px;
-  width: 408px;
-  height: 315.541px;
-  flex-shrink: 0;
-  border: none !important;
-  filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.2)); /* Soft shadow */
+  display: none;
 }
 
 .upper-right {
-  position: absolute;
-  top: -15px;
-  right: -5px;
-  width: 596px;
-  height: 336px;
-  flex-shrink: 0;
-  border: none !important;
-  filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.2)); /* Soft shadow */
+  display: none;
 }
 
 /* Ensure content stays above */
@@ -152,10 +138,16 @@ canvas {
   width: 700px; /* 4:3 aspect ratio */
   height: 500px; /* 4:3 aspect ratio */
   border-radius: 15px;
-  border: 0.5px solid rgb(171, 171, 171);
+  border: 4px solid rgb(62, 62, 62);
   background: white;
   object-fit: cover;
   max-width: 100%;
+  transition: filter 0.3s ease-in-out;
+}
+
+/* Black and white filter for video */
+video.bw-filter {
+  filter: grayscale(100%);
 }
 
 .flash {
@@ -271,8 +263,10 @@ button {
 }
 .btn-start.capturing {
   color: white;
-  background: #b1b1b1; /* Change color when capturing */
+  background: #6c757d !important; /* Gray background when capturing */
   cursor: default;
+  animation: none !important; /* Remove gradient animation when capturing */
+  transform: none !important;
 }
 .btn-start {
   background: #e01818;
@@ -325,54 +319,60 @@ button {
 
 /* New capture control buttons */
 .btn-warning {
-  background: #ff8c00;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 10px 15px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
+  background: #ff8c00 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 10px 15px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease-in-out !important;
 }
 
 .btn-warning:hover {
-  color: white;
-  background: #ff7b00;
+  color: white !important;
+  background: #ff7b00 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4) !important;
 }
 
 .btn-success {
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 10px 15px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
+  background: #28a745 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 10px 15px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease-in-out !important;
 }
 
 .btn-success:hover {
-  color: white;
-  background: #218838;
+  color: white !important;
+  background: #218838 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4) !important;
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 10px 15px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
+  background: #6c757d !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 10px 15px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease-in-out !important;
 }
 
 .btn-secondary:hover {
-  color: white;
-  background: #5a6268;
+  color: white !important;
+  background: #5a6268 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4) !important;
 }
 
 .icon {
@@ -393,7 +393,13 @@ button {
 
 .icon-mirror {
   fill: #383838;
-  transition: all 0.2s ease-in-out;
+  stroke: none;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Mirror flip animation */
+.icon-mirror.flipped {
+  transform: scaleX(-1);
 }
 
 .icon-moon {
@@ -417,6 +423,19 @@ button {
   stroke: #efefef;
 }
 
+.icon-filter {
+  stroke: #383838;
+  fill: none;
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Filter rotation animation */
+.icon-filter.rotated {
+  transform: rotate(180deg);
+}
+
 #countdownOverlay {
   display: none;
   position: absolute;
@@ -438,7 +457,7 @@ button {
 #mirrorButton,
 #timerButton,
 #settingsButton,
-#themeButton {
+#filterButton {
   margin: 0;
   background: transparent;
   border: none;
@@ -448,9 +467,23 @@ button {
   align-items: center;
 }
 
-#mirrorButton:hover .icon-mirror,
-#themeButton:hover .icon-moon {
+#mirrorButton:hover .icon-mirror {
   transform: translate(0, -2px);
+  fill: #171717;
+}
+
+#mirrorButton:hover .icon-mirror.flipped {
+  transform: translate(0, -2px) scaleX(-1);
+  fill: #171717;
+}
+
+#filterButton:hover .icon-filter {
+  transform: translate(0, -2px);
+  fill: #171717;
+}
+
+#filterButton:hover .icon-filter.rotated {
+  transform: translate(0, -2px) rotate(180deg);
   fill: #171717;
 }
 #settingsButton:hover .icon-settings,

@@ -20,13 +20,22 @@
     <!-- script.js functionality is included inline in this file -->
     <title>Photo Booth Template</title>
     <style>
+        /* Dark mode body styling */
+        body {
+            background: #1a1a1a;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
         #backButton {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(50, 50, 50, 0.9);
             backdrop-filter: blur(10px);
-            color: #333;
+            color: #f0f0f0;
             border: none;
             width: 44px;
             height: 44px;
@@ -37,48 +46,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
         }
 
         #backButton:hover {
-            background: rgba(255, 255, 255, 1);
+            background: rgba(70, 70, 70, 1);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
         }
 
         #backButton:active {
-            transform: translateY(0);
-        }
-
-        #themeButton {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            color: #333;
-            border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 22px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-
-        #themeButton:hover {
-            background: rgba(255, 255, 255, 1);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        #themeButton:active {
             transform: translateY(0);
         }
 
@@ -101,53 +79,135 @@
             display: flex;
             height: 100%;
             flex-direction: column;
-            align-items: flex-start; /* Align content to the left */
-            gap: 30px;
-            padding-left: 50px; /* Adds spacing from the template */
+            align-items: flex-start;
+            gap: 25px;
+            padding-left: 40px;
+        }
+
+        .template-header {
+            margin-bottom: 5px;
+            text-align: center;
         }
 
         .template-selection h1 {
-            margin-bottom: 10px;
-            align-self: flex-start; /* Aligns header with the template */
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #f0f0f0;
+            letter-spacing: -0.02em;
+        }
+
+        .temp-subtitle {
+            font-size: 14px;
+            color: #b0b0b0;
+            margin: 0;
+            font-weight: 400;
         }
 
         .template-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            max-width: 350px; /* Limit width to fit 5 buttons per row */
+            gap: 20px;
+            max-width: 400px;
         }
 
         .template-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            width: 80px;
+            height: 90px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            transform: scale(1);
-             border: 4px solid #7878782f;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(50, 50, 50, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(102, 126, 234, 0.2) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .template-btn:hover::before {
+            opacity: 1;
+        }
+
+        .template-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .template-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #f0f0f0;
+            text-align: center;
+            transition: color 0.3s ease;
         }
 
         .template-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.25);
+            border-color: #667eea;
+        }
+
+        .template-btn:hover .template-preview {
             transform: scale(1.1);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            border-color: #4a90e2;
-            z-index: 10;
-            position: relative;
+        }
+
+        .template-btn:hover .template-name {
+            color: #667eea;
         }
 
         .template-btn.active-template {
-            border: 4px solid #6b7b87;
-            transform: scale(1.05);
+            border: 4px solid #eff2ff;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3), 0 0 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .template-btn.active-template .template-name {
+            color: #667eea;
         }
 
         .template-btn.active-template:hover {
-            transform: scale(1.15);
-        
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.35), 0 0 40px rgba(102, 126, 234, 0.5);
         }
-        #btn-template1 { background: white; }
-        #btn-template2 { background: black; }
+
+
+
+        /* Template specific colors for preview */
+        #btn-template7 .template-preview { 
+            background: linear-gradient(135deg, #5078f2 0%, #764ba2 100%);
+        }
+        #btn-template2 .template-preview { 
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        #btn-template3 .template-preview { 
+            background: linear-gradient(135deg, #c8b6b3 0%, #a0807a 100%);
+        }
+        #btn-template4 .template-preview { 
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+        #btn-template5 .template-preview { 
+            background: linear-gradient(135deg, #fbffd4 0%, #f4f3a0 100%);
+        }
         #btn-template3 { background: #c8b6b3; }
         #btn-template4 { background: #ff0000; }
         #btn-template5 { background: #fbffd4; }
@@ -161,6 +221,7 @@
             background: transparent;
             filter: drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.223)); /* Soft shadow */
             margin-bottom: 0; /* Space between template and buttons */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1), 0 0 30px rgba(255, 255, 255, 0.05);
         }
 
         .button-container {
@@ -179,10 +240,44 @@
             background-size: cover;
             background-position: center;
             cursor: grab;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Hide dashed border when photo is loaded */
+        .photo-slot.has-photo {
+            border: 2px solid transparent;
+        }
+
+        .photo-slot:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .photo-slot.has-photo:hover {
+            border-color: rgba(102, 126, 234, 0.7);
+        }
+
+        .photo-slot.dragging {
+            cursor: grabbing;
+            transform: translateX(-50%) scale(1.05);
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .photo-slot.drag-over {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
         }
         .slot1 { top: 26px; }
-        .slot2 { top: 189px; }
-        .slot3 { top: 350px; }
+        .slot2 { top: 191px; }
+        .slot3 { top: 352px; }
 
         .template {
             position: absolute;
@@ -198,21 +293,59 @@
 
      
 
-        .btn-download{
-            padding: 10px 20px;
+        .btn-download {
+            background: linear-gradient(45deg, #1a237e, #3f51b5, #2196f3, #00bcd4, #2196f3, #3f51b5, #1a237e);
+            background-size: 400% 400%;
+            color: white;
             border: none;
-            background: #37ba20;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 12px;
             cursor: pointer;
-            border-radius: 40px;
-            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 16px 0 rgba(26, 35, 126, 0.3), 0 0 20px rgba(59, 130, 246, 0.3);
+            animation: gradientShift 4s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
         }
-        .btn-download:hover{
-            color: white;
-            background: #2f9e17;
+
+        .btn-download::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
+
+        .btn-download:hover::before {
+            left: 100%;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            color: whitesmoke;
+            box-shadow: 0 10px 30px 0 rgba(26, 35, 126, 0.5), 0 0 30px rgba(59, 130, 246, 0.5);
+            animation-duration: 2s;
+        }
+
+        .btn-download:active {
+            transform: translateY(-1px);
+            transition: transform 0.1s;
+        }
+
+        .btn-download .btn-icon {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
 
         .btn-again{
             padding: 11px 20px;
@@ -233,20 +366,197 @@
         .modal {
         display: none;
         position: fixed;
-        z-index: 1000;
+        z-index: 9999;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
         justify-content: center;
         align-items: center;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .modal.show {
         display: flex;
+        opacity: 1;
+    }
+
+    .modal-content {
+        background: rgba(30, 30, 30, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 480px;
+        width: 90%;
+        box-shadow: 
+            0 20px 25px -5px rgba(0, 0, 0, 0.3),
+            0 10px 10px -5px rgba(0, 0, 0, 0.2),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+        transform: scale(0.8) translateY(40px);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal.show .modal-content {
+        transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+        border-bottom: #454545 solid 2px;
+    }
+
+    .success-icon {
+        margin: 0;
+        width: 48px;
+        height: 48px;
+        animation: successPulse 0.6s ease-out;
+        flex-shrink: 0;
+    }
+
+    .modal-text-container {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        flex: 1;
+    }
+
+    .modal-content h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #f0f0f0;
+        margin: 0 0 4px 0;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
+    }
+
+    .modal-subtitle {
+        font-size: 14px;
+        color: #b0b0b0;
+        margin: 0 0 8px 0;
+        font-weight: 400;
+        line-height: 1.4;
+    }
+
+    #qrCodeContainer {
+        display: none; /* Initially hidden */
+        justify-content: center;
+        align-items: center;
+        margin: 24px auto;
+        padding: 16px; /* 8px + QR code size padding */
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: fit-content;
+        height: fit-content;
+    }
+
+    /* Show QR container when modal is visible */
+    .modal.show #qrCodeContainer {
+        display: flex;
+    }
+
+    .modal-footer {
+        border-top: #454545 solid 2px;
+        margin-top: 24px;
+        justify-content: center;
+    }
+
+    .made-by {
+        font-size: 12px;
+        color: #b0b0b0;
+        margin: 0 0 20px 0;
+        font-weight: 400;
+        text-align: center;
+    }
+
+    .download-btn {
+        background: linear-gradient(45deg, #1a237e, #3f51b5, #2196f3, #00bcd4, #2196f3, #3f51b5, #1a237e);
+        background-size: 400% 400%;
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 6px 20px 0 rgba(26, 35, 126, 0.35), 0 0 25px rgba(59, 130, 246, 0.3);
+        animation: gradientShift 4s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .download-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .download-btn:hover::before {
+        left: 100%;
+    }
+
+    .download-btn:hover {
+        transform: translateY(-3px);
+        color: whitesmoke;
+        box-shadow: 0 12px 28px 0 rgba(26, 35, 126, 0.5), 0 0 35px rgba(59, 130, 246, 0.5);
+        animation-duration: 2s;
+    }
+
+    .download-btn:active {
+        transform: translateY(-1px);
+        transition: transform 0.1s;
+    }
+
+    .btn-text {
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .btn-icon {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+
+    @keyframes gradientShift {
+        0%, 100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    @keyframes successPulse {
+        0% {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
 
     body.modal-open {
@@ -254,30 +564,13 @@
     }
 
     body.modal-open > *:not(.modal) {
-        filter: blur(3px);
-        transition: filter 0.3s ease;
+        filter: brightness(0.7);
+        transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     body:not(.modal-open) > * {
         filter: none;
-        transition: filter 0.3s ease;
-    }
-
-    .modal-content {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        max-width: 350px;
-        width: 90%;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    #qrCodeContainer {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 20px 0;
+        transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .close-btn {
@@ -375,7 +668,7 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
-    z-index: 2000;
+    z-index: 5000;
     animation: fadeIn 0.3s ease;
 }
 
@@ -386,14 +679,19 @@
 }
 
 .settings-modal-content {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
     padding: 0;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.3),
+        0 10px 10px -5px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
     width: 90%;
-    max-width: 450px;
-    animation: slideUp 0.3s ease;
+    max-width: 480px;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
 }
 
@@ -402,14 +700,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 25px 30px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(50, 50, 50, 0.2);
 }
 
 .settings-modal-header h2 {
     font-size: 24px;
     font-weight: 700;
-    color: #333;
+    color: #f0f0f0;
     margin: 0;
 }
 
@@ -418,7 +716,7 @@
     border: none;
     font-size: 28px;
     cursor: pointer;
-    color: #666;
+    color: #b0b0b0;
     padding: 0;
     width: 35px;
     height: 35px;
@@ -430,8 +728,8 @@
 }
 
 .settings-close:hover {
-    background: rgba(0, 0, 0, 0.1);
-    color: #333;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0f0f0;
     transform: rotate(90deg);
 }
 
@@ -452,13 +750,13 @@
 .settings-section h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: #f0f0f0;
     margin: 0 0 8px 0;
 }
 
 .settings-description {
     font-size: 14px;
-    color: #666;
+    color: #b0b0b0;
     margin: 0 0 20px 0;
 }
 
@@ -467,7 +765,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 18px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .settings-option:last-child {
@@ -482,14 +780,14 @@
 .settings-label {
     font-size: 16px;
     font-weight: 500;
-    color: #333;
+    color: #f0f0f0;
     margin: 0 0 4px 0;
     display: block;
 }
 
 .settings-sublabel {
     font-size: 13px;
-    color: #666;
+    color: #b0b0b0;
     display: block;
     line-height: 1.4;
 }
@@ -498,39 +796,69 @@
     display: flex;
     gap: 15px;
     padding: 25px 30px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(50, 50, 50, 0.2);
 }
 
 .settings-btn {
     flex: 1;
-    padding: 12px 20px;
+    padding: 14px 24px;
     border: none;
     border-radius: 12px;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.settings-btn:hover::before {
+    left: 100%;
 }
 
 .settings-btn-secondary {
-    background: rgba(0, 0, 0, 0.1);
-    color: #666;
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    border: 1px solid rgba(107, 114, 128, 0.2);
 }
 
 .settings-btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.15);
-    color: #333;
+    background: rgba(107, 114, 128, 0.15);
+    color: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .settings-btn-primary {
-    background: #37ba20;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
 }
 
 .settings-btn-primary:hover {
-    background: #2f9e17;
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.4);
+}
+
+#googleSignIn {
+    flex: none;
+    min-width: 80px;
+    max-width: 120px;
+    padding: 10px 16px;
+    font-size: 13px;
 }
 
 @keyframes fadeIn {
@@ -553,92 +881,395 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        background: #6750a4;
-        color: white;
+        background:transparent;
+        backdrop-filter: blur(10px);
+        color: #f0f0f0;
         border: none;
-        padding: 12px;
+        padding: 8px;
         border-radius: 20px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
-        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
         transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-        width: 48px;
-        height: 48px;
+        width: 52px;
+        height: 52px;
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 10;
     }
 
     #settingsButton:hover {
-        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
         transform: translateY(-1px);
+        background: rgba(70, 70, 70, 1);
     }
 
     #settingsButton:active {
         transform: translateY(0);
     }
 
+    .icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .logo-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        object-fit: contain;
+        filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
     /* Old account modal styles removed - now using Settings modal design */
 
     #progressDialog {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
-    width: 300px;
-    text-align: center;
-    z-index: 1000;
-}
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 1000000;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+    }
 
-#progressDialog p {
-    margin-bottom: 10px;
-}
+    #progressDialog.show {
+        opacity: 1;
+        pointer-events: all;
+    }
 
-#progressBarContainer {
-    width: 100%;
-    background: #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-}
+    .progress-content {
+        background: rgba(30, 30, 30, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 35px;
+        border-radius: 24px;
+        text-align: center;
+        max-width: 380px;
+        width: 90%;
+        box-shadow: 
+            0 20px 25px -5px rgba(0, 0, 0, 0.3),
+            0 10px 10px -5px rgba(0, 0, 0, 0.2),
+            0 0 0 1px rgba(255, 255, 255, 0.1),
+            0 0 30px rgba(0, 255, 215, 0.15),
+            0 0 60px rgba(102, 126, 234, 0.1);
+        transform: scale(0.9) translateY(20px);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: subtleGlow 4s ease-in-out infinite;
+    }
 
-#progressBar {
-    width: 0%;
-    height: 10px;
-    background: linear-gradient(to right, #ff512f, #dd2476);
-    border-radius: 5px;
-    transition: width 0.3s ease-in-out;
-}
+    #progressDialog.show .progress-content {
+        transform: scale(1) translateY(0);
+    }
+
+    .progress-icon {
+        margin: 0 auto 20px;
+        width: 48px;
+        height: 48px;
+        animation: spin 2s linear infinite;
+    }
+
+    .progress-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #f0f0f0;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.02em;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: textSlideIn 0.6s ease-out 0.2s forwards;
+    }
+
+    .progress-message {
+        font-size: 13px;
+        color: #b0b0b0;
+        margin: 0 0 24px 0;
+        font-weight: 400;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: textSlideIn 0.6s ease-out 0.4s forwards;
+        min-height: 18px;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    #progressBarContainer {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        height: 8px;
+        position: relative;
+        margin-bottom: 16px;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: textSlideIn 0.6s ease-out 0.6s forwards;
+    }
+
+    #progressBar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(45deg, #00ffd7, #00e6f5, #00c8ff, #00a5ff, #007aff, #8f63ed, #c842cd, #eb00a1, #ff3175, #ff7546, #ffb408, #ffed00, #00ffd7, #00e6f5, #00c8ff);
+        background-size: 400% 400%;
+        border-radius: 12px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 255, 215, 0.5), 0 0 40px rgba(0, 255, 215, 0.3), 0 0 60px rgba(255, 237, 0, 0.2);
+        animation: gradientFlow 3s ease-in-out infinite, pulseGlow 2s ease-in-out infinite;
+    }
+
+    #progressBar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    .progress-percentage {
+        font-size: 12px;
+        color: #b0b0b0;
+        font-weight: 500;
+        margin: 0;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: textSlideIn 0.6s ease-out 0.8s forwards;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    @keyframes gradientFlow {
+        0%, 100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    @keyframes pulseGlow {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(0, 255, 215, 0.3), 0 0 40px rgba(0, 255, 215, 0.2), 0 0 60px rgba(255, 237, 0, 0.1);
+        }
+        50% {
+            box-shadow: 0 0 30px rgba(0, 255, 215, 0.6), 0 0 60px rgba(0, 255, 215, 0.4), 0 0 90px rgba(255, 237, 0, 0.3);
+        }
+    }
+
+    @keyframes subtleGlow {
+        0%, 100% {
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.3),
+                0 10px 10px -5px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                0 0 20px rgba(0, 255, 215, 0.1),
+                0 0 40px rgba(102, 126, 234, 0.05);
+        }
+        50% {
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.3),
+                0 10px 10px -5px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(0, 255, 215, 0.2),
+                0 0 80px rgba(102, 126, 234, 0.15);
+        }
+    }
+
+    @keyframes templateFadeIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .template-loading {
+        animation: templateFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes textSlideIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Prevent interaction with background */
+    body.progress-loading {
+        overflow: hidden;
+    }
+
+    body.progress-loading > *:not(#progressDialog) {
+        pointer-events: none;
+        transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body:not(.progress-loading) > * {
+        pointer-events: auto;
+        filter: none;
+        transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Drag instruction styling */
+    .drag-instruction {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 15px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        color: #b0b0b0;
+        font-size: 13px;
+        font-weight: 400;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(10px);
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        pointer-events: none;
+    }
+
+    .drag-instruction.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .drag-instruction svg {
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+    }
+
+    .drag-instruction.show svg {
+        opacity: 1;
+    }
+
+    /* Enhanced drag states */
+    .photo-slot.dragging {
+        opacity: 0.9;
+        transform: translateX(-50%) scale(1.1);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+        z-index: 1000;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: popOutCentered 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .photo-slot.drag-over {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        transform: translateX(-50%) scale(1.05);
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: popInCentered 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popOutCentered {
+        0% {
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: translateX(-50%) scale(1.15);
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateX(-50%) scale(1.1);
+            opacity: 0.9;
+        }
+    }
+
+    @keyframes popInCentered {
+        0% {
+            transform: translateX(-50%) scale(1);
+        }
+        50% {
+            transform: translateX(-50%) scale(1.08);
+        }
+        100% {
+            transform: translateX(-50%) scale(1.05);
+        }
+    }
 
     
     </style>
 </head>
 <body>
-    <!-- Back Button -->
-    <button id="backButton" onclick="goBack()">←</button>
-    
-    <!-- Theme Toggle Button -->
-    <button id="themeButton" onclick="toggleTheme()">
-        <svg class="icon icon-moon" fill="currentColor">
-            <use xlink:href="icons.svg#icon-moon"></use>
-        </svg>
-    </button>
-    
-    <!-- ✅ QR Code Modal -->
+        <!-- ✅ QR Code Modal -->
     <div id="qrModal" class="modal">
         <div class="modal-content">
-            <h2>Scan to Download</h2>
+            <div class="modal-header">
+                <div class="success-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill="#34D399"/>
+                        <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="modal-text-container">
+                    <h2>Your soft copy is ready!</h2>
+                    <p class="modal-subtitle">Scan the QR code below to download your photo</p>
+                </div>
+            </div>
             <div id="qrCodeContainer"></div>
-            <button class="close-btn" onclick="closeQRModal()">ONE MORE</button>
+            <div class="modal-footer">
+                <p class="made-by">Made by the Society of Computer Engineering Students</p>
+                <button class="download-btn" onclick="goToFormatSelection()">
+                    <span class="btn-text">Done</span>
+                    <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </button>
+            </div>
+        </div>
+    </div>
+        <!-- Progress Dialog -->
+    <div id="progressDialog">
+        <div class="progress-content">
+            <div class="progress-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h3 class="progress-title">Preparing your QR Code</h3>
+            <p class="progress-message">Please wait while we process your photo...</p>
+            <div id="progressBarContainer">
+                <div id="progressBar"></div>
+            </div>
+            <p class="progress-percentage">0%</p>
         </div>
     </div>
 
-    <button id="settingsButton">Account</button>
+
+    <!-- Back Button -->
+    <button id="backButton" onclick="goBack()">←</button>
+    
+    <button id="settingsButton">
+        <img src="logo.png" alt="SCpES Logo" class="logo-icon">
+    </button>
 
 
     <div class="background-container">
@@ -660,24 +1291,44 @@
                 <div class="photo-slot slot3" id="photo3" draggable="true"></div>
                 <div class="template" id="template-image"></div>
             </div>
+            
+            <!-- Subtle instruction prompt -->
+            <div class="drag-instruction" id="dragInstruction" style="display: none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 7h10v10H7V7z" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M14 11l-3 3-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Drag photos to rearrange order</span>
+            </div>
     
        
         </div>
     
-        <!-- Template Selection Buttons -->
         <div class="template-selection">
-            <h1 class="temp-title">Make it Yours!</h1>
+            <div class="template-header">
+                <h1 class="temp-title">Choose Your Style ✨</h1>
+                <p class="temp-subtitle">Pick a template that matches your vibe</p>
+            </div>
             <div class="template-buttons">
-                <button class="template-btn" onclick="changeTemplate('TechCon_Template.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template7"></button>
+                <button class="template-btn" onclick="changeTemplate('TechCon_Template.png');" id="btn-template7" data-template="TechCon_Template.png">
+                    <div class="template-preview"></div>
+                    <span class="template-name">Tech</span>
+                </button>
                 <!-- <button class="template-btn" onclick="changeTemplate('template4.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template4"></button>
                 <button class="template-btn" onclick="changeTemplate('template2.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template2"></button>
                 <button class="template-btn" onclick="changeTemplate('template3.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template3"></button>
                 <button class="template-btn" onclick="changeTemplate('template4.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template4"></button>
                 <button class="template-btn" onclick="changeTemplate('template5.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template5"></button> -->
-
             </div>
             <div class="button-container">
-                <button class="btn btn-download" onclick="downloadImage()">Finish</button>
+                <button class="btn btn-download" onclick="downloadImage()">
+                    <span class="btn-text">Download</span>
+                    <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
                 <div id="qrCodeContainer" class="mt-3"></div>
                 <!-- ✅ Account Modal (Hidden by Default) -->
                 <div id="settingsPanel" class="settings-modal">
@@ -722,13 +1373,7 @@
                     </div>
                 </div>
 
-                <!-- Progress Dialog -->
-                <div id="progressDialog">
-                    <p>Preparing your Photo QR</p>
-                    <div id="progressBarContainer">
-                        <div id="progressBar"></div>
-                    </div>
-                </div>
+   
 
                 <!-- ✅ QR Code Modal -->
                 <div id="qrModal" class="modal">
@@ -1110,16 +1755,34 @@
                     console.log("Photo elements found:", photo1, photo2, photo3); // Debug log
                     
                     if (photo1 && photo2 && photo3) {
-                        // Clear any existing background images first
-                        photo1.style.backgroundImage = "";
-                        photo2.style.backgroundImage = "";
-                        photo3.style.backgroundImage = "";
+                        // Only load photos if they don't already have the correct images
+                        const currentImages = [
+                            photo1.style.backgroundImage,
+                            photo2.style.backgroundImage,
+                            photo3.style.backgroundImage
+                        ];
                         
-                        // Force a small delay to ensure clearing takes effect
-                        setTimeout(() => {
+                        const expectedImages = [
+                            `url("${images[0]}")`,
+                            `url("${images[1]}")`,
+                            `url("${images[2]}")`
+                        ];
+                        
+                        // Check if photos are already loaded correctly
+                        const photosAlreadyLoaded = currentImages.every((current, index) => 
+                            current === expectedImages[index]
+                        );
+                        
+                        if (!photosAlreadyLoaded) {
+                            // Load photos smoothly without clearing first
                             photo1.style.backgroundImage = `url('${images[0]}')`;
                             photo2.style.backgroundImage = `url('${images[1]}')`;
                             photo3.style.backgroundImage = `url('${images[2]}')`;
+                            
+                            // Add has-photo class to hide dashed borders
+                            photo1.classList.add('has-photo');
+                            photo2.classList.add('has-photo');
+                            photo3.classList.add('has-photo');
                             
                             // Ensure proper background properties for photo display
                             [photo1, photo2, photo3].forEach(element => {
@@ -1128,8 +1791,16 @@
                                 element.style.backgroundRepeat = "no-repeat";
                             });
                             
+                            // Initialize drag and drop after photos are loaded
+                            initializeDragAndDrop();
+                            
+                            // Show drag instruction
+                            showDragInstruction();
+                            
                             console.log("Photos loaded successfully"); // Debug log
-                        }, 10);
+                        } else {
+                            console.log("Photos already loaded correctly, skipping reload"); // Debug log
+                        }
                     } else {
                         console.error("Photo elements not found in DOM"); // Debug log
                         // Retry after a short delay if elements not found
@@ -1143,29 +1814,242 @@
             }
         }
     
+        // ✅ Drag and Drop Functionality for Photo Slots
+        let draggedElement = null;
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let isDragging = false;
+    
+        function initializeDragAndDrop() {
+            const photoSlots = document.querySelectorAll('.photo-slot');
+            
+            photoSlots.forEach((slot, index) => {
+                // Remove existing event listeners first to prevent duplicates
+                slot.removeEventListener('mousedown', handleMouseDown);
+                slot.removeEventListener('touchstart', handleTouchStart);
+                slot.removeEventListener('dragstart', handleDragStart);
+                slot.removeEventListener('dragover', handleDragOver);
+                slot.removeEventListener('drop', handleDrop);
+                slot.removeEventListener('dragend', handleDragEnd);
+                
+                // Mouse events
+                slot.addEventListener('mousedown', handleMouseDown);
+                
+                // Touch events for mobile
+                slot.addEventListener('touchstart', handleTouchStart, { passive: false });
+                
+                // Native HTML5 drag and drop for mouse
+                slot.draggable = true;
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
+                
+                // Add data attribute for easy identification
+                slot.setAttribute('data-slot-index', index);
+            });
+        }
+        
+        function handleMouseDown(e) {
+            // Allow native drag and drop for mouse, prevent for touch
+            if (e.type === 'mousedown') {
+                // Don't prevent default for mouse - allow native drag
+                return;
+            }
+            e.preventDefault();
+        }
+        
+        function handleTouchStart(e) {
+            if (e.touches.length !== 1) return;
+            
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            isDragging = false;
+            draggedElement = e.currentTarget;
+            
+            // Prevent default to avoid scrolling
+            e.preventDefault();
+            
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd);
+        }
+        
+        function handleTouchMove(e) {
+            if (!draggedElement) return;
+            
+            const touch = e.touches[0];
+            const deltaX = Math.abs(touch.clientX - touchStartX);
+            const deltaY = Math.abs(touch.clientY - touchStartY);
+            
+            // Start dragging if moved enough
+            if ((deltaX > 10 || deltaY > 10) && !isDragging) {
+                isDragging = true;
+                draggedElement.classList.add('dragging');
+            }
+            
+            if (isDragging) {
+                e.preventDefault();
+                
+                // Find element under touch point
+                const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                const dropTarget = elementBelow?.closest('.photo-slot');
+                
+                // Remove drag-over class from all slots
+                document.querySelectorAll('.photo-slot').forEach(slot => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                // Add drag-over class to valid drop target
+                if (dropTarget && dropTarget !== draggedElement) {
+                    dropTarget.classList.add('drag-over');
+                }
+            }
+        }
+        
+        function handleTouchEnd(e) {
+            if (isDragging && draggedElement) {
+                const touch = e.changedTouches[0];
+                const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                const dropTarget = elementBelow?.closest('.photo-slot');
+                
+                if (dropTarget && dropTarget !== draggedElement) {
+                    swapPhotoSlots(draggedElement, dropTarget);
+                }
+            }
+            
+            // Clean up
+            document.querySelectorAll('.photo-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drag-over');
+            });
+            
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleTouchEnd);
+            
+            draggedElement = null;
+            isDragging = false;
+        }
+        
+        function handleDragStart(e) {
+            draggedElement = e.currentTarget;
+            e.currentTarget.classList.add('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            if (e.currentTarget !== draggedElement) {
+                e.currentTarget.classList.add('drag-over');
+            }
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            if (e.currentTarget !== draggedElement && draggedElement) {
+                swapPhotoSlots(draggedElement, e.currentTarget);
+            }
+        }
+        
+        function handleDragEnd(e) {
+            document.querySelectorAll('.photo-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drag-over');
+            });
+            draggedElement = null;
+        }
+        
+        function swapPhotoSlots(slot1, slot2) {
+            const index1 = parseInt(slot1.getAttribute('data-slot-index'));
+            const index2 = parseInt(slot2.getAttribute('data-slot-index'));
+            
+            // Get current images from localStorage
+            const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+            
+            if (images.length >= 3 && index1 < images.length && index2 < images.length) {
+                // Swap the images in the array
+                [images[index1], images[index2]] = [images[index2], images[index1]];
+                
+                // Save back to localStorage
+                localStorage.setItem("capturedPhotos", JSON.stringify(images));
+                
+                // Reload photos to reflect the change
+                loadPhotos();
+                
+                console.log(`Swapped photos at positions ${index1} and ${index2}`);
+            }
+        }
+        
+        // Show drag instruction when photos are loaded
+        function showDragInstruction() {
+            const dragInstruction = document.getElementById("dragInstruction");
+            const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+            
+            if (images.length === 3 && dragInstruction) {
+                dragInstruction.style.display = "flex";
+                
+                // Delay the show animation slightly
+                setTimeout(() => {
+                    dragInstruction.classList.add("show");
+                }, 300);
+                
+                // Remove auto-hide - let the instruction stay visible
+                // User can still interact with it and it provides helpful guidance
+            }
+        }
+        
+        // Hide drag instruction
+        function hideDragInstruction() {
+            const dragInstruction = document.getElementById("dragInstruction");
+            if (dragInstruction) {
+                dragInstruction.classList.remove("show");
+                setTimeout(() => {
+                    dragInstruction.style.display = "none";
+                }, 300);
+            }
+        }
+    
         // ✅ Change Template
         function changeTemplate(templateSrc) {
             console.log("Template changed to:", templateSrc);
             currentTemplate = templateSrc;
             localStorage.setItem("selectedTemplate", templateSrc);
-    
-            const templatePath = getTemplatePath(templateSrc);
-            document.getElementById("template-image").style.backgroundImage = `url('${templatePath}')`;
-    
+
+            const templateContainer = document.getElementById("photo-booth");
+            const templateImage = document.getElementById("template-image");
+            
+            // Preserve current photos during template change
+            const currentPhotos = {
+                photo1: document.getElementById("photo1").style.backgroundImage,
+                photo2: document.getElementById("photo2").style.backgroundImage,
+                photo3: document.getElementById("photo3").style.backgroundImage
+            };
+            
+            // Add smooth transition for template only
+            templateImage.style.transition = "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
+            templateImage.style.opacity = "0.7";
+
+            // Change template after brief fade
+            setTimeout(() => {
+                const templatePath = getTemplatePath(templateSrc);
+                templateImage.style.backgroundImage = `url('${templatePath}')`;
+                
+                // Fade template back in
+                templateImage.style.opacity = "1";
+                
+                // Add loading class for subtle animation
+                templateContainer.classList.add('template-loading');
+                
+                // Remove loading class after animation
+                setTimeout(() => {
+                    templateContainer.classList.remove('template-loading');
+                    // Clear transition after animation completes
+                    templateImage.style.transition = "";
+                }, 800);
+                
+            }, 150);
+
             // ✅ Highlight selected template button
             document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
             document.querySelector(`.template-btn[data-template='${templateSrc}']`)?.classList.add("active-template");
-            
-            // Load photos immediately when template changes (no delay)
-            loadPhotos();
-            
-            // Force a second load after a short delay to ensure photos appear
-            setTimeout(() => {
-                loadPhotos();
-            }, 50);
-        }
-    
-        // ✅ Load saved template on page refresh
+        }        // ✅ Load saved template on page refresh
         function loadSelectedTemplate() {
             const selectedFormat = localStorage.getItem("selectedFormat") || "new";
             let savedTemplate = localStorage.getItem("selectedTemplate") || getDefaultTemplate();
@@ -1200,13 +2084,25 @@
         }
     
         // ✅ Process & Upload Image
-        function downloadImage() {
+        async function downloadImage() {
+            console.log("🎯 Download image function called");
+            
+            // Refresh token from localStorage first
+            refreshAccessToken();
+            
             // Check if user is signed in before processing
             if (!accessToken) {
+                console.error("❌ No access token available");
                 alert("Please sign in with Google first to upload your photo.");
-                document.getElementById("settingsPanel").classList.remove("hidden");
+                document.getElementById("settingsPanel").classList.add("show");
                 return;
             }
+            
+            console.log("✅ Access token found, proceeding with download");
+            
+            // Show progress dialog immediately
+            showProgressDialog();
+            updateProgress(0, "Preparing your photos...");
             
     const settings = getDownloadSettings();
     const canvas = document.createElement("canvas");
@@ -1217,6 +2113,7 @@
     const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
     
     if (images.length !== 3) {
+        hideProgressDialog();
         alert("Please capture 3 photos before downloading.");
         return;
     }
@@ -1252,7 +2149,9 @@
                 settings.photoWidth, 
                 settings.photoHeight);
             loadedImages++;
+            updateProgress(Math.round((loadedImages / images.length) * 25), `Processing photo ${loadedImages} of ${images.length}...`);
             if (loadedImages === images.length) {
+                updateProgress(30, "Applying template...");
                 drawTemplate();
             }
         };
@@ -1268,28 +2167,30 @@
         const templateImg = new Image();
         templateImg.src = getTemplatePath(currentTemplate);
         templateImg.onload = () => {
+            updateProgress(35, "Rendering final image...");
             ctx.drawImage(templateImg, 0, 0, settings.originalWidth, settings.originalHeight);
 
             // Convert canvas to Blob
             canvas.toBlob(async (blob) => {
                 if (!blob) {
                     alert("Failed to generate image. Please try again.");
+                    hideProgressDialog();
                     return;
                 }
                 
-                const file = new File([blob], `photobooth-${Date.now()}.png`, { type: "image/png" });
+                updateProgress(40, "Preparing download...");
+                const file = new File([blob], `photobooth-${Date.now()}.jpg`, { type: "image/jpeg" });
 
                 // Save locally first
                 let link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = `photobooth-${Date.now()}.png`;
+                link.download = `photobooth-${Date.now()}.jpg`;
                 link.click();
 
-                // Upload to Google Drive after local save
-                setTimeout(async () => {
-                    await uploadToGoogleDrive(file);
-                }, 1000);
-            }, "image/png", 0.95); // High quality
+                // Upload to Google Drive immediately (no delay)
+                updateProgress(45, "Starting upload...");
+                await uploadToGoogleDrive(file);
+            }, "image/jpeg", 0.85); // Optimized quality for smaller file size
         };
         
         templateImg.onerror = () => {
@@ -1300,18 +2201,34 @@
 }
 
 function showProgressDialog() {
-        const dialog = document.getElementById("progressDialog");
-        if (dialog) {
-            dialog.style.display = "flex";
+        const progressDialog = document.getElementById("progressDialog");
+        const progressBar = document.getElementById("progressBar");
+        
+        if (progressDialog && progressBar) {
+            document.body.classList.add("progress-loading");
+            progressDialog.style.display = "flex";
+            progressBar.style.width = "0%"; // Reset progress
+            
+            // Smooth show animation
+            requestAnimationFrame(() => {
+                progressDialog.classList.add("show");
+            });
         } else {
             console.error("progressDialog not found!");
         }
     }
 
     function hideProgressDialog() {
-        const dialog = document.getElementById("progressDialog");
-        if (dialog) {
-            dialog.style.display = "none";
+        const progressDialog = document.getElementById("progressDialog");
+        
+        if (progressDialog) {
+            document.body.classList.remove("progress-loading");
+            progressDialog.classList.remove("show");
+            
+            // Hide after animation completes
+            setTimeout(() => {
+                progressDialog.style.display = "none";
+            }, 400);
         }
     }
 
@@ -1334,26 +2251,58 @@ function showProgressDialog() {
     }
 
     function showProgressDialog() {
-    const progressDialog = document.getElementById("progressDialog");
-    const progressBar = document.getElementById("progressBar");
-    
-    if (progressDialog && progressBar) {
-        progressDialog.style.display = "block";
-        progressBar.style.width = "0%"; // Reset progress
+        const progressDialog = document.getElementById("progressDialog");
+        const progressBar = document.getElementById("progressBar");
+        
+        if (progressDialog && progressBar) {
+            document.body.classList.add("progress-loading");
+            progressDialog.style.display = "flex";
+            progressBar.style.width = "0%"; // Reset progress
+            
+            // Smooth show animation
+            requestAnimationFrame(() => {
+                progressDialog.classList.add("show");
+            });
+        }
     }
-}
 
-    // Update progress bar and text
+    function hideProgressDialog() {
+        const progressDialog = document.getElementById("progressDialog");
+        
+        if (progressDialog) {
+            document.body.classList.remove("progress-loading");
+            progressDialog.classList.remove("show");
+            
+            // Hide after animation completes
+            setTimeout(() => {
+                progressDialog.style.display = "none";
+            }, 400);
+        }
+    }
+
+    // Update progress bar and text with smooth animations
     function updateProgress(percentage, message) {
         const progressBar = document.getElementById("progressBar");
-        const progressText = document.querySelector("#progressDialog p");
+        const progressMessage = document.querySelector(".progress-message");
+        const progressPercentage = document.querySelector(".progress-percentage");
         
         if (progressBar) {
             progressBar.style.width = percentage + "%";
         }
         
-        if (progressText) {
-            progressText.textContent = message;
+        if (progressMessage) {
+            progressMessage.style.opacity = "0";
+            progressMessage.style.transform = "translateY(5px)";
+            
+            setTimeout(() => {
+                progressMessage.textContent = message;
+                progressMessage.style.opacity = "1";
+                progressMessage.style.transform = "translateY(0)";
+            }, 150);
+        }
+        
+        if (progressPercentage) {
+            progressPercentage.textContent = percentage + "%";
         }
         
         console.log(`📊 Progress: ${percentage}% - ${message}`);
@@ -1390,90 +2339,94 @@ async function uploadToGoogleDrive(imageFile) {
         document.getElementById("userInfo").innerText = "Session expired. Please sign in again.";
         return;
     }
-    
-    showProgressDialog();
 
     try {
         console.log("📤 Uploading photobooth.png to Google Drive...");
         
         // Update progress: Starting upload
-        updateProgress(10, "Preparing upload...");
+        updateProgress(50, "Initializing upload...");
         
-        // First, create the file metadata
+        // Create file metadata and upload content simultaneously for better performance
+        const fileName = `photobooth-${Date.now()}.png`;
         const metadata = {
-            name: `photobooth-${Date.now()}.png`,
+            name: fileName,
             mimeType: "image/png",
             parents: [folderId]
         };
 
         // Update progress: Creating file
-        updateProgress(20, "Creating file...");
+        updateProgress(55, "Creating file...");
 
-        // Create the file using the Drive API
-        console.log("🔍 Creating file with metadata:", metadata);
-        console.log("🔍 Using access token:", accessToken.substring(0, 20) + "...");
-        
-        const createResponse = await fetch("https://www.googleapis.com/drive/v3/files", {
+        // Use resumable upload for better performance and reliability
+        const createResponse = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${accessToken}`,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-Upload-Content-Type": "image/png",
+                "X-Upload-Content-Length": imageFile.size
             },
             body: JSON.stringify(metadata)
         });
 
-        console.log("🔍 Create response status:", createResponse.status);
-        console.log("🔍 Create response headers:", createResponse.headers);
-        
         if (!createResponse.ok) {
             const errorText = await createResponse.text();
             console.error("❌ Create file error response:", errorText);
-            throw new Error(`Failed to create file: ${createResponse.status} ${createResponse.statusText} - ${errorText}`);
+            throw new Error(`Failed to create file: ${createResponse.status} ${createResponse.statusText}`);
         }
 
-        const fileData = await createResponse.json();
-        const fileId = fileData.id;
+        const uploadUrl = createResponse.headers.get('Location');
         
-        console.log("📁 File created with ID:", fileId);
-
         // Update progress: Uploading content
-        updateProgress(50, "Uploading image...");
+        updateProgress(60, "Uploading image data...");
 
-        // Now upload the file content
-        const uploadResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
-            method: "PATCH",
+        // Start upload with progress simulation for small files
+        const uploadPromise = fetch(uploadUrl, {
+            method: "PUT",
             headers: {
-                "Authorization": `Bearer ${accessToken}`,
                 "Content-Type": "image/png"
             },
             body: imageFile
         });
+
+        // Simulate upload progress for better UX
+        let currentProgress = 60;
+        const progressInterval = setInterval(() => {
+            if (currentProgress < 72) {
+                currentProgress += 2;
+                updateProgress(currentProgress, "Uploading image data...");
+            }
+        }, 100);
+
+        const uploadResponse = await uploadPromise;
+        clearInterval(progressInterval);
+
+        // Quick progress updates during upload
+        updateProgress(75, "Processing upload...");
 
         if (!uploadResponse.ok) {
             throw new Error(`Failed to upload file: ${uploadResponse.status} ${uploadResponse.statusText}`);
         }
 
         const uploadResult = await uploadResponse.json();
+        const fileId = uploadResult.id;
         console.log("✅ Upload successful:", uploadResult);
         
         // Update progress: Making file public
-        updateProgress(80, "Making file public...");
+        updateProgress(85, "Making file public...");
         
         // Make the file publicly accessible
         await makeFilePublic(fileId);
         
         // Update progress: Generating QR code
-        updateProgress(90, "Generating QR code...");
-        
-        // Small delay to show the progress
-        await new Promise(resolve => setTimeout(resolve, 500));
+        updateProgress(95, "Generating QR code...");
         
         updateProgress(100, "Complete!");
         
-        // Hide progress dialog after a short delay
+        // Hide progress dialog and show QR modal smoothly
         setTimeout(() => {
             hideProgressDialog();
-        }, 1000);
+        }, 200);
         
     } catch (error) {
         console.error("⚠ Error uploading to Google Drive:", error);
@@ -1509,9 +2462,8 @@ async function uploadToGoogleDrive(imageFile) {
 async function tryAlternativeUpload(imageFile, folderId) {
     try {
         console.log("🔄 Attempting alternative multipart upload...");
-        showProgressDialog();
         
-        updateProgress(10, "Preparing alternative upload...");
+        updateProgress(50, "Preparing alternative upload...");
         
         const metadata = {
             name: `photobooth-${Date.now()}.png`,
@@ -1519,7 +2471,7 @@ async function tryAlternativeUpload(imageFile, folderId) {
             parents: [folderId]
         };
 
-        updateProgress(30, "Uploading with alternative method...");
+        updateProgress(60, "Uploading with alternative method...");
 
         const formData = new FormData();
         formData.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
@@ -1538,17 +2490,16 @@ async function tryAlternativeUpload(imageFile, folderId) {
             const result = await response.json();
             console.log("✅ Alternative upload successful:", result);
             
-            updateProgress(80, "Making file public...");
+            updateProgress(85, "Making file public...");
             await makeFilePublic(result.id);
             
-            updateProgress(90, "Generating QR code...");
-            await new Promise(resolve => setTimeout(resolve, 500));
+            updateProgress(95, "Generating QR code...");
             
             updateProgress(100, "Complete!");
             
             setTimeout(() => {
                 hideProgressDialog();
-            }, 1000);
+            }, 200);
         } else {
             const errorText = await response.text();
             console.error("❌ Alternative upload failed:", response.status, errorText);
@@ -1598,21 +2549,86 @@ async function makeFilePublic(fileId) {
 
 
     function showQRModal(url) {
-        document.getElementById("qrCodeContainer").innerHTML = "";
-        new QRCode(document.getElementById("qrCodeContainer"), { text: url, width: 250, height: 250 });
+        // First hide the progress dialog smoothly
+        const progressDialog = document.getElementById("progressDialog");
+        if (progressDialog && progressDialog.classList.contains("show")) {
+            document.body.classList.remove("progress-loading");
+            progressDialog.classList.remove("show");
+            
+            // Wait for progress dialog to fade out completely before showing QR modal
+            setTimeout(() => {
+                progressDialog.style.display = "none";
+                // Now show the QR modal
+                showQRModalAfterDelay(url);
+            }, 400); // Match the progress dialog transition duration
+        } else {
+            // No progress dialog to hide, show QR modal immediately
+            showQRModalAfterDelay(url);
+        }
+    }
+    
+    function showQRModalAfterDelay(url) {
+        const qrContainer = document.getElementById("qrCodeContainer");
+        qrContainer.innerHTML = "";
+        qrContainer.style.display = "flex"; // Show the container
+        
+        new QRCode(qrContainer, { 
+            text: url, 
+            width: 240, 
+            height: 240,
+            colorDark: "#1f2937",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
         
         const modal = document.getElementById("qrModal");
         document.body.classList.add("modal-open");
-        modal.classList.add("show");
+        
+        // Set display first but keep it hidden with opacity
         modal.style.display = "flex";
+        modal.style.opacity = "0";
+        
+        // Smooth show animation with proper timing
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                modal.classList.add("show");
+                modal.style.opacity = "";  // Remove inline opacity to let CSS handle it
+            });
+        });
     }
 
     function closeQRModal() {
         const modal = document.getElementById("qrModal");
+        const qrContainer = document.getElementById("qrCodeContainer");
+        
         document.body.classList.remove("modal-open");
         modal.classList.remove("show");
-        modal.style.display = "none";
+        
+        // Wait for animation to complete before hiding
+        setTimeout(() => {
+            modal.style.display = "none";
+            modal.style.opacity = "";  // Clear any inline opacity
+            qrContainer.style.display = "none"; // Hide QR container
+            qrContainer.innerHTML = ""; // Clear QR code
+        }, 400); // Match the transition duration
+        
         goBack();   
+    }
+
+    function goToFormatSelection() {
+        const modal = document.getElementById("qrModal");
+        const qrContainer = document.getElementById("qrCodeContainer");
+        
+        document.body.classList.remove("modal-open");
+        modal.classList.remove("show");
+        
+        // Smooth transition out
+        setTimeout(() => {
+            modal.style.display = "none";
+            qrContainer.style.display = "none"; // Hide QR container
+            qrContainer.innerHTML = ""; // Clear QR code
+            window.location.href = "format-selection.html";
+        }, 300);
     }
 
     
@@ -1849,26 +2865,26 @@ async function makeFilePublic(fileId) {
             
             if (selectedFormat === "old") {
                 return {
-                    originalWidth: 2284,
-                    originalHeight: 6458, 
-                    photoWidth: 2000,
-                    photoHeight: 1500,
+                    originalWidth: 1940, // Reduced from 2284 (15% smaller)
+                    originalHeight: 5490, // Reduced from 6458 (15% smaller)
+                    photoWidth: 1700, // Reduced from 2000 (15% smaller)
+                    photoHeight: 1275, // Reduced from 1500 (15% smaller)
                     photoPositions: [
-                        { x: 142, y: 450, width: 2000, height: 1500 }, // Centered positions for old format
-                        { x: 142, y: 2000, width: 2000, height: 1500 },
-                        { x: 142, y: 3545, width: 2000, height: 1500 }
+                        { x: 120, y: 383, width: 1700, height: 1275 }, // Adjusted positions for old format
+                        { x: 120, y: 1700, width: 1700, height: 1275 },
+                        { x: 120, y: 3013, width: 1700, height: 1275 }
                     ]
                 };
             } else {
                 return {
-                    originalWidth: 1575, // 315 * 5
-                    originalHeight: 2800, // 560 * 5
-                    photoWidth: 1315, // 263 * 5
-                    photoHeight: 750, // 150 * 5
+                    originalWidth: 1339, // Reduced from 1575 (15% smaller)
+                    originalHeight: 2380, // Reduced from 2800 (15% smaller)
+                    photoWidth: 1118, // Reduced from 1315 (15% smaller)
+                    photoHeight: 638, // Reduced from 750 (15% smaller)
                     photoPositions: [
-                        { x: 130, y: 130, width: 1315, height: 750 }, // 26 * 5
-                        { x: 130, y: 945, width: 1315, height: 750 }, // 189 * 5
-                        { x: 130, y: 1750, width: 1315, height: 750 } // 350 * 5
+                        { x: 111, y: 111, width: 1118, height: 638 }, // Slot1: top: 26px adjusted
+                        { x: 111, y: 814, width: 1118, height: 638 }, // Slot2: top: 191px adjusted
+                        { x: 111, y: 1499, width: 1118, height: 638 } // Slot3: top: 352px adjusted
                     ]
                 };
             }

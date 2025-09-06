@@ -51,11 +51,32 @@ function checkLoginStatus() {
 
 // Mirror toggle functionality
 function toggleMirror() {
+    const mirrorButton = document.getElementById('mirrorButton');
+    const mirrorIcon = mirrorButton.querySelector('.icon-mirror');
+    
     isMirrored = !isMirrored;
     if (isMirrored) {
         video.style.transform = "scaleX(-1)";
+        mirrorIcon.classList.add('flipped');
     } else {
         video.style.transform = "scaleX(1)";
+        mirrorIcon.classList.remove('flipped');
+    }
+}
+
+// Black and white filter toggle functionality
+let isBWFilter = false; // Default to no filter
+function toggleFilter() {
+    const filterButton = document.getElementById('filterButton');
+    const filterIcon = filterButton.querySelector('.icon-filter');
+    isBWFilter = !isBWFilter;
+    
+    if (isBWFilter) {
+        video.classList.add('bw-filter');
+        filterIcon.classList.add('rotated');
+    } else {
+        video.classList.remove('bw-filter');
+        filterIcon.classList.remove('rotated');
     }
 }
 
@@ -110,7 +131,7 @@ async function startCapture() {
 // Use `captureDelay` in the countdown function
 async function countdownAndCapture(seconds) {
     if (!isCapturing || cancelCaptureFlag || captureCount >= 3) return;
-    startButton.innerText = `Capturing... (${captureCount + 1}/3)`;
+    startButton.innerText = `Capturing...`;
 
     const countdownOverlay = document.getElementById("countdownOverlay");
     countdownOverlay.style.display = "block";
@@ -163,6 +184,22 @@ function captureImage() {
     }
 
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Apply black and white filter if enabled
+    if (isBWFilter) {
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const brightness = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            data[i] = brightness;     // Red
+            data[i + 1] = brightness; // Green
+            data[i + 2] = brightness; // Blue
+            // data[i + 3] is alpha, leave unchanged
+        }
+        
+        context.putImageData(imageData, 0, 0);
+    }
 
     if (isMirrored) {
         context.setTransform(1, 0, 0, 1, 0, 0);
@@ -252,7 +289,7 @@ function resumeCapture() {
     
     // Update start button states
     startButton.classList.add("capturing");
-    startButton.innerText = `Capturing... (${captureCount + 1}/3)`;
+    startButton.innerText = `Capturing...`;
     startButton.disabled = true;
     startButton.style.display = "block";
     
@@ -271,31 +308,49 @@ function resetCapture() {
     isPaused = false;
     captureCount = 0;
     
+    // Get all button elements
     const pauseButton = document.getElementById('pauseButton');
     const resetButton = document.getElementById('resetButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const resumeButton = document.getElementById('resumeButton');
+    const retakeButton = document.getElementById('retakeButton');
     
+    // Reset start button to original state
     startButton.innerHTML = `
         <svg class="icon icon-start" fill="currentColor">
             <use xlink:href="icons.svg#icon-start"></use>
-        </svg> Start Capture
+        </svg>Start
     `;
     startButton.classList.remove("capturing");
     startButton.disabled = false;
+    startButton.style.display = "inline-block"; // Make sure start button is visible
     
-    pauseButton.style.display = "none";
-    resetButton.style.display = "none";
-    proceedButton.style.display = "none";
+    // Hide all other control buttons
+    if (pauseButton) pauseButton.style.display = "none";
+    if (resetButton) resetButton.style.display = "none";
+    if (cancelButton) cancelButton.style.display = "none";
+    if (resumeButton) resumeButton.style.display = "none";
+    if (retakeButton) retakeButton.style.display = "none";
+    if (proceedButton) proceedButton.style.display = "none";
     
+    // Clear captured images and reset placeholders
     resetPlaceholders();
+    
+    // Clear any stored captured photos data
+    localStorage.removeItem("capturedPhotos");
     
     // Hide countdown overlay
     const countdownOverlay = document.getElementById("countdownOverlay");
-    countdownOverlay.style.display = "none";
+    if (countdownOverlay) {
+        countdownOverlay.style.display = "none";
+    }
     
     // Reset the flag after a brief delay
     setTimeout(() => {
         cancelCaptureFlag = false;
     }, 100);
+    
+    console.log("🔄 Capture reset - returned to start state");
 }
 
 function cancelCapture() {
@@ -305,7 +360,7 @@ function cancelCapture() {
     startButton.innerHTML = `
         <svg class="icon icon-start" fill="currentColor">
             <use xlink:href="icons.svg#icon-start"></use>
-        </svg> Start Capture
+        </svg>Start
     `;
     startButton.classList.remove("capturing");
     startButton.classList.add("btn-start"); // Ensure it keeps original styling
@@ -747,6 +802,16 @@ function toggleTimerSlider() {
     const sliderWrapper = document.getElementById("timerSliderWrapper");
     sliderWrapper.classList.toggle("active");
 }
+
+// Close timer slider when clicking outside
+document.addEventListener("click", function(event) {
+    const timerContainer = document.querySelector(".timer-container");
+    const sliderWrapper = document.getElementById("timerSliderWrapper");
+    
+    if (!timerContainer.contains(event.target) && sliderWrapper.classList.contains("active")) {
+        sliderWrapper.classList.remove("active");
+    }
+});
 
 // Map slider values to actual timer seconds
 
