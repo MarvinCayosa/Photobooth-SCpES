@@ -388,14 +388,47 @@ function flashEffect() {
 }
 
 function proceedToTemplate() {
+    console.log("🚀 Proceeding to template...");
+    
     const capturedData = [];
+    console.log("📸 Checking captured images...");
+    console.log("Total children:", capturedImages.children.length);
+    
     for (let i = 0; i < 3; i++) {
-        if (capturedImages.children[i].tagName === 'IMG') {
-            capturedData.push(capturedImages.children[i].src);
+        const child = capturedImages.children[i];
+        console.log(`Child ${i}:`, child ? child.tagName : "null", child ? child.src : "no src");
+        
+        if (child && child.tagName === 'IMG' && child.src) {
+            capturedData.push(child.src);
+            console.log(`✅ Added image ${i + 1} to captured data`);
+        } else {
+            console.warn(`⚠️ Missing or invalid image at slot ${i + 1}`);
         }
     }
-    localStorage.setItem("capturedPhotos", JSON.stringify(capturedData));
-    window.location.href = "template.html";
+    
+    console.log("📦 Final captured data:", capturedData);
+    console.log("📝 Number of images to save:", capturedData.length);
+    
+    if (capturedData.length === 0) {
+        console.error("❌ No images captured! Cannot proceed to template.");
+        alert("No photos captured yet. Please take some photos first!");
+        return;
+    }
+    
+    if (capturedData.length < 3) {
+        console.warn(`⚠️ Only ${capturedData.length} photos captured out of 3. Proceeding anyway...`);
+    }
+    
+    try {
+        localStorage.setItem("capturedPhotos", JSON.stringify(capturedData));
+        console.log("💾 Saved captured photos to localStorage");
+        
+        console.log("🔄 Redirecting to template.html...");
+        window.location.href = "template.html";
+    } catch (error) {
+        console.error("❌ Error saving to localStorage or redirecting:", error);
+        alert("Error saving photos. Please try again.");
+    }
 }
 
 // Template management functions

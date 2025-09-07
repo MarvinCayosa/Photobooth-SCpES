@@ -205,13 +205,14 @@
         #btn-template4 .template-preview { 
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
         }
-        #btn-template5 .template-preview { 
-            background: linear-gradient(135deg, #fbffd4 0%, #f4f3a0 100%);
+        #btn-template8 .template-preview { 
+            background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);
         }
+
         #btn-template3 { background: #c8b6b3; }
         #btn-template4 { background: #ff0000; }
-        #btn-template5 { background: #fbffd4; }
         #btn-template7 { background:rgb(80, 122, 229); }
+        #btn-template8 { background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);}
 
         .template-container {
             position: relative;
@@ -221,7 +222,7 @@
             background: transparent;
             filter: drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.223)); /* Soft shadow */
             margin-bottom: 0; /* Space between template and buttons */
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1), 0 0 30px rgba(255, 255, 255, 0.05);
+
         }
 
         .button-container {
@@ -2743,15 +2744,14 @@ async function makeFilePublic(fileId) {
             templateButtonsContainer.innerHTML = "";
             
             if (selectedFormat === "old") {
-                // Classic templates (template1.png to template7.png)
+                // Classic templates (template1.png to template4.png, template7.png, template8.png)
                 const classicTemplates = [
                     { name: "template1.png", color: "white" },
                     { name: "template2.png", color: "black" },
                     { name: "template3.png", color: "#c8b6b3" },
                     { name: "template4.png", color: "#ff0000" },
-                    { name: "template5.png", color: "#fbffd4" },
-                    { name: "template6.png", color: "#4a90e2" },
-                    { name: "template7.png", color: "rgb(80, 122, 229)" }
+                    { name: "template7.png", color: "rgb(80, 122, 229)" },
+                    { name: "template8.png", color: "black" }
                 ];
                 
                 classicTemplates.forEach((template, index) => {
@@ -2823,6 +2823,11 @@ async function makeFilePublic(fileId) {
                 templateImage.style.backgroundImage = `url('${getTemplatePath(defaultOldTemplate)}')`;
                 currentTemplate = defaultOldTemplate;
                 localStorage.setItem("selectedTemplate", defaultOldTemplate);
+                
+                // Force immediate photo loading for Classic format
+                setTimeout(() => {
+                    loadPhotos();
+                }, 50);
                 
                 // Update template button
                 document.getElementById("btn-template7").onclick = () => changeTemplate(defaultOldTemplate);
