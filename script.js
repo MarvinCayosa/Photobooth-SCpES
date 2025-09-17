@@ -63,7 +63,7 @@ function updateUIState() {
         startButton.innerHTML = `
             <svg class="icon icon-reset" fill="currentColor">
                 <use xlink:href="icons.svg#icon-reset"></use>
-            </svg>RESET
+            </svg>Reset
         `;
         startButton.disabled = false;
         startButton.onclick = resetCapture; // Change the onclick function to reset
@@ -146,7 +146,7 @@ function deleteImage(index) {
     }
     
     placeholder.innerHTML = `
-        <div style="color: #888; font-size: 18px; font-weight: 600; margin-bottom: 8px;">${index + 1}</div>
+        <div style="color: #888; font-size: 35px; font-weight: 600; margin-bottom: 8px;">${index + 1}</div>
     `;
     
     // Completely remove the current element first
