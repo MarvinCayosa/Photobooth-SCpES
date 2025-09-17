@@ -807,6 +807,32 @@
             color: #f0f0f0;
             transform: translateY(-2px);
         }
+
+        /* Footer styling */
+        .page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 20, 0.255);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.027);
+            padding: 15px 0;
+            text-align: center;
+            z-index: 999;
+        }
+
+        .page-footer p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.292);
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        /* Add bottom padding to body to account for fixed footer */
+        body {
+            padding-bottom: 60px;
+        }
     </style>
 </head>
 <body>
@@ -835,27 +861,13 @@
     <p class="page-subtitle">Select the template format that works best for you</p>
 
     <div class="format-selection-container">
-        <!-- Old Format Option -->
+        <!-- Classic Format Option -->
         <div class="format-option" id="classicFormatCard">
             <div class="old-format-preview"></div>
             <div class="shots-pill">3 Shots</div>
             <h2 class="format-title">Classic Photostrip</h2>
             <p class="format-description">Traditional vertical photo strip format. Perfect for classic photo booth experience and keepsakes.</p>
             <button class="select-format-btn" onclick="selectFormat('old')">Choose Classic</button>
-            <div class="unavailable-overlay">
-                <div class="unavailable-text">Unavailable</div>
-            </div>
-        </div>
-
-        <!-- New Format Option -->
-        <div class="format-option" id="storiesFormatCard">
-            <!--<div class="badge new-badge">New</div> -->
-            <div class="new-format-preview"></div>
-            <div class="shots-pill">3 Shots</div>
-            <h2 class="format-title">Stories & Social </h2>
-            <em>Softcopies only.</em>
-            <p class="format-description">16:9 landscape format. Perfect for Instagram Stories, social media sharing, and digital displays. </p>
-            <button class="select-format-btn" onclick="selectFormat('new')">Choose Stories</button>
             <div class="unavailable-overlay">
                 <div class="unavailable-text">Unavailable</div>
             </div>
@@ -873,7 +885,26 @@
                 <div class="unavailable-text">Unavailable</div>
             </div>
         </div>
+
+        <!-- Stories Format Option -->
+        <div class="format-option" id="storiesFormatCard">
+            <!--<div class="badge new-badge">New</div> -->
+            <div class="new-format-preview"></div>
+            <div class="shots-pill">3 Shots</div>
+            <h2 class="format-title">Stories & Social </h2>
+            <em>Softcopies only.</em>
+            <p class="format-description">16:9 landscape format. Perfect for Instagram Stories, social media sharing, and digital displays. </p>
+            <button class="select-format-btn" onclick="selectFormat('new')">Choose Stories</button>
+            <div class="unavailable-overlay">
+                <div class="unavailable-text">Unavailable</div>
+            </div>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <p>Made by UE - Society of Computer Engineering Students</p>
+    </footer>
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="settings-modal">
