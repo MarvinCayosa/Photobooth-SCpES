@@ -185,6 +185,14 @@
             flex-grow: 1;
         }
 
+        .format-option em {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+            display: block;
+            margin: 5px 0;
+        }
+
         .select-format-btn {
             padding: 12px 24px;
             border: 2px solid #8094ea;
@@ -307,7 +315,30 @@
         }
 
         .new-badge {
-            background: #f32f2f;
+            background: linear-gradient(45deg, #f32f2f, #ff6b6b, #f32f2f);
+            background-size: 200% 200%;
+            animation: newBadgeGlow 3s ease-in-out infinite, newBadgePulse 2s ease-in-out infinite;
+            box-shadow: 0 0 15px rgba(243, 47, 47, 0.6);
+        }
+
+        @keyframes newBadgeGlow {
+            0%, 100% {
+                background-position: 0% 50%;
+                box-shadow: 0 0 15px rgba(243, 47, 47, 0.6);
+            }
+            50% {
+                background-position: 100% 50%;
+                box-shadow: 0 0 25px rgba(243, 47, 47, 0.8), 0 0 35px rgba(255, 107, 107, 0.4);
+            }
+        }
+
+        @keyframes newBadgePulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         .format-option {
@@ -333,12 +364,14 @@
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
+            opacity: 0.6;
         }
 
         #backButton:hover {
             background: rgba(70, 70, 70, 1);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            opacity: 1;
         }
 
         #backButton:active {
@@ -369,12 +402,14 @@
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
+            opacity: 0.6;
         }
 
         #settingsButton:hover {
             background: rgba(70, 70, 70, 1);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            opacity: 1;
         }
 
         #settingsButton:active {
@@ -804,7 +839,7 @@
         <div class="format-option" id="classicFormatCard">
             <div class="old-format-preview"></div>
             <div class="shots-pill">3 Shots</div>
-            <h2 class="format-title">Classic Portrait</h2>
+            <h2 class="format-title">Classic Photostrip</h2>
             <p class="format-description">Traditional vertical photo strip format. Perfect for classic photo booth experience and keepsakes.</p>
             <button class="select-format-btn" onclick="selectFormat('old')">Choose Classic</button>
             <div class="unavailable-overlay">
@@ -814,11 +849,12 @@
 
         <!-- New Format Option -->
         <div class="format-option" id="storiesFormatCard">
-            <div class="badge new-badge">New</div>
+            <!--<div class="badge new-badge">New</div> -->
             <div class="new-format-preview"></div>
             <div class="shots-pill">3 Shots</div>
-            <h2 class="format-title">Stories & Social</h2>
-            <p class="format-description">16:9 landscape format. Perfect for Instagram Stories, social media sharing, and digital displays.</p>
+            <h2 class="format-title">Stories & Social </h2>
+            <em>Softcopies only.</em>
+            <p class="format-description">16:9 landscape format. Perfect for Instagram Stories, social media sharing, and digital displays. </p>
             <button class="select-format-btn" onclick="selectFormat('new')">Choose Stories</button>
             <div class="unavailable-overlay">
                 <div class="unavailable-text">Unavailable</div>
@@ -827,10 +863,10 @@
 
         <!-- Enhanced Format Option -->
         <div class="format-option" id="enhancedFormatCard">
-            <div class="badge new-badge">Enhanced</div>
+            <div class="badge new-badge">New</div>
             <div class="enhanced-format-preview"></div>
             <div class="shots-pill">4 Shots</div>
-            <h2 class="format-title">Enhanced Portrait</h2>
+            <h2 class="format-title">Photostrip v2</h2>
             <p class="format-description">New portrait layout with 4 shots. Same classic size with modern layout for enhanced photo experience.</p>
             <button class="select-format-btn" onclick="selectFormat('enhanced')">Choose Enhanced</button>
             <div class="unavailable-overlay">

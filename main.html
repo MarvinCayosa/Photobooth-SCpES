@@ -37,12 +37,14 @@
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
+            opacity: 0.6;
         }
 
         #backButton:hover {
             background: rgba(70, 70, 70, 1);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            opacity: 1;
         }
 
         #backButton:active {
@@ -294,25 +296,55 @@
             color: #ffffff !important;
         }
 
+        .captured-images{
+            margin-left: 40px;
+        }
+
         .placeholder {
             background: rgba(50, 50, 50, 0.8) !important;
             border: 2px dashed rgba(255, 255, 255, 0.2) !important;
             color: #b0b0b0 !important;
             border-radius: 12px;
             transition: all 0.3s ease;
-            min-height: 80px;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
             font-size: 24px;
             aspect-ratio: 4 / 3 !important;
-            max-height: 100px;
+            width: 250px !important;
+            height: auto !important;
         }
 
         .captured-images img {
+    
             aspect-ratio: 4 / 3 !important;
-            max-height: 100px !important;
+            width: 250px !important;
+            height: auto !important;
+            object-fit: cover !important;
+            border-radius: 12px !important;
+            border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Stories format specific styling */
+        body[data-format="new"] .placeholder,
+        .stories-format .placeholder {
+            /* You can manually adjust these values */
+            aspect-ratio: 4 / 2.5 !important;
+            width: 300px !important;
+            height: auto !important;
+        }
+
+        body[data-format="new"] .captured-images img,
+        .stories-format .captured-images img {
+            /* You can manually adjust these values */
+             aspect-ratio: 4 / 2.5 !important;
+            width: 300px !important;
+            height: auto !important;
+            object-fit: cover !important;
+            border-radius: 12px !important;
+            border: 2px solid rgba(255, 255, 255, 0.2) !important;
         }
 
         /* Enhanced format preview sizing - scale down 2773x3240 ratio */
