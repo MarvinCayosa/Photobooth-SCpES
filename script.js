@@ -18,6 +18,15 @@ const beepSound = document.getElementById('beepSound');
 const countdownHigh = document.getElementById('countdownHigh');
 let captureCount = 0;
 
+// Function to get maximum capture count based on selected format
+function getMaxCaptureCount() {
+    const selectedFormat = localStorage.getItem("selectedFormat");
+    if (selectedFormat === "enhanced") {
+        return 4; // Enhanced format has 4 shots
+    }
+    return 3; // Classic and Stories formats have 3 shots
+}
+
 let isMirrored = true; // Default to mirrored
 
 // Google OAuth Login
@@ -130,7 +139,8 @@ async function startCapture() {
 
 // Use `captureDelay` in the countdown function
 async function countdownAndCapture(seconds) {
-    if (!isCapturing || cancelCaptureFlag || captureCount >= 3) return;
+    const maxCount = getMaxCaptureCount();
+    if (!isCapturing || cancelCaptureFlag || captureCount >= maxCount) return;
     startButton.innerText = `Capturing...`;
 
     const countdownOverlay = document.getElementById("countdownOverlay");
@@ -175,15 +185,52 @@ function captureImage() {
     shutterSound.currentTime = 0;
     shutterSound.play();
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const selectedFormat = localStorage.getItem("selectedFormat");
+    
+    // For enhanced format, we need to crop to the overlay area
+    if (selectedFormat === "enhanced") {
+        const enhancedOverlay = document.querySelector('.enhanced-template-overlay');
+        const videoRect = video.getBoundingClientRect();
+        const overlayRect = enhancedOverlay.getBoundingClientRect();
+        
+        // Calculate crop dimensions relative to video
+        const scaleX = video.videoWidth / videoRect.width;
+        const scaleY = video.videoHeight / videoRect.height;
+        
+        const cropX = (overlayRect.left - videoRect.left) * scaleX;
+        const cropY = (overlayRect.top - videoRect.top) * scaleY;
+        const cropWidth = overlayRect.width * scaleX;
+        const cropHeight = overlayRect.height * scaleY;
+        
+        // Set canvas size to the cropped dimensions
+        canvas.width = cropWidth;
+        canvas.height = cropHeight;
+        
+        if (isMirrored) {
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+            // Draw the cropped area from the mirrored video
+            context.drawImage(video, 
+                video.videoWidth - cropX - cropWidth, cropY, cropWidth, cropHeight,
+                0, 0, canvas.width, canvas.height);
+        } else {
+            // Draw the cropped area
+            context.drawImage(video, 
+                cropX, cropY, cropWidth, cropHeight,
+                0, 0, canvas.width, canvas.height);
+        }
+    } else {
+        // Original behavior for other formats
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-    if (isMirrored) {
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
+        if (isMirrored) {
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+        }
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
     }
-
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // Apply black and white filter if enabled
     if (isBWFilter) {
@@ -226,10 +273,11 @@ function captureImage() {
 
     captureCount++;
 
-    if (captureCount < 3) {
+    const maxCount = getMaxCaptureCount();
+    if (captureCount < maxCount) {
         setTimeout(() => countdownAndCapture(captureDelay), 1000);
     } else {
-        // All 3 photos captured - show Retake and Next buttons
+        // All photos captured - show Retake and Next buttons
         isCapturing = false;
         isPaused = false;
         
@@ -373,11 +421,18 @@ function cancelCapture() {
 
 
 function resetPlaceholders() {
-    capturedImages.innerHTML = `
-        <div class="placeholder p-4 text-center">1</div>
-        <div class="placeholder p-4 text-center">2</div>
-        <div class="placeholder p-4 text-center">3</div>
-    `;
+    const selectedFormat = localStorage.getItem("selectedFormat");
+    const maxCount = getMaxCaptureCount();
+    
+    let placeholdersHTML = '';
+    for (let i = 1; i <= maxCount; i++) {
+        const isEnhancedOnly = i === 4 && selectedFormat !== "enhanced";
+        const displayStyle = isEnhancedOnly ? ' style="display: none;"' : '';
+        const enhancedClass = i === 4 ? ' enhanced-only' : '';
+        placeholdersHTML += `<div class="placeholder p-4 text-center${enhancedClass}"${displayStyle}>${i}</div>`;
+    }
+    
+    capturedImages.innerHTML = placeholdersHTML;
 }
 
 function flashEffect() {
@@ -391,10 +446,12 @@ function proceedToTemplate() {
     console.log("🚀 Proceeding to template...");
     
     const capturedData = [];
+    const maxCount = getMaxCaptureCount();
     console.log("📸 Checking captured images...");
     console.log("Total children:", capturedImages.children.length);
+    console.log("Expected count:", maxCount);
     
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < maxCount; i++) {
         const child = capturedImages.children[i];
         console.log(`Child ${i}:`, child ? child.tagName : "null", child ? child.src : "no src");
         
@@ -415,8 +472,8 @@ function proceedToTemplate() {
         return;
     }
     
-    if (capturedData.length < 3) {
-        console.warn(`⚠️ Only ${capturedData.length} photos captured out of 3. Proceeding anyway...`);
+    if (capturedData.length < maxCount) {
+        console.warn(`⚠️ Only ${capturedData.length} photos captured out of ${maxCount}. Proceeding anyway...`);
     }
     
     try {

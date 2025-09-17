@@ -208,11 +208,29 @@
         #btn-template8 .template-preview { 
             background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);
         }
+        
+        /* Enhanced Format Template Previews */
+        #btn-enhanced1 .template-preview {
+            background-image: url('new_template/new_template1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #btn-enhanced2 .template-preview {
+            background-image: url('new_template/new_template2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
 
         #btn-template3 { background: #c8b6b3; }
         #btn-template4 { background: #ff0000; }
         #btn-template7 { background:rgb(80, 122, 229); }
         #btn-template8 { background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);}
+        
+        /* Enhanced Format Template Buttons */
+        #btn-enhanced1 { background: #ffffff !important; } /* White background for template 1 */
+        #btn-enhanced2 { background: #333333 !important; } /* Greyish black background for template 2 */
 
         .template-container {
             position: relative;
@@ -279,6 +297,40 @@
         .slot1 { top: 26px; }
         .slot2 { top: 191px; }
         .slot3 { top: 352px; }
+        .slot4 { top: 513px; }
+
+        /* Enhanced Format - Single Column Layout */
+        body[data-format="enhanced"] .template-container {
+            width: 315px !important; /* Keep original width */
+            height: 560px !important; /* Keep original height */
+        }
+
+        body[data-format="enhanced"] .photo-slot {
+            width: 120px !important; /* Smaller width for single column */
+            height: 140px !important; /* Height based on 2773:3240 aspect ratio (120 * 3240/2773) */
+            aspect-ratio: 2773 / 3240 !important; /* Enhanced format aspect ratio */
+            left: 50% !important; /* Center horizontally */
+            transform: translateX(-50%) !important; /* Center using transform */
+        }
+
+        /* Enhanced format single column positions - stacked vertically */
+        body[data-format="enhanced"] .slot1 { 
+            top: 26px !important; /* Photo 1 at top */
+        }
+        
+        body[data-format="enhanced"] .slot2 { 
+            top: 180px !important; /* Photo 2 below 1 */
+        }
+        
+        body[data-format="enhanced"] .slot3 { 
+            top: 334px !important; /* Photo 3 below 2 */
+        }
+        
+        body[data-format="enhanced"] .slot4 { 
+            top: 488px !important; /* Photo 4 at bottom */
+        }
+
+
 
         .template {
             position: absolute;
@@ -476,6 +528,33 @@
         margin: 0 0 20px 0;
         font-weight: 400;
         text-align: center;
+    }
+
+    .instagram-tag {
+        font-size: 14px;
+        color: #e0e0e090;
+        margin: 0 0 8px 0;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .instagram-handle {
+        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+
+        position: relative;
+    }
+
+    @keyframes instagramGlow {
+        0% {
+            filter: drop-shadow(0 0 5px rgba(240, 148, 51, 0.4));
+        }
+        100% {
+            filter: drop-shadow(0 0 15px rgba(240, 148, 51, 0.8));
+        }
     }
 
     .download-btn {
@@ -1216,6 +1295,23 @@
         }
     }
 
+    /* Enhanced Format Photo Slot Positioning */
+    body[data-format="enhanced"] .photo-slot {
+        position: absolute !important;
+        left: auto !important; 
+        right: 59px !important; 
+        transform: none !important;
+        border-radius: 0px;
+        width: 121px !important;
+        height: 141px !important;
+    }
+    
+    body[data-format="enhanced"] .slot1 { top: 1px !important; }
+    body[data-format="enhanced"] .slot2 { top: 140px !important; }
+    body[data-format="enhanced"] .slot3 { top: 280px !important; }
+    body[data-format="enhanced"] .slot4 { top: 420px !important; }
+
+
     
     </style>
 </head>
@@ -1231,12 +1327,13 @@
                     </svg>
                 </div>
                 <div class="modal-text-container">
-                    <h2>Your soft copy is ready!</h2>
+                    <h2>Your softcopy is ready!</h2>
                     <p class="modal-subtitle">Scan the QR code below to download your photo</p>
                 </div>
             </div>
             <div id="qrCodeContainer"></div>
             <div class="modal-footer">
+                <p class="instagram-tag">Tag us on IG: <span class="instagram-handle">@uescpes_official</span></p>
                 <p class="made-by">Made by the Society of Computer Engineering Students</p>
                 <button class="download-btn" onclick="goToFormatSelection()">
                     <span class="btn-text">Done</span>
@@ -1290,6 +1387,7 @@
                 <div class="photo-slot slot1" id="photo1" draggable="true"></div>
                 <div class="photo-slot slot2" id="photo2" draggable="true"></div>
                 <div class="photo-slot slot3" id="photo3" draggable="true"></div>
+                <div class="photo-slot slot4" id="photo4" draggable="true" style="display: none;"></div>
                 <div class="template" id="template-image"></div>
             </div>
             
@@ -1315,6 +1413,17 @@
                     <div class="template-preview"></div>
                     <span class="template-name">Tech</span>
                 </button>
+                
+                <!-- Enhanced Format Templates -->
+                <button class="template-btn" onclick="changeTemplate('new_template1.png');" id="btn-enhanced1" data-template="new_template1.png" style="display: none;">
+                    <div class="template-preview"></div>
+                    <span class="template-name">Enhanced 1</span>
+                </button>
+                <button class="template-btn" onclick="changeTemplate('new_template2.png');" id="btn-enhanced2" data-template="new_template2.png" style="display: none;">
+                    <div class="template-preview"></div>
+                    <span class="template-name">Enhanced 2</span>
+                </button>
+                
                 <!-- <button class="template-btn" onclick="changeTemplate('template4.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template4"></button>
                 <button class="template-btn" onclick="changeTemplate('template2.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template2"></button>
                 <button class="template-btn" onclick="changeTemplate('template3.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template3"></button>
@@ -1443,7 +1552,13 @@
                     logout();
                 }
             }, 5000); // Checks after 5 seconds
-               
+            
+            // Initialize templates and photos on page load
+            setTimeout(() => {
+                updateTemplateButtonsForFormat();
+                loadSelectedTemplate();
+                loadPhotos();
+            }, 100);
 
         
         
@@ -1460,6 +1575,10 @@
     <script>
         let accessToken = localStorage.getItem("googleAccessToken") || "";
         const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+        
+        // Set body data-format attribute for CSS styling
+        document.body.setAttribute('data-format', selectedFormat);
+        console.log("🎨 Body data-format set to:", selectedFormat);
         
         // ✅ Global Logout Function
         async function logout() {
@@ -1554,10 +1673,31 @@
             }
         }
         
+        // Function to show/hide template buttons based on format
+        function updateTemplateButtonsForFormat() {
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            
+            // Hide all template buttons first
+            const allButtons = document.querySelectorAll('.template-btn');
+            allButtons.forEach(btn => btn.style.display = 'none');
+            
+            if (selectedFormat === "enhanced") {
+                // Show enhanced format buttons
+                document.getElementById('btn-enhanced1')?.style.setProperty('display', 'flex');
+                document.getElementById('btn-enhanced2')?.style.setProperty('display', 'flex');
+            } else if (selectedFormat === "new") {
+                // Show stories format buttons
+                document.getElementById('btn-template7')?.style.setProperty('display', 'flex');
+            }
+            // Note: Add old format buttons here when needed
+        }
+        
         // Helper function to get correct template path
         function getTemplatePath(templateName) {
             if (selectedFormat === "old") {
                 return `classic_templates/${templateName}`;
+            } else if (selectedFormat === "enhanced") {
+                return `new_template/${templateName}`;
             } else {
                 return `stories_template/${templateName}`;
             }
@@ -1565,7 +1705,13 @@
         
         // Get default template based on format
         function getDefaultTemplate() {
-            return selectedFormat === "old" ? "template1.png" : "TechCon_Template.png";
+            if (selectedFormat === "old") {
+                return "template1.png";
+            } else if (selectedFormat === "enhanced") {
+                return "new_template1.png";
+            } else {
+                return "TechCon_Template.png";
+            }
         }
         
         let currentTemplate = localStorage.getItem("selectedTemplate") || getDefaultTemplate();
@@ -1744,30 +1890,48 @@
         // ✅ Load Photos (Fix: Ensure they appear correctly)
         function loadPhotos() {
             const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
-            console.log("Loading photos:", images); // Debug log
+            const selectedFormat = localStorage.getItem("selectedFormat");
+            const expectedPhotoCount = selectedFormat === "enhanced" ? 4 : 3;
             
-            if (images.length === 3) {
+            console.log("Loading photos:", images); // Debug log
+            console.log("Selected format:", selectedFormat, "Expected photos:", expectedPhotoCount);
+            
+            // Show/hide the 4th slot based on format
+            const photo4 = document.getElementById("photo4");
+            if (photo4) {
+                photo4.style.display = selectedFormat === "enhanced" ? "block" : "none";
+            }
+            
+            if (images.length >= 3) {
                 // Wait for DOM to be ready, then load photos
                 const attemptLoad = () => {
                     const photo1 = document.getElementById("photo1");
                     const photo2 = document.getElementById("photo2");
                     const photo3 = document.getElementById("photo3");
+                    const photo4 = document.getElementById("photo4");
                     
-                    console.log("Photo elements found:", photo1, photo2, photo3); // Debug log
+                    console.log("Photo elements found:", photo1, photo2, photo3, photo4); // Debug log
                     
                     if (photo1 && photo2 && photo3) {
-                        // Only load photos if they don't already have the correct images
+                        // Build arrays based on format
+                        const photoElements = [photo1, photo2, photo3];
                         const currentImages = [
                             photo1.style.backgroundImage,
                             photo2.style.backgroundImage,
                             photo3.style.backgroundImage
                         ];
-                        
                         const expectedImages = [
                             `url("${images[0]}")`,
                             `url("${images[1]}")`,
                             `url("${images[2]}")`
                         ];
+                        
+                        // Add 4th photo support for enhanced format
+                        if (selectedFormat === "enhanced" && photo4 && images[3]) {
+                            photoElements.push(photo4);
+                            currentImages.push(photo4.style.backgroundImage);
+                            expectedImages.push(`url("${images[3]}")`);
+                        }
                         
                         // Check if photos are already loaded correctly
                         const photosAlreadyLoaded = currentImages.every((current, index) => 
@@ -1775,21 +1939,15 @@
                         );
                         
                         if (!photosAlreadyLoaded) {
-                            // Load photos smoothly without clearing first
-                            photo1.style.backgroundImage = `url('${images[0]}')`;
-                            photo2.style.backgroundImage = `url('${images[1]}')`;
-                            photo3.style.backgroundImage = `url('${images[2]}')`;
-                            
-                            // Add has-photo class to hide dashed borders
-                            photo1.classList.add('has-photo');
-                            photo2.classList.add('has-photo');
-                            photo3.classList.add('has-photo');
-                            
-                            // Ensure proper background properties for photo display
-                            [photo1, photo2, photo3].forEach(element => {
-                                element.style.backgroundSize = "cover";
-                                element.style.backgroundPosition = "center";
-                                element.style.backgroundRepeat = "no-repeat";
+                            // Load photos dynamically based on available photos and format
+                            photoElements.forEach((element, index) => {
+                                if (images[index]) {
+                                    element.style.backgroundImage = `url('${images[index]}')`;
+                                    element.classList.add('has-photo');
+                                    element.style.backgroundSize = "cover";
+                                    element.style.backgroundPosition = "center";
+                                    element.style.backgroundRepeat = "no-repeat";
+                                }
                             });
                             
                             // Initialize drag and drop after photos are loaded
@@ -2064,6 +2222,14 @@
                 setTimeout(() => {
                     changeTemplate(savedTemplate);
                 }, 50);
+            } else if (selectedFormat === "enhanced" && !localStorage.getItem("selectedTemplate")) {
+                savedTemplate = "new_template1.png";
+                localStorage.setItem("selectedTemplate", savedTemplate);
+                
+                // Automatically trigger template selection
+                setTimeout(() => {
+                    changeTemplate(savedTemplate);
+                }, 50);
             } else if (selectedFormat === "old" && !localStorage.getItem("selectedTemplate")) {
                 savedTemplate = "template1.png";
                 localStorage.setItem("selectedTemplate", savedTemplate);
@@ -2112,10 +2278,12 @@
     const ctx = canvas.getContext("2d");
 
     const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
+    const selectedFormat = localStorage.getItem("selectedFormat");
+    const expectedPhotoCount = selectedFormat === "enhanced" ? 4 : 3;
     
-    if (images.length !== 3) {
+    if (images.length < expectedPhotoCount) {
         hideProgressDialog();
-        alert("Please capture 3 photos before downloading.");
+        alert(`Please capture ${expectedPhotoCount} photos before downloading.`);
         return;
     }
     
@@ -2768,6 +2936,27 @@ async function makeFilePublic(fileId) {
                     button.style.border = "3px solid #606460";
                     templateButtonsContainer.appendChild(button);
                 });
+            } else if (selectedFormat === "enhanced") {
+                // Enhanced templates (new_template1.png, new_template2.png)
+                const enhancedTemplates = [
+                    { name: "new_template1.png", color: "#8e44ad" },
+                    { name: "new_template2.png", color: "#3498db" }
+                ];
+                
+                enhancedTemplates.forEach((template, index) => {
+                    const button = document.createElement("button");
+                    button.className = "template-btn";
+                    button.setAttribute("data-template", template.name);
+                    button.onclick = () => {
+                        changeTemplate(template.name);
+                        // Force immediate photo load
+                        setTimeout(() => loadPhotos(), 0);
+                    };
+                    button.id = `btn-enhanced${index + 1}`;
+                    button.style.background = template.color;
+                    button.style.border = "3px solid #606460";
+                    templateButtonsContainer.appendChild(button);
+                });
             } else {
                 // Stories & Social templates (only 2 actual templates)
                 const storiesTemplates = [
@@ -2832,6 +3021,34 @@ async function makeFilePublic(fileId) {
                 // Update template button
                 document.getElementById("btn-template7").onclick = () => changeTemplate(defaultOldTemplate);
                 
+            } else if (selectedFormat === "enhanced") {
+                // Apply enhanced format settings
+                templateContainer.style.width = "315px";
+                templateContainer.style.height = "560px";
+                
+                // Update photo slots for enhanced format
+                photoSlots.forEach((slot, index) => {
+                    slot.style.width = "263px";
+                    slot.style.height = "150px";
+                });
+                
+                // Set enhanced template image
+                const defaultEnhancedTemplate = "new_template1.png";
+                templateImage.style.backgroundImage = `url('${getTemplatePath(defaultEnhancedTemplate)}')`;
+                currentTemplate = defaultEnhancedTemplate;
+                localStorage.setItem("selectedTemplate", defaultEnhancedTemplate);
+                
+                // Force immediate photo loading for Enhanced format
+                setTimeout(() => {
+                    loadPhotos();
+                }, 50);
+                
+                // Update template button to show Enhanced 1 as active
+                setTimeout(() => {
+                    document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
+                    document.getElementById("btn-enhanced1")?.classList.add("active-template");
+                }, 100);
+                
             } else {
                 // Apply new format settings (current default)
                 templateContainer.style.width = "315px";
@@ -2878,6 +3095,21 @@ async function makeFilePublic(fileId) {
                         { x: 120, y: 383, width: 1700, height: 1275 }, // Adjusted positions for old format
                         { x: 120, y: 1700, width: 1700, height: 1275 },
                         { x: 120, y: 3013, width: 1700, height: 1275 }
+                    ]
+                };
+            } else if (selectedFormat === "enhanced") {
+                // Enhanced format with proper photo dimensions to fill template areas
+                // Instead of scaling UI dimensions, use dimensions that fill the template photo areas
+                return {
+                    originalWidth: 1940, // Same as old format template
+                    originalHeight: 5490, // Same as old format template
+                    photoWidth: 1200, // Much larger to fill template photo areas
+                    photoHeight: 1370, // Much larger to fill template photo areas
+                    photoPositions: [
+                        { x: 770, y: 10, width: 1200, height: 1340 },   // Slot1 - top: 1px scaled (1 * 9.8 ≈ 10)
+                        { x: 770, y: 1372, width: 1200, height: 1340 },  // Slot2 - top: 140px scaled (140 * 9.8 ≈ 1372)
+                        { x: 770, y: 2744, width: 1200, height: 1340 },  // Slot3 - top: 280px scaled (280 * 9.8 ≈ 2744)
+                        { x: 770, y: 4116, width: 1200, height: 1340 }   // Slot4 - top: 420px scaled (420 * 9.8 ≈ 4116)
                     ]
                 };
             } else {

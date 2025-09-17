@@ -23,7 +23,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 30px;
-            gap: 50px;
+            gap: 30px;
         }
 
         .format-option {
@@ -34,7 +34,7 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             border: 3px solid rgba(36, 36, 36, 0.978);
-            width: 320px;
+            width: 280px;
             height: 420px;
             display: flex;
             flex-direction: column;
@@ -54,6 +54,10 @@
 
         .format-option:nth-child(2) {
             animation-delay: 0.3s;
+        }
+
+        .format-option:nth-child(3) {
+            animation-delay: 0.5s;
         }
 
         .format-option::before {
@@ -103,7 +107,8 @@
         }
 
         .format-option .old-format-preview,
-        .format-option .new-format-preview {
+        .format-option .new-format-preview,
+        .format-option .enhanced-format-preview {
             margin: 0 auto 15px;
         }
 
@@ -273,6 +278,15 @@
             width: 150px;
             height: 120px;
             background: url('stories_template/template2_169.png') no-repeat center/contain;
+            border-radius: 12px;
+            margin: 0 auto 15px;
+        }
+
+        /* Enhanced format preview styling */
+        .enhanced-format-preview {
+            width: 150px;
+            height: 120px;
+            background: url('new_template/new_template1.png') no-repeat center/contain;
             border-radius: 12px;
             margin: 0 auto 15px;
         }
@@ -810,6 +824,19 @@
                 <div class="unavailable-text">Unavailable</div>
             </div>
         </div>
+
+        <!-- Enhanced Format Option -->
+        <div class="format-option" id="enhancedFormatCard">
+            <div class="badge new-badge">Enhanced</div>
+            <div class="enhanced-format-preview"></div>
+            <div class="shots-pill">4 Shots</div>
+            <h2 class="format-title">Enhanced Portrait</h2>
+            <p class="format-description">New portrait layout with 4 shots. Same classic size with modern layout for enhanced photo experience.</p>
+            <button class="select-format-btn" onclick="selectFormat('enhanced')">Choose Enhanced</button>
+            <div class="unavailable-overlay">
+                <div class="unavailable-text">Unavailable</div>
+            </div>
+        </div>
     </div>
 
     <!-- Settings Modal -->
@@ -843,6 +870,17 @@
                         <div class="toggle-switch">
                             <input type="checkbox" id="storiesToggle" checked onchange="toggleFormatAvailability('stories')">
                             <label for="storiesToggle"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="settings-option-info">
+                            <label class="settings-label">Enhanced Format</label>
+                            <span class="settings-sublabel">Enhanced portrait with 4 shots</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="enhancedToggle" checked onchange="toggleFormatAvailability('enhanced')">
+                            <label for="enhancedToggle"></label>
                         </div>
                     </div>
                 </div>
@@ -979,7 +1017,8 @@
             // Map toggle names to actual format names used in selectFormat
             const formatMap = {
                 'classic': 'old',
-                'stories': 'new'
+                'stories': 'new',
+                'enhanced': 'enhanced'
             };
             
             const actualFormat = formatMap[format];
@@ -990,8 +1029,9 @@
 
         function getFormatSettings() {
             const defaultSettings = {
-                old: true,      // Classic format
-                new: true       // Stories format
+                old: true,        // Classic format
+                new: true,        // Stories format
+                enhanced: true    // Enhanced format
             };
             
             const saved = localStorage.getItem('formatSettings');
@@ -1004,6 +1044,7 @@
             // Update toggle states - map format names to toggle IDs
             document.getElementById('classicToggle').checked = formatSettings.old;
             document.getElementById('storiesToggle').checked = formatSettings.new;
+            document.getElementById('enhancedToggle').checked = formatSettings.enhanced;
         }
 
         function updateFormatAvailability() {
@@ -1040,12 +1081,29 @@
                     storiesOverlay.style.display = 'none';
                 }
             }
+            
+            // Update Enhanced format card
+            const enhancedCard = document.getElementById('enhancedFormatCard');
+            const enhancedOverlay = enhancedCard.querySelector('.unavailable-overlay');
+            
+            if (!formatSettings.enhanced) {
+                enhancedCard.classList.add('disabled');
+                if (enhancedOverlay) {
+                    enhancedOverlay.style.display = 'flex';
+                }
+            } else {
+                enhancedCard.classList.remove('disabled');
+                if (enhancedOverlay) {
+                    enhancedOverlay.style.display = 'none';
+                }
+            }
         }
 
         function resetSettings() {
             const defaultSettings = {
-                old: true,      // Classic format
-                new: true       // Stories format
+                old: true,        // Classic format
+                new: true,        // Stories format
+                enhanced: true    // Enhanced format
             };
             
             localStorage.setItem('formatSettings', JSON.stringify(defaultSettings));

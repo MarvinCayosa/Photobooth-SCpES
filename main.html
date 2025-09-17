@@ -87,6 +87,13 @@
             animation: storiesGradientShift 4s ease-in-out infinite;
         }
 
+        .format-indicator.enhanced {
+            background: linear-gradient(45deg, #11998e, #38ef7d, #06ffa5, #11998e, #00d4ff, #38ef7d) !important;
+            background-size: 300% 300% !important;
+            box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+            animation: enhancedGradientShift 4s ease-in-out infinite;
+        }
+
         @keyframes classicGradientShift {
             0%, 100% {
                 background-position: 0% 50%;
@@ -114,6 +121,21 @@
             }
         }
 
+        @keyframes enhancedGradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 100% 25%;
+            }
+            50% {
+                background-position: 50% 100%;
+            }
+            75% {
+                background-position: 0% 75%;
+            }
+        }
+
         .format-indicator:hover {
             transform: translateY(-2px) scale(1.05);
             animation-duration: 2s !important;
@@ -125,6 +147,10 @@
 
         .format-indicator.stories:hover {
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .format-indicator.enhanced:hover {
+            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.6);
         }
 
         /* Dark mode styling for main page elements */
@@ -273,6 +299,122 @@
             border: 2px dashed rgba(255, 255, 255, 0.2) !important;
             color: #b0b0b0 !important;
             border-radius: 12px;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 24px;
+            aspect-ratio: 4 / 3 !important;
+            max-height: 100px;
+        }
+
+        .captured-images img {
+            aspect-ratio: 4 / 3 !important;
+            max-height: 100px !important;
+        }
+
+        /* Enhanced format preview sizing - scale down 2773x3240 ratio */
+        .enhanced-only {
+            aspect-ratio: 2773 / 3240 !important;
+            max-height: 120px !important;
+        }
+
+        /* Enhanced format elements - consolidated rule */
+        body[data-format="enhanced"] .placeholder,
+        body[data-format="enhanced"] .captured-thumbnail,
+        body[data-format="enhanced"] .captured-images img,
+        .enhanced-format .placeholder,
+        .enhanced-format .captured-thumbnail,
+        .enhanced-format .captured-images img {
+            aspect-ratio: 2773 / 3240 !important;
+            width: 205px !important;
+            height: auto !important;
+            max-height: none !important;
+            min-height: 120px !important;
+            border-radius: 8px !important;
+            box-sizing: border-box !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* Enhanced format specific styling for captured images */
+        body[data-format="enhanced"] .captured-thumbnail,
+        body[data-format="enhanced"] .captured-images img,
+        .enhanced-format .captured-thumbnail,
+        .enhanced-format .captured-images img {
+            object-fit: cover !important;
+            border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Enhanced format specific styling for placeholders */
+        body[data-format="enhanced"] .placeholder,
+        .enhanced-format .placeholder {
+            font-size: 20px !important;
+            max-width: 205px !important;
+        }
+
+        /* Enhanced format 2-column layout for preview */
+        .enhanced-format .captured-images {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            grid-template-rows: auto auto !important;
+            gap: 18px !important;
+            height: auto !important;
+            max-width: none !important;
+            align-items: start !important;
+            justify-items: center !important;
+        }
+
+        /* Enhanced format side rectangles within video preview */
+        body[data-format="enhanced"] .preview::before,
+        body[data-format="enhanced"] .preview::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 198px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.805);
+            backdrop-filter: blur(10px);
+
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        body[data-format="enhanced"] .preview::before {
+            left: 0;
+        }
+
+        body[data-format="enhanced"] .preview::after {
+            right: 0;
+        }
+
+        /* Enhanced format column layout adjustments */
+        body[data-format="enhanced"] #cameraColumn {
+            flex: 0 0 65% !important;
+            max-width: 65% !important;
+        }
+
+        body[data-format="enhanced"] #previewColumn {
+            flex: 0 0 35% !important;
+            max-width: 35% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: start !important;
+            height: auto !important;
+            padding: 5px !important;
+            box-sizing: border-box !important;
+            overflow: visible !important;
+        }
+
+        body[data-format="enhanced"] #capturedImages {
+            margin-top: 40px !important;
+            height: auto !important;
+            max-height: none !important;
+            justify-content: center !important;
+            padding: 5px !important;
+            box-sizing: border-box !important;
+            overflow: visible !important;
         }
 
         /* Timer slider styling */
@@ -308,6 +450,25 @@
         .grid-toggle-btn:hover {
             background: rgba(70, 70, 70, 1) !important;
         }
+
+        /* Enhanced template overlay for showing new template aspect ratio */
+        .enhanced-template-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            height: 100%; 
+            aspect-ratio: 2773 / 3240;
+            border: 2px solid rgba(255, 255, 255, 0.79);
+            background: rgba(255, 255, 255, 0);
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: 
+                inset 0 0 20px rgba(224, 224, 224, 0.2),
+                0 0 20px rgba(236, 236, 236, 0.3);
+        }
+
 
         /* Modal dark mode styling */
         .modal-content {
@@ -370,23 +531,39 @@
             box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
         }
 
-        /* Action tabs transparent styling */
-        .action-tabs {
-            background: transparent !important;
-        }
-
-        .action-tabs .btn {
+        /* Transparent buttons - consolidated styling */
+        .action-tabs,
+        .timer-container,
+        .action-tabs .btn,
+        .timer-container .btn,
+        #timerButton,
+        .dropdown .btn {
             background: transparent !important;
             border: none !important;
+        }
+
+        .action-tabs .btn,
+        .timer-container .btn,
+        .dropdown .btn {
             padding: 10px !important;
             border-radius: 8px !important;
         }
 
-        .action-tabs .btn:hover {
+        .action-tabs .btn:hover,
+        .timer-container .btn:hover,
+        #timerButton:hover,
+        .dropdown .btn:hover {
             background: transparent !important;
         }
 
-        /* SVG icons styling - white by default */
+        .dropdown .btn {
+            color: #f0f0f0 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+
+        /* SVG icons styling */
         .icon {
             fill: white !important;
             stroke: white !important;
@@ -394,20 +571,17 @@
             height: 20px;
         }
 
-        /* Camera icon specific styling */
         .icon-camera {
             fill: none !important;
             stroke: white !important;
             stroke-width: 1.5 !important;
         }
 
-        /* Timer icon specific styling */
         .icon-timer {
             fill: white !important;
             stroke: white !important;
         }
 
-        /* Grid icon specific styling - keep original color */
         .icon-grid {
             fill: currentColor !important;
             stroke: currentColor !important;
@@ -416,43 +590,6 @@
         .grid-toggle-btn .icon {
             fill: #f0f0f0 !important;
             stroke: #f0f0f0 !important;
-        }
-
-        /* Timer container styling */
-        .timer-container {
-            background: transparent !important;
-        }
-
-        .timer-container .btn {
-            background: transparent !important;
-            border: none !important;
-        }
-
-        .timer-container .btn:hover {
-            background: transparent !important;
-        }
-
-        #timerButton {
-            background: transparent !important;
-            border: none !important;
-        }
-
-        #timerButton:hover {
-            background: transparent !important;
-        }
-
-        /* Dropdown button styling */
-        .dropdown .btn {
-            background: transparent !important;
-            border: none !important;
-            color: #f0f0f0 !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 8px !important;
-        }
-
-        .dropdown .btn:hover {
-            background: transparent !important;
         }
     </style>
 
@@ -479,7 +616,7 @@
                 PhotoBooth UE-SCpES
                 <span id="formatIndicator" class="format-indicator">Loading...</span>
             </h1>
-            <div class="col-md-8">
+            <div class="col-md-8" id="cameraColumn">
 
 
                 <!-- Camera Options -->
@@ -535,6 +672,7 @@
                     </button>
                     
                     <div class="grid-overlay"></div>
+                    <div class="enhanced-template-overlay" style="display: none;"></div>
                     <canvas id="canvas" style="display:none;"></canvas>
                     <div class="flash" id="flash"></div>
                     <div id="countdownOverlay" class="countdown-overlay"></div>
@@ -575,11 +713,12 @@
             </div>
 
             <!-- Right: Captured Images -->
-            <div class="col d-flex flex-column align-items-center">
+            <div class="col d-flex flex-column align-items-start" id="previewColumn">
                 <div id="capturedImages" class="captured-images d-flex flex-column gap-3">
                     <div class="placeholder p-4 text-center">1</div>
                     <div class="placeholder p-4 text-center">2</div>
                     <div class="placeholder p-4 text-center">3</div>
+                    <div class="placeholder p-4 text-center enhanced-only" style="display: none;">4</div>
                 </div>
             </div>
 
@@ -639,11 +778,13 @@
             // Display current format selection
             console.log("🚀 DOM loaded, calling updateFormatIndicator...");
             updateFormatIndicator();
+            updateFormatSpecificUI();
             
             // Also call it after a short delay to ensure DOM is fully ready
             setTimeout(() => {
                 console.log("⏰ Delayed call to updateFormatIndicator...");
                 updateFormatIndicator();
+                updateFormatSpecificUI();
             }, 100);
         });
         
@@ -673,14 +814,19 @@
             }
             
             // Clear any existing classes
-            indicator.classList.remove("classic", "stories");
+            indicator.classList.remove("classic", "stories", "enhanced");
             
-            // Set the text content
+            // Set the text content and class
             if (selectedFormat === "old") {
                 indicator.textContent = "Classic Portrait";
                 indicator.innerHTML = "Classic Portrait"; // Also set innerHTML
                 indicator.classList.add("classic");
                 console.log("✅ Format indicator set to Classic Portrait");
+            } else if (selectedFormat === "enhanced") {
+                indicator.textContent = "Enhanced Portrait";
+                indicator.innerHTML = "Enhanced Portrait"; // Also set innerHTML
+                indicator.classList.add("enhanced");
+                console.log("✅ Format indicator set to Enhanced Portrait");
             } else {
                 indicator.textContent = "Stories & Social";
                 indicator.innerHTML = "Stories & Social"; // Also set innerHTML
@@ -705,6 +851,73 @@
             console.log("🔍 Final indicator innerHTML:", indicator.innerHTML);
             console.log("🔍 Final indicator classes:", indicator.className);
             console.log("🔍 Final indicator computed styles:", window.getComputedStyle(indicator).color);
+        }
+
+        // Function to update format-specific UI elements
+        function updateFormatSpecificUI() {
+            const selectedFormat = localStorage.getItem("selectedFormat");
+            const fourthSlot = document.querySelector('.enhanced-only');
+            const enhancedOverlay = document.querySelector('.enhanced-template-overlay');
+            const capturedImagesContainer = document.getElementById('capturedImages');
+            const parentCol = capturedImagesContainer.parentElement;
+            
+            console.log("🔧 Updating format-specific UI for:", selectedFormat);
+            
+            // Set body data attribute for CSS targeting
+            document.body.setAttribute('data-format', selectedFormat);
+            
+            if (selectedFormat === "enhanced") {
+                // Show 4th slot for enhanced format
+                if (fourthSlot) {
+                    fourthSlot.style.display = "flex";
+                    console.log("✅ Showing 4th photo slot for enhanced format");
+                }
+                
+                // Show enhanced template overlay
+                if (enhancedOverlay) {
+                    enhancedOverlay.style.display = "block";
+                    console.log("✅ Showing enhanced template overlay");
+                }
+                
+                // Apply enhanced format layout
+                if (parentCol) {
+                    parentCol.classList.add('enhanced-format');
+                    console.log("✅ Applied enhanced format 2-column layout");
+                }
+                
+                // Force aspect ratio on all placeholders immediately
+                const allPlaceholders = document.querySelectorAll('.placeholder');
+                allPlaceholders.forEach(placeholder => {
+                    placeholder.style.aspectRatio = '2773 / 3240';
+                });
+                console.log("✅ Forced 2773:3240 aspect ratio on all placeholders");
+                
+            } else {
+                // Hide 4th slot for other formats
+                if (fourthSlot) {
+                    fourthSlot.style.display = "none";
+                    console.log("🔒 Hiding 4th photo slot for non-enhanced format");
+                }
+                
+                // Hide enhanced template overlay
+                if (enhancedOverlay) {
+                    enhancedOverlay.style.display = "none";
+                    console.log("🔒 Hiding enhanced template overlay");
+                }
+                
+                // Remove enhanced format layout
+                if (parentCol) {
+                    parentCol.classList.remove('enhanced-format');
+                    console.log("🔒 Removed enhanced format layout");
+                }
+                
+                // Reset aspect ratio on all placeholders
+                const allPlaceholders = document.querySelectorAll('.placeholder');
+                allPlaceholders.forEach(placeholder => {
+                    placeholder.style.aspectRatio = '400/ 300';
+                });
+                console.log("🔒 Reset placeholders to 4:3 aspect ratio");
+            }
         }
 
         // Debug function to test format indicator
@@ -737,6 +950,7 @@
         console.log("🚀 Script loaded, attempting immediate format update...");
         setTimeout(() => {
             updateFormatIndicator();
+            updateFormatSpecificUI();
         }, 50);
     </script>
 
