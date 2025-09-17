@@ -17,6 +17,7 @@ const shutterSound = document.getElementById('shutterSound');
 const beepSound = document.getElementById('beepSound');
 const countdownHigh = document.getElementById('countdownHigh');
 let captureCount = 0;
+let currentDeleteIndex = -1; // Track which image is being deleted
 
 // Function to get maximum capture count based on selected format
 function getMaxCaptureCount() {
@@ -25,6 +26,306 @@ function getMaxCaptureCount() {
         return 4; // Enhanced format has 4 shots
     }
     return 3; // Classic and Stories formats have 3 shots
+}
+
+// Function to get current captured count
+function getCurrentCapturedCount() {
+    let count = 0;
+    const maxCount = getMaxCaptureCount();
+    for (let i = 0; i < maxCount; i++) {
+        const child = capturedImages.children[i];
+        // Check if it's a captured image wrapper (not a placeholder)
+        if (child && child.classList && child.classList.contains('captured-thumbnail-wrapper')) {
+            count++;
+        }
+    }
+    return count;
+}
+
+// Function to update UI based on current state
+function updateUIState() {
+    const currentCount = getCurrentCapturedCount();
+    const maxCount = getMaxCaptureCount();
+    const isAllCaptured = currentCount === maxCount;
+    
+    // Update proceed button visibility and state
+    if (isAllCaptured && !isCapturing) {
+        proceedButton.style.display = "block";
+        proceedButton.disabled = false;
+    } else {
+        proceedButton.style.display = "none";
+        proceedButton.disabled = true;
+    }
+    
+    // Update start button based on capture state
+    if (isAllCaptured && !isCapturing) {
+        // When all slots are filled, change start button to RESET
+        startButton.innerHTML = `
+            <svg class="icon icon-reset" fill="currentColor">
+                <use xlink:href="icons.svg#icon-reset"></use>
+            </svg>RESET
+        `;
+        startButton.disabled = false;
+        startButton.onclick = resetCapture; // Change the onclick function to reset
+    } else if (!isCapturing && currentCount > 0 && currentCount < maxCount) {
+        startButton.innerHTML = `
+            <svg class="icon icon-start" fill="currentColor">
+                <use xlink:href="icons.svg#icon-start"></use>
+            </svg>Continue (${currentCount}/${maxCount})
+        `;
+        startButton.disabled = false;
+        startButton.onclick = startCapture; // Ensure it's set to start capture
+    } else if (!isCapturing && currentCount === 0) {
+        startButton.innerHTML = `
+            <svg class="icon icon-start" fill="currentColor">
+                <use xlink:href="icons.svg#icon-start"></use>
+            </svg>Start
+        `;
+        startButton.disabled = false;
+        startButton.onclick = startCapture; // Ensure it's set to start capture
+    }
+}
+
+// Delete modal functions
+function showDeleteModal(index) {
+    console.log("🔥 showDeleteModal called with index:", index);
+    currentDeleteIndex = index;
+    console.log("🔥 Set currentDeleteIndex to:", currentDeleteIndex);
+    document.getElementById("deleteModal").style.display = "flex";
+    console.log("🔥 Modal should now be visible");
+}
+
+function closeDeleteModal() {
+    console.log("🔥 closeDeleteModal called");
+    currentDeleteIndex = -1;
+    document.getElementById("deleteModal").style.display = "none";
+    console.log("🔥 Modal closed, currentDeleteIndex reset to -1");
+}
+
+function confirmDelete() {
+    console.log("🔥 confirmDelete called! currentDeleteIndex:", currentDeleteIndex);
+    if (currentDeleteIndex !== -1) {
+        console.log("🔥 About to call deleteImage with index:", currentDeleteIndex);
+        deleteImage(currentDeleteIndex);
+    } else {
+        console.log("⚠️ currentDeleteIndex is -1, cannot delete");
+    }
+    closeDeleteModal();
+}
+
+// Function to delete an image and convert back to placeholder
+function deleteImage(index) {
+    const maxCount = getMaxCaptureCount();
+    console.log(`🗑️ Starting delete for slot ${index + 1}, maxCount: ${maxCount}`);
+    
+    if (index < 0 || index >= maxCount) {
+        console.warn(`⚠️ Invalid index ${index}. Valid range: 0-${maxCount-1}`);
+        return;
+    }
+    
+    const selectedFormat = localStorage.getItem("selectedFormat");
+    const isEnhancedOnly = index === 3 && selectedFormat !== "enhanced";
+    const enhancedClass = index === 3 ? ' enhanced-only' : '';
+    
+    // Get the current element at this index
+    const currentElement = capturedImages.children[index];
+    if (!currentElement) {
+        console.warn(`⚠️ No element found at index ${index}`);
+        return;
+    }
+    
+    console.log(`📋 Current element at index ${index}:`, currentElement.className);
+    
+    // Create new placeholder with single capture button
+    const placeholder = document.createElement('div');
+    placeholder.className = `placeholder p-4 text-center${enhancedClass}`;
+    
+    // Handle enhanced-only visibility
+    if (isEnhancedOnly) {
+        placeholder.style.display = 'none';
+    }
+    
+    placeholder.innerHTML = `
+        <div style="color: #888; font-size: 18px; font-weight: 600; margin-bottom: 8px;">${index + 1}</div>
+    `;
+    
+    // Completely remove the current element first
+    currentElement.remove();
+    console.log(`🗂️ Removed element at index ${index}`);
+    
+    // Insert the new placeholder at the correct position
+    if (index >= capturedImages.children.length) {
+        capturedImages.appendChild(placeholder);
+        console.log(`➕ Appended placeholder at end`);
+    } else {
+        capturedImages.insertBefore(placeholder, capturedImages.children[index]);
+        console.log(`➕ Inserted placeholder at index ${index}`);
+    }
+    
+    // Force a repaint to ensure the change is visible
+    placeholder.offsetHeight;
+    
+    // Update UI state
+    updateUIState();
+    
+    console.log(`✅ Delete completed for slot ${index + 1}. Current count: ${getCurrentCapturedCount()}`);
+}
+
+// Function to capture a single image for a specific slot
+async function captureSingleImage(slotIndex) {
+    if (isCapturing) return; // Prevent multiple captures
+    
+    console.log(`📸 Capturing single image for slot ${slotIndex + 1}`);
+    
+    // Disable the button temporarily
+    const placeholder = capturedImages.children[slotIndex];
+    const captureBtn = placeholder.querySelector('.single-capture-btn');
+    if (captureBtn) {
+        captureBtn.disabled = true;
+        captureBtn.innerHTML = '⏳';
+    }
+    
+    // Start countdown for single capture
+    await singleImageCountdown(slotIndex);
+}
+
+// Countdown for single image capture
+async function singleImageCountdown(slotIndex) {
+    const countdownOverlay = document.getElementById("countdownOverlay");
+    countdownOverlay.style.display = "block";
+
+    for (let i = captureDelay; i > 0; i--) {
+        countdownOverlay.innerText = i;
+        countdownOverlay.style.opacity = "1";
+        countdownOverlay.style.transform = "translate(-50%, -50%) scale(1.2)";
+
+        if (i > 1) {
+            beepSound.currentTime = 0;
+            beepSound.play();
+        } else {
+            countdownHigh.currentTime = 0;
+            countdownHigh.play();
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 800));
+        countdownOverlay.style.transform = "translate(-50%, -50%) scale(1)";
+        countdownOverlay.style.opacity = "0.5";
+
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+
+    countdownOverlay.style.display = "none";
+    captureSingleImageToSlot(slotIndex);
+}
+
+// Function to capture and place image in specific slot
+function captureSingleImageToSlot(slotIndex) {
+    flashEffect();
+    shutterSound.currentTime = 0;
+    shutterSound.play();
+
+    const selectedFormat = localStorage.getItem("selectedFormat");
+    
+    // Same capture logic as original captureImage function
+    if (selectedFormat === "enhanced") {
+        const enhancedOverlay = document.querySelector('.enhanced-template-overlay');
+        const videoRect = video.getBoundingClientRect();
+        const overlayRect = enhancedOverlay.getBoundingClientRect();
+        
+        const scaleX = video.videoWidth / videoRect.width;
+        const scaleY = video.videoHeight / videoRect.height;
+        
+        const cropX = (overlayRect.left - videoRect.left) * scaleX;
+        const cropY = (overlayRect.top - videoRect.top) * scaleY;
+        const cropWidth = overlayRect.width * scaleX;
+        const cropHeight = overlayRect.height * scaleY;
+        
+        canvas.width = cropWidth;
+        canvas.height = cropHeight;
+        
+        if (isMirrored) {
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(video, 
+                video.videoWidth - cropX - cropWidth, cropY, cropWidth, cropHeight,
+                0, 0, canvas.width, canvas.height);
+        } else {
+            context.drawImage(video, 
+                cropX, cropY, cropWidth, cropHeight,
+                0, 0, canvas.width, canvas.height);
+        }
+    } else {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        if (isMirrored) {
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+        }
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    }
+
+    // Apply black and white filter if enabled
+    if (isBWFilter) {
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const brightness = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            data[i] = brightness;
+            data[i + 1] = brightness;
+            data[i + 2] = brightness;
+        }
+        
+        context.putImageData(imageData, 0, 0);
+    }
+
+    if (isMirrored) {
+        context.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+    // Create image wrapper with delete button
+    const wrapper = document.createElement('div');
+    wrapper.className = 'captured-thumbnail-wrapper';
+    
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png');
+    img.classList.add("captured-thumbnail");
+    img.style.opacity = "0";
+    img.style.transform = "scale(0.8)";
+
+    img.onclick = function() {
+        document.getElementById("modalImage").src = img.src;
+        new bootstrap.Modal(document.getElementById("imagePreviewModal")).show();
+    };
+
+    // Create delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '×';
+    deleteBtn.onclick = function(e) {
+        console.log("🔥 Delete button clicked! slotIndex:", slotIndex);
+        e.stopPropagation();
+        showDeleteModal(slotIndex);
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(deleteBtn);
+
+    // Replace placeholder with image
+    capturedImages.replaceChild(wrapper, capturedImages.children[slotIndex]);
+
+    setTimeout(() => {
+        img.style.transition = "opacity 0.5s ease-in-out, transform 0.3s ease-in-out";
+        img.style.opacity = "1";
+        img.style.transform = "scale(1)";
+    }, 100);
+
+    // Update UI state
+    updateUIState();
+    
+    console.log(`✅ Captured image for slot ${slotIndex + 1}`);
 }
 
 let isMirrored = true; // Default to mirrored
@@ -117,14 +418,27 @@ timerSlider.addEventListener("input", function () {
 
 // Modify the capture function to use the selected timer
 async function startCapture() {
-    console.log("Start Capture Clicked! Capture Delay:", captureDelay); // Debugging
+    console.log("Start Capture Clicked! Capture Delay:", captureDelay);
+    
+    // Find first empty slot to start from
+    const maxCount = getMaxCaptureCount();
+    let startIndex = 0;
+    for (let i = 0; i < maxCount; i++) {
+        const child = capturedImages.children[i];
+        if (child && child.classList.contains('placeholder')) {
+            startIndex = i;
+            break;
+        }
+    }
+    
+    // Set capture count to the first empty slot
+    captureCount = startIndex;
+    
     // Change button appearance
     startButton.classList.add("capturing");
     startButton.innerText = "Capturing...";
-    captureCount = 0;
     cancelCaptureFlag = false;
     isPaused = false;
-    resetPlaceholders();
     startButton.disabled = true;
     proceedButton.style.display = "none";
     
@@ -140,8 +454,20 @@ async function startCapture() {
 // Use `captureDelay` in the countdown function
 async function countdownAndCapture(seconds) {
     const maxCount = getMaxCaptureCount();
+    
+    // Find next empty slot
+    while (captureCount < maxCount) {
+        const child = capturedImages.children[captureCount];
+        if (child && child.classList.contains('placeholder')) {
+            break; // Found empty slot
+        }
+        captureCount++; // Skip filled slot
+    }
+    
     if (!isCapturing || cancelCaptureFlag || captureCount >= maxCount) return;
-    startButton.innerText = `Capturing...`;
+    
+    const currentCount = getCurrentCapturedCount();
+    startButton.innerText = `Capturing... (${currentCount + 1}/${maxCount})`;
 
     const countdownOverlay = document.getElementById("countdownOverlay");
     countdownOverlay.style.display = "block";
@@ -176,7 +502,6 @@ async function countdownAndCapture(seconds) {
         captureImage();
     }
 }
-
 
 function captureImage() {
     if (cancelCaptureFlag) return;
@@ -236,14 +561,14 @@ function captureImage() {
     if (isBWFilter) {
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
-        
+        `
         for (let i = 0; i < data.length; i += 4) {
             const brightness = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
             data[i] = brightness;     // Red
             data[i + 1] = brightness; // Green
             data[i + 2] = brightness; // Blue
             // data[i + 3] is alpha, leave unchanged
-        }
+        }`
         
         context.putImageData(imageData, 0, 0);
     }
@@ -252,6 +577,10 @@ function captureImage() {
         context.setTransform(1, 0, 0, 1, 0, 0);
     }
 
+    // Create image wrapper with delete button
+    const wrapper = document.createElement('div');
+    wrapper.className = 'captured-thumbnail-wrapper';
+    
     const img = document.createElement('img');
     img.src = canvas.toDataURL('image/png');
     img.classList.add("captured-thumbnail");
@@ -263,7 +592,23 @@ function captureImage() {
         new bootstrap.Modal(document.getElementById("imagePreviewModal")).show();
     };
 
-    capturedImages.replaceChild(img, capturedImages.children[captureCount]);
+    // Create delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '×';
+    
+    // Capture the current slot index before captureCount is incremented
+    const currentSlotIndex = captureCount;
+    deleteBtn.onclick = function(e) {
+        console.log("🔥 Delete button clicked! slot index:", currentSlotIndex);
+        e.stopPropagation();
+        showDeleteModal(currentSlotIndex);
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(deleteBtn);
+
+    capturedImages.replaceChild(wrapper, capturedImages.children[captureCount]);
 
     setTimeout(() => {
         img.style.transition = "opacity 0.5s ease-in-out, transform 0.3s ease-in-out";
@@ -271,13 +616,26 @@ function captureImage() {
         img.style.transform = "scale(1)";
     }, 100);
 
-    captureCount++;
+    captureCount++; // Increment AFTER using captureCount for the delete button
 
     const maxCount = getMaxCaptureCount();
-    if (captureCount < maxCount) {
+    const currentCount = getCurrentCapturedCount();
+    
+    // Check if there are more empty slots to capture
+    let hasEmptySlots = false;
+    for (let i = captureCount; i < maxCount; i++) {
+        const child = capturedImages.children[i];
+        if (child && child.classList.contains('placeholder')) {
+            hasEmptySlots = true;
+            break;
+        }
+    }
+    
+    if (hasEmptySlots && captureCount < maxCount) {
+        // Continue capturing remaining empty slots
         setTimeout(() => countdownAndCapture(captureDelay), 1000);
     } else {
-        // All photos captured - show Retake and Next buttons
+        // All available slots captured or reached max count
         isCapturing = false;
         isPaused = false;
         
@@ -287,21 +645,8 @@ function captureImage() {
         pauseButton.style.display = "none";
         if (resetButton) resetButton.style.display = "none";
         
-        // Show Retake and Next buttons
-        startButton.innerHTML = `
-            <svg class="icon icon-reset" fill="currentColor">
-                <use xlink:href="icons.svg#icon-reset"></use>
-            </svg> Retake
-        `;
-        startButton.classList.remove("capturing");
-        startButton.disabled = false;
-        
-        proceedButton.innerHTML = `
-            <svg class="icon icon-next" fill="currentColor">
-                <use xlink:href="icons.svg#icon-next"></use>
-            </svg> Next
-        `;
-        proceedButton.style.display = "block";
+        // Update UI state (this will handle button states)
+        updateUIState();
     }
 }
 
@@ -371,7 +716,8 @@ function resetCapture() {
     `;
     startButton.classList.remove("capturing");
     startButton.disabled = false;
-    startButton.style.display = "inline-block"; // Make sure start button is visible
+    startButton.style.display = "inline-block";
+    startButton.onclick = startCapture; // Reset onclick function to startCapture
     
     // Hide all other control buttons
     if (pauseButton) pauseButton.style.display = "none";
@@ -424,15 +770,30 @@ function resetPlaceholders() {
     const selectedFormat = localStorage.getItem("selectedFormat");
     const maxCount = getMaxCaptureCount();
     
-    let placeholdersHTML = '';
+    // Clear all existing children
+    capturedImages.innerHTML = '';
+    
+    // Create new placeholder elements one by one
     for (let i = 1; i <= maxCount; i++) {
         const isEnhancedOnly = i === 4 && selectedFormat !== "enhanced";
-        const displayStyle = isEnhancedOnly ? ' style="display: none;"' : '';
         const enhancedClass = i === 4 ? ' enhanced-only' : '';
-        placeholdersHTML += `<div class="placeholder p-4 text-center${enhancedClass}"${displayStyle}>${i}</div>`;
+        
+        const placeholder = document.createElement('div');
+        placeholder.className = `placeholder p-4 text-center${enhancedClass}`;
+        
+        if (isEnhancedOnly) {
+            placeholder.style.display = 'none';
+        }
+        
+            placeholder.innerHTML = `
+                <div style="color: #888; font-size: 18px; font-weight: 600; margin-bottom: 8px;">${i}</div>
+            `;
+        
+        capturedImages.appendChild(placeholder);
     }
     
-    capturedImages.innerHTML = placeholdersHTML;
+    // Update UI state after reset
+    updateUIState();
 }
 
 function flashEffect() {
@@ -447,17 +808,31 @@ function proceedToTemplate() {
     
     const capturedData = [];
     const maxCount = getMaxCaptureCount();
+    const currentCount = getCurrentCapturedCount();
+    
     console.log("📸 Checking captured images...");
     console.log("Total children:", capturedImages.children.length);
     console.log("Expected count:", maxCount);
+    console.log("Current captured count:", currentCount);
+    
+    // Check if all slots are filled
+    if (currentCount < maxCount) {
+        alert(`Please capture all photos first! You have ${currentCount}/${maxCount} photos.`);
+        return;
+    }
     
     for (let i = 0; i < maxCount; i++) {
         const child = capturedImages.children[i];
-        console.log(`Child ${i}:`, child ? child.tagName : "null", child ? child.src : "no src");
+        console.log(`Child ${i}:`, child ? child.tagName : "null");
         
-        if (child && child.tagName === 'IMG' && child.src) {
-            capturedData.push(child.src);
-            console.log(`✅ Added image ${i + 1} to captured data`);
+        if (child && child.classList.contains('captured-thumbnail-wrapper')) {
+            const img = child.querySelector('img');
+            if (img && img.src) {
+                capturedData.push(img.src);
+                console.log(`✅ Added image ${i + 1} to captured data`);
+            } else {
+                console.warn(`⚠️ Missing image in wrapper at slot ${i + 1}`);
+            }
         } else {
             console.warn(`⚠️ Missing or invalid image at slot ${i + 1}`);
         }
@@ -473,7 +848,9 @@ function proceedToTemplate() {
     }
     
     if (capturedData.length < maxCount) {
-        console.warn(`⚠️ Only ${capturedData.length} photos captured out of ${maxCount}. Proceeding anyway...`);
+        console.error(`❌ Only ${capturedData.length} photos captured out of ${maxCount}. Cannot proceed.`);
+        alert(`Please capture all ${maxCount} photos before proceeding. Currently have ${capturedData.length}/${maxCount}.`);
+        return;
     }
     
     try {
