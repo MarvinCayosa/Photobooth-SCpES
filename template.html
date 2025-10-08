@@ -223,6 +223,13 @@
             background-repeat: no-repeat;
         }
 
+        #btn-sixshots1 .template-preview {
+            background-image: url('4R_templates/template1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
         #btn-template3 { background: #c8b6b3; }
         #btn-template4 { background: #ff0000; }
         #btn-template7 { background:rgb(80, 122, 229); }
@@ -231,6 +238,9 @@
         /* Enhanced Format Template Buttons */
         #btn-enhanced1 { background: #ffffff !important; } /* White background for template 1 */
         #btn-enhanced2 { background: #333333 !important; } /* Greyish black background for template 2 */
+        
+        /* 6 Shots Format Template Buttons */
+        #btn-sixshots1 { background: linear-gradient(135deg, #ff9d00, #fa6a41) !important; }
 
         .template-container {
             position: relative;
@@ -328,6 +338,58 @@
         
         body[data-format="enhanced"] .slot4 { 
             top: 488px !important; /* Photo 4 at bottom */
+        }
+
+        /* 6 Shots Format - 3x2 Grid Layout (3 rows, 2 columns) */
+        body[data-format="sixshots"] .template-container {
+            width: 460px !important; /* Double width for 2 columns */
+            height: 690px !important; /* Same height as classic */
+        }
+
+        body[data-format="sixshots"] .photo-slot {
+            width: 215px !important; /* Same as classic */
+            height: 155px !important; /* 4:3 aspect ratio */
+            aspect-ratio: 4 / 3 !important;
+            transform: none !important; /* Remove centering transform */
+        }
+
+        /* 6 Shots format grid positions - 3 rows x 2 columns */
+        /* Left column */
+        body[data-format="sixshots"] .slot1 { 
+            top: 52px !important;
+            left: 10px !important;
+            position: absolute !important;
+        }
+        
+        body[data-format="sixshots"] .slot3 { 
+            top: 216px !important;
+            left: 10px !important;
+            position: absolute !important;
+        }
+        
+        body[data-format="sixshots"] .slot5 { 
+            top: 380px !important;
+            left: 10px !important;
+            position: absolute !important;
+        }
+
+        /* Right column */
+        body[data-format="sixshots"] .slot2 { 
+            top: 52px !important;
+            left: 240px !important;
+            position: absolute !important;
+        }
+        
+        body[data-format="sixshots"] .slot4 { 
+            top: 216px !important;
+            left: 240px !important;
+            position: absolute !important;
+        }
+        
+        body[data-format="sixshots"] .slot6 { 
+            top: 380px !important;
+            left: 240px !important;
+            position: absolute !important;
         }
 
 
@@ -1388,6 +1450,8 @@
                 <div class="photo-slot slot2" id="photo2" draggable="true"></div>
                 <div class="photo-slot slot3" id="photo3" draggable="true"></div>
                 <div class="photo-slot slot4" id="photo4" draggable="true" style="display: none;"></div>
+                <div class="photo-slot slot5" id="photo5" draggable="true" style="display: none;"></div>
+                <div class="photo-slot slot6" id="photo6" draggable="true" style="display: none;"></div>
                 <div class="template" id="template-image"></div>
             </div>
             
@@ -1422,6 +1486,12 @@
                 <button class="template-btn" onclick="changeTemplate('new_template2.png');" id="btn-enhanced2" data-template="new_template2.png" style="display: none;">
                     <div class="template-preview"></div>
                     <span class="template-name">Enhanced 2</span>
+                </button>
+                
+                <!-- 6 Shots Format Templates -->
+                <button class="template-btn" onclick="changeTemplate('template1.png');" id="btn-sixshots1" data-template="template1.png" style="display: none;">
+                    <div class="template-preview"></div>
+                    <span class="template-name">4R Template</span>
                 </button>
                 
                 <!-- <button class="template-btn" onclick="changeTemplate('template4.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template4"></button>
@@ -1688,6 +1758,9 @@
             } else if (selectedFormat === "new") {
                 // Show stories format buttons
                 document.getElementById('btn-template7')?.style.setProperty('display', 'flex');
+            } else if (selectedFormat === "sixshots") {
+                // Show 6 shots format buttons
+                document.getElementById('btn-sixshots1')?.style.setProperty('display', 'flex');
             }
             // Note: Add old format buttons here when needed
         }
@@ -1698,6 +1771,8 @@
                 return `classic_templates/${templateName}`;
             } else if (selectedFormat === "enhanced") {
                 return `new_template/${templateName}`;
+            } else if (selectedFormat === "sixshots") {
+                return `4R_templates/${templateName}`;
             } else {
                 return `stories_template/${templateName}`;
             }
@@ -1709,6 +1784,8 @@
                 return "template1.png";
             } else if (selectedFormat === "enhanced") {
                 return "new_template1.png";
+            } else if (selectedFormat === "sixshots") {
+                return "template1.png";
             } else {
                 return "TechCon_Template.png";
             }
@@ -1891,15 +1968,33 @@
         function loadPhotos() {
             const images = JSON.parse(localStorage.getItem("capturedPhotos")) || [];
             const selectedFormat = localStorage.getItem("selectedFormat");
-            const expectedPhotoCount = selectedFormat === "enhanced" ? 4 : 3;
+            
+            // Determine expected photo count based on format
+            let expectedPhotoCount = 3; // Default for classic and stories
+            if (selectedFormat === "enhanced") {
+                expectedPhotoCount = 4;
+            } else if (selectedFormat === "sixshots") {
+                expectedPhotoCount = 6;
+            }
             
             console.log("Loading photos:", images); // Debug log
             console.log("Selected format:", selectedFormat, "Expected photos:", expectedPhotoCount);
             
-            // Show/hide the 4th slot based on format
+            // Show/hide the 4th slot based on format (show for enhanced AND sixshots)
             const photo4 = document.getElementById("photo4");
             if (photo4) {
-                photo4.style.display = selectedFormat === "enhanced" ? "block" : "none";
+                photo4.style.display = (selectedFormat === "enhanced" || selectedFormat === "sixshots") ? "block" : "none";
+            }
+            
+            // Show/hide slots 5 and 6 for sixshots format
+            const photo5 = document.getElementById("photo5");
+            const photo6 = document.getElementById("photo6");
+            if (selectedFormat === "sixshots") {
+                if (photo5) photo5.style.display = "block";
+                if (photo6) photo6.style.display = "block";
+            } else {
+                if (photo5) photo5.style.display = "none";
+                if (photo6) photo6.style.display = "none";
             }
             
             if (images.length >= 3) {
@@ -1909,8 +2004,10 @@
                     const photo2 = document.getElementById("photo2");
                     const photo3 = document.getElementById("photo3");
                     const photo4 = document.getElementById("photo4");
+                    const photo5 = document.getElementById("photo5");
+                    const photo6 = document.getElementById("photo6");
                     
-                    console.log("Photo elements found:", photo1, photo2, photo3, photo4); // Debug log
+                    console.log("Photo elements found:", photo1, photo2, photo3, photo4, photo5, photo6); // Debug log
                     
                     if (photo1 && photo2 && photo3) {
                         // Build arrays based on format
@@ -1931,6 +2028,25 @@
                             photoElements.push(photo4);
                             currentImages.push(photo4.style.backgroundImage);
                             expectedImages.push(`url("${images[3]}")`);
+                        }
+                        
+                        // Add 5th and 6th photo support for sixshots format
+                        if (selectedFormat === "sixshots") {
+                            if (photo4 && images[3]) {
+                                photoElements.push(photo4);
+                                currentImages.push(photo4.style.backgroundImage);
+                                expectedImages.push(`url("${images[3]}")`);
+                            }
+                            if (photo5 && images[4]) {
+                                photoElements.push(photo5);
+                                currentImages.push(photo5.style.backgroundImage);
+                                expectedImages.push(`url("${images[4]}")`);
+                            }
+                            if (photo6 && images[5]) {
+                                photoElements.push(photo6);
+                                currentImages.push(photo6.style.backgroundImage);
+                                expectedImages.push(`url("${images[5]}")`);
+                            }
                         }
                         
                         // Check if photos are already loaded correctly
@@ -3049,6 +3165,44 @@ async function makeFilePublic(fileId) {
                     document.getElementById("btn-enhanced1")?.classList.add("active-template");
                 }, 100);
                 
+            } else if (selectedFormat === "sixshots") {
+                // Apply 6 shots format settings - same as classic but wider
+                templateContainer.style.width = "460px"; // Double width for 2 columns
+                templateContainer.style.height = "690px"; // Same height as classic
+                
+                // Update photo slots for 6 shots format (4:3 aspect ratio)
+                photoSlots.forEach((slot, index) => {
+                    slot.style.width = "210px";
+                    slot.style.height = "150px";
+                });
+                
+                // Position slots for 6 shots format (3x2 grid)
+                // Left column
+                document.querySelector(".slot1")?.setAttribute('style', 'position: absolute; top: 65px; left: 10px; width: 210px; height: 150px; transform: none;');
+                document.querySelector(".slot3")?.setAttribute('style', 'position: absolute; top: 220px; left: 10px; width: 210px; height: 150px; transform: none;');
+                document.querySelector(".slot5")?.setAttribute('style', 'position: absolute; top: 375px; left: 10px; width: 210px; height: 150px; transform: none;');
+                // Right column
+                document.querySelector(".slot2")?.setAttribute('style', 'position: absolute; top: 65px; left: 240px; width: 210px; height: 150px; transform: none;');
+                document.querySelector(".slot4")?.setAttribute('style', 'position: absolute; top: 220px; left: 240px; width: 210px; height: 150px; transform: none;');
+                document.querySelector(".slot6")?.setAttribute('style', 'position: absolute; top: 375px; left: 240px; width: 210px; height: 150px; transform: none;');
+                
+                // Set 6 shots template image
+                const defaultSixshotsTemplate = "template1.png";
+                templateImage.style.backgroundImage = `url('${getTemplatePath(defaultSixshotsTemplate)}')`;
+                currentTemplate = defaultSixshotsTemplate;
+                localStorage.setItem("selectedTemplate", defaultSixshotsTemplate);
+                
+                // Force immediate photo loading for 6 Shots format
+                setTimeout(() => {
+                    loadPhotos();
+                }, 50);
+                
+                // Update template button to show 6 Shots 1 as active
+                setTimeout(() => {
+                    document.querySelectorAll(".template-btn").forEach((btn) => btn.classList.remove("active-template"));
+                    document.getElementById("btn-sixshots1")?.classList.add("active-template");
+                }, 100);
+                
             } else {
                 // Apply new format settings (current default)
                 templateContainer.style.width = "315px";
@@ -3110,6 +3264,26 @@ async function makeFilePublic(fileId) {
                         { x: 769, y: 1372, width: 1200, height: 1340 },  // Slot2 - top: 140px scaled (140 * 9.8 ≈ 1372)
                         { x: 769, y: 2744, width: 1200, height: 1340 },  // Slot3 - top: 280px scaled (280 * 9.8 ≈ 2744)
                         { x: 769, y: 4116, width: 1200, height: 1340 }   // Slot4 - top: 420px scaled (420 * 9.8 ≈ 4116)
+                    ]
+                };
+            } else if (selectedFormat === "sixshots") {
+                // 6 Shots format - 3x2 grid layout (3 rows, 2 columns)
+                // Array indices [0,1,2,3,4,5] correspond to photos [1,2,3,4,5,6]
+                // Grid layout: 1 2
+                //              3 4
+                //              5 6
+                return {
+                    originalWidth: 3880, // Double width of classic format for 2 columns
+                    originalHeight: 5490, // Same height as classic format
+                    photoWidth: 1700, // Same as classic format
+                    photoHeight: 1275, // Same as classic format
+                    photoPositions: [
+                        { x: 120, y: 383, width: 1700, height: 1275 },   // Photo 1 (index 0) - top left
+                        { x: 2060, y: 383, width: 1700, height: 1275 },  // Photo 2 (index 1) - top right
+                        { x: 120, y: 1700, width: 1700, height: 1275 },  // Photo 3 (index 2) - middle left
+                        { x: 2060, y: 1700, width: 1700, height: 1275 }, // Photo 4 (index 3) - middle right
+                        { x: 120, y: 3013, width: 1700, height: 1275 },  // Photo 5 (index 4) - bottom left
+                        { x: 2060, y: 3013, width: 1700, height: 1275 }  // Photo 6 (index 5) - bottom right
                     ]
                 };
             } else {

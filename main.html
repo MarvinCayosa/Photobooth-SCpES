@@ -96,6 +96,13 @@
             animation: enhancedGradientShift 4s ease-in-out infinite;
         }
 
+        .format-indicator.sixshots {
+            background: linear-gradient(45deg, #ff9d00, #fa6a41, #da4562, #a43773, #653470) !important;
+            background-size: 300% 300% !important;
+            box-shadow: 0 4px 12px rgba(255, 157, 0, 0.4);
+            animation: sixshotsGradientShift 4s ease-in-out infinite;
+        }
+
         @keyframes classicGradientShift {
             0%, 100% {
                 background-position: 0% 50%;
@@ -138,6 +145,24 @@
             }
         }
 
+        @keyframes sixshotsGradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            20% {
+                background-position: 100% 0%;
+            }
+            40% {
+                background-position: 100% 100%;
+            }
+            60% {
+                background-position: 50% 100%;
+            }
+            80% {
+                background-position: 0% 100%;
+            }
+        }
+
         .format-indicator:hover {
             transform: translateY(-2px) scale(1.05);
             animation-duration: 2s !important;
@@ -153,6 +178,10 @@
 
         .format-indicator.enhanced:hover {
             box-shadow: 0 8px 20px rgba(17, 153, 142, 0.6);
+        }
+
+        .format-indicator.sixshots:hover {
+            box-shadow: 0 8px 20px rgba(255, 157, 0, 0.6);
         }
 
         /* Dark mode styling for main page elements */
@@ -406,6 +435,77 @@
             max-width: none !important;
             align-items: start !important;
             justify-items: center !important;
+        }
+
+        /* 6 Shots format specific styling - 3x2 grid layout */
+        body[data-format="sixshots"] .placeholder,
+        body[data-format="sixshots"] .captured-thumbnail,
+        body[data-format="sixshots"] .captured-images img,
+        .sixshots-format .placeholder,
+        .sixshots-format .captured-thumbnail,
+        .sixshots-format .captured-images img {
+            aspect-ratio: 4 / 3 !important;
+            width: 200px !important;
+            height: auto !important;
+            max-height: none !important;
+            min-height: 100px !important;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
+            flex-shrink: 0 !important;
+        }
+
+        body[data-format="sixshots"] .captured-thumbnail,
+        body[data-format="sixshots"] .captured-images img,
+        .sixshots-format .captured-thumbnail,
+        .sixshots-format .captured-images img {
+            object-fit: cover !important;
+            border: 1px solid rgba(124, 124, 124, 0.2) !important;
+        }
+
+        body[data-format="sixshots"] .placeholder,
+        .sixshots-format .placeholder {
+            font-size: 35px !important;
+            max-width: 200px !important;
+        }
+
+        /* 6 Shots format 2-column, 3-row grid layout for preview */
+        .sixshots-format .captured-images {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            grid-template-rows: auto auto auto !important;
+            gap: 15px !important;
+            height: auto !important;
+            max-width: none !important;
+            align-items: start !important;
+            justify-items: center !important;
+        }
+
+        /* 6 Shots format column layout adjustments */
+        body[data-format="sixshots"] #cameraColumn {
+            flex: 0 0 65% !important;
+            max-width: 65% !important;
+        }
+
+        body[data-format="sixshots"] #previewColumn {
+            flex: 0 0 35% !important;
+            max-width: 35% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: start !important;
+            height: auto !important;
+            padding: 5px !important;
+            box-sizing: border-box !important;
+            overflow: visible !important;
+        }
+
+        body[data-format="sixshots"] #capturedImages {
+            margin-top: 20px !important;
+            height: auto !important;
+            max-height: none !important;
+            justify-content: center !important;
+            padding: 5px !important;
+            box-sizing: border-box !important;
+            overflow: visible !important;
         }
 
         /* Enhanced format side rectangles within video preview */
@@ -973,6 +1073,8 @@
                     <div class="placeholder p-4 text-center">2</div>
                     <div class="placeholder p-4 text-center">3</div>
                     <div class="placeholder p-4 text-center enhanced-only" style="display: none;">4</div>
+                    <div class="placeholder p-4 text-center sixshots-only" style="display: none;">5</div>
+                    <div class="placeholder p-4 text-center sixshots-only" style="display: none;">6</div>
                 </div>
             </div>
 
@@ -1087,7 +1189,7 @@
             }
             
             // Clear any existing classes
-            indicator.classList.remove("classic", "stories", "enhanced");
+            indicator.classList.remove("classic", "stories", "enhanced", "sixshots");
             
             // Set the text content and class
             if (selectedFormat === "old") {
@@ -1100,6 +1202,11 @@
                 indicator.innerHTML = "Photostrip v2"; // Also set innerHTML
                 indicator.classList.add("enhanced");
                 console.log("✅ Format indicator set to Enhanced Portrait");
+            } else if (selectedFormat === "sixshots") {
+                indicator.textContent = "6 Shots 4R";
+                indicator.innerHTML = "6 Shots 4R"; // Also set innerHTML
+                indicator.classList.add("sixshots");
+                console.log("✅ Format indicator set to 6 Shots 4R");
             } else {
                 indicator.textContent = "Stories & Social";
                 indicator.innerHTML = "Stories & Social"; // Also set innerHTML
@@ -1130,6 +1237,7 @@
         function updateFormatSpecificUI() {
             const selectedFormat = localStorage.getItem("selectedFormat");
             const fourthSlot = document.querySelector('.enhanced-only');
+            const sixshotsSlots = document.querySelectorAll('.sixshots-only');
             const enhancedOverlay = document.querySelector('.enhanced-template-overlay');
             const capturedImagesContainer = document.getElementById('capturedImages');
             const parentCol = capturedImagesContainer.parentElement;
@@ -1146,6 +1254,12 @@
                     console.log("✅ Showing 4th photo slot for enhanced format");
                 }
                 
+                // Hide 5th and 6th slots
+                sixshotsSlots.forEach(slot => {
+                    slot.style.display = "none";
+                });
+                console.log("🔒 Hiding 5th and 6th photo slots");
+                
                 // Show enhanced template overlay
                 if (enhancedOverlay) {
                     enhancedOverlay.style.display = "block";
@@ -1154,6 +1268,7 @@
                 
                 // Apply enhanced format layout
                 if (parentCol) {
+                    parentCol.classList.remove('sixshots-format');
                     parentCol.classList.add('enhanced-format');
                     console.log("✅ Applied enhanced format 2-column layout");
                 }
@@ -1165,12 +1280,51 @@
                 });
                 console.log("✅ Forced 2773:3240 aspect ratio on all placeholders");
                 
+            } else if (selectedFormat === "sixshots") {
+                // Show 4th slot for 6 shots format (we need all 6 slots!)
+                if (fourthSlot) {
+                    fourthSlot.style.display = "flex";
+                    console.log("✅ Showing 4th photo slot for 6 shots format");
+                }
+                
+                // Show 5th and 6th slots for 6 shots format
+                sixshotsSlots.forEach(slot => {
+                    slot.style.display = "flex";
+                });
+                console.log("✅ Showing 5th and 6th photo slots for 6 shots format");
+                
+                // Hide enhanced template overlay
+                if (enhancedOverlay) {
+                    enhancedOverlay.style.display = "none";
+                    console.log("🔒 Hiding enhanced template overlay");
+                }
+                
+                // Apply 6 shots format layout
+                if (parentCol) {
+                    parentCol.classList.remove('enhanced-format');
+                    parentCol.classList.add('sixshots-format');
+                    console.log("✅ Applied 6 shots format 3x2 grid layout");
+                }
+                
+                // Force aspect ratio on all placeholders immediately
+                const allPlaceholders = document.querySelectorAll('.placeholder');
+                allPlaceholders.forEach(placeholder => {
+                    placeholder.style.aspectRatio = '4 / 3';
+                });
+                console.log("✅ Forced 4:3 aspect ratio on all placeholders for 6 shots");
+                
             } else {
                 // Hide 4th slot for other formats
                 if (fourthSlot) {
                     fourthSlot.style.display = "none";
                     console.log("🔒 Hiding 4th photo slot for non-enhanced format");
                 }
+                
+                // Hide 5th and 6th slots for other formats
+                sixshotsSlots.forEach(slot => {
+                    slot.style.display = "none";
+                });
+                console.log("🔒 Hiding 5th and 6th photo slots for non-sixshots format");
                 
                 // Hide enhanced template overlay
                 if (enhancedOverlay) {
@@ -1180,8 +1334,8 @@
                 
                 // Remove enhanced format layout
                 if (parentCol) {
-                    parentCol.classList.remove('enhanced-format');
-                    console.log("🔒 Removed enhanced format layout");
+                    parentCol.classList.remove('enhanced-format', 'sixshots-format');
+                    console.log("🔒 Removed special format layouts");
                 }
                 
                 // Reset aspect ratio on all placeholders

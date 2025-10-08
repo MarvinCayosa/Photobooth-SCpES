@@ -24,6 +24,8 @@ function getMaxCaptureCount() {
     const selectedFormat = localStorage.getItem("selectedFormat");
     if (selectedFormat === "enhanced") {
         return 4; // Enhanced format has 4 shots
+    } else if (selectedFormat === "sixshots") {
+        return 6; // 6 Shots format has 6 shots
     }
     return 3; // Classic and Stories formats have 3 shots
 }

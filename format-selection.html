@@ -60,6 +60,10 @@
             animation-delay: 0.5s;
         }
 
+        .format-option:nth-child(4) {
+            animation-delay: 0.7s;
+        }
+
         .format-option::before {
             content: '';
             position: absolute;
@@ -299,6 +303,15 @@
             margin: 0 auto 15px;
         }
 
+        /* 6 Shots format preview styling */
+        .sixshots-format-preview {
+            width: 150px;
+            height: 120px;
+            background: url('4R_templates/template1.png') no-repeat center/contain;
+            border-radius: 12px;
+            margin: 0 auto 15px;
+        }
+
         .badge {
             position: absolute;
             top: -12px;
@@ -490,6 +503,7 @@
             padding: 30px;
             max-height: 60vh;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .settings-section {
@@ -645,57 +659,12 @@
             transform: translateY(-1px);
         }
 
-        .unavailable-text {
-            color: #f0f0f0;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-            text-align: center;
-            padding: 12px 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.1);
-            z-index: 20;
-        }
-
-        /* Unavailable Overlay */
-        .unavailable-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(38, 38, 38, 0.688);
-            backdrop-filter: blur(1px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            z-index: 10;
-            transition: all 0.3s ease;
-        }
-
- 
-
+        /* Hide disabled format cards entirely */
         .format-option.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+            display: none !important;
+            visibility: hidden;
+            opacity: 0;
             pointer-events: none;
-            filter: grayscale(100%);
-            transform: scale(0.98);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .format-option.disabled .unavailable-overlay {
-            display: flex;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .format-option.disabled:hover {
-            transform: scale(0.98);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
         }
 
         @keyframes fadeIn {
@@ -832,6 +801,32 @@
         /* Add bottom padding to body to account for fixed footer */
         body {
             padding-bottom: 60px;
+            overflow-x: hidden; /* Remove horizontal scrollbar */
+        }
+
+        /* Custom scrollbar styling - transparent track */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent; /* Make track transparent */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2); /* Semi-transparent thumb */
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3); /* Slightly more visible on hover */
+        }
+
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
     </style>
 </head>
@@ -868,9 +863,7 @@
             <h2 class="format-title">Classic Photostrip</h2>
             <p class="format-description">Traditional vertical photo strip format. Perfect for classic photo booth experience and keepsakes.</p>
             <button class="select-format-btn" onclick="selectFormat('old')">Choose Classic</button>
-            <div class="unavailable-overlay">
-                <div class="unavailable-text">Unavailable</div>
-            </div>
+   
         </div>
 
         <!-- Enhanced Format Option -->
@@ -881,9 +874,6 @@
             <h2 class="format-title">Photostrip v2</h2>
             <p class="format-description">New portrait layout with 4 shots. Same classic size with modern layout for enhanced photo experience.</p>
             <button class="select-format-btn" onclick="selectFormat('enhanced')">Choose Enhanced</button>
-            <div class="unavailable-overlay">
-                <div class="unavailable-text">Unavailable</div>
-            </div>
         </div>
 
         <!-- Stories Format Option -->
@@ -895,9 +885,16 @@
             <em>Softcopies only.</em>
             <p class="format-description">16:9 landscape format. Perfect for Instagram Stories, social media sharing, and digital displays. </p>
             <button class="select-format-btn" onclick="selectFormat('new')">Choose Stories</button>
-            <div class="unavailable-overlay">
-                <div class="unavailable-text">Unavailable</div>
-            </div>
+        </div>
+
+        <!-- 6 Shots Format Option -->
+        <div class="format-option" id="sixshotsFormatCard">
+            <div class="badge new-badge">New</div>
+            <div class="sixshots-format-preview"></div>
+            <div class="shots-pill">6 Shots</div>
+            <h2 class="format-title">6 Shots 4R</h2>
+            <p class="format-description">Double classic layout with 6 shots in 3x2 grid. Perfect for larger group photos and more memories in one print.</p>
+            <button class="select-format-btn" onclick="selectFormat('sixshots')">Choose 6 Shots</button>
         </div>
     </div>
 
@@ -948,6 +945,17 @@
                         <div class="toggle-switch">
                             <input type="checkbox" id="enhancedToggle" checked onchange="toggleFormatAvailability('enhanced')">
                             <label for="enhancedToggle"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="settings-option-info">
+                            <label class="settings-label">6 Shots Format</label>
+                            <span class="settings-sublabel">4R layout with 6 shots in 3x2 grid</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="sixshotsToggle" checked onchange="toggleFormatAvailability('sixshots')">
+                            <label for="sixshotsToggle"></label>
                         </div>
                     </div>
                 </div>
@@ -1085,7 +1093,8 @@
             const formatMap = {
                 'classic': 'old',
                 'stories': 'new',
-                'enhanced': 'enhanced'
+                'enhanced': 'enhanced',
+                'sixshots': 'sixshots'
             };
             
             const actualFormat = formatMap[format];
@@ -1098,7 +1107,8 @@
             const defaultSettings = {
                 old: true,        // Classic format
                 new: true,        // Stories format
-                enhanced: true    // Enhanced format
+                enhanced: true,   // Enhanced format
+                sixshots: true    // 6 Shots format
             };
             
             const saved = localStorage.getItem('formatSettings');
@@ -1112,57 +1122,42 @@
             document.getElementById('classicToggle').checked = formatSettings.old;
             document.getElementById('storiesToggle').checked = formatSettings.new;
             document.getElementById('enhancedToggle').checked = formatSettings.enhanced;
+            document.getElementById('sixshotsToggle').checked = formatSettings.sixshots;
         }
 
         function updateFormatAvailability() {
             const formatSettings = getFormatSettings();
             
-            // Update Classic format card
+            // Update Classic format card - hide completely if disabled
             const classicCard = document.getElementById('classicFormatCard');
-            const classicOverlay = classicCard.querySelector('.unavailable-overlay');
-            
             if (!formatSettings.old) {
                 classicCard.classList.add('disabled');
-                if (classicOverlay) {
-                    classicOverlay.style.display = 'flex';
-                }
             } else {
                 classicCard.classList.remove('disabled');
-                if (classicOverlay) {
-                    classicOverlay.style.display = 'none';
-                }
             }
             
-            // Update Stories format card
+            // Update Stories format card - hide completely if disabled
             const storiesCard = document.getElementById('storiesFormatCard');
-            const storiesOverlay = storiesCard.querySelector('.unavailable-overlay');
-            
             if (!formatSettings.new) {
                 storiesCard.classList.add('disabled');
-                if (storiesOverlay) {
-                    storiesOverlay.style.display = 'flex';
-                }
             } else {
                 storiesCard.classList.remove('disabled');
-                if (storiesOverlay) {
-                    storiesOverlay.style.display = 'none';
-                }
             }
             
-            // Update Enhanced format card
+            // Update Enhanced format card - hide completely if disabled
             const enhancedCard = document.getElementById('enhancedFormatCard');
-            const enhancedOverlay = enhancedCard.querySelector('.unavailable-overlay');
-            
             if (!formatSettings.enhanced) {
                 enhancedCard.classList.add('disabled');
-                if (enhancedOverlay) {
-                    enhancedOverlay.style.display = 'flex';
-                }
             } else {
                 enhancedCard.classList.remove('disabled');
-                if (enhancedOverlay) {
-                    enhancedOverlay.style.display = 'none';
-                }
+            }
+
+            // Update 6 Shots format card - hide completely if disabled
+            const sixshotsCard = document.getElementById('sixshotsFormatCard');
+            if (!formatSettings.sixshots) {
+                sixshotsCard.classList.add('disabled');
+            } else {
+                sixshotsCard.classList.remove('disabled');
             }
         }
 
@@ -1170,7 +1165,8 @@
             const defaultSettings = {
                 old: true,        // Classic format
                 new: true,        // Stories format
-                enhanced: true    // Enhanced format
+                enhanced: true,   // Enhanced format
+                sixshots: true    // 6 Shots format
             };
             
             localStorage.setItem('formatSettings', JSON.stringify(defaultSettings));
