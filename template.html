@@ -60,6 +60,39 @@
             transform: translateY(0);
         }
 
+        #templateSettingsButton {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(50, 50, 50, 0.9);
+            backdrop-filter: blur(10px);
+            color: #f0f0f0;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            opacity: 0.6;
+        }
+
+        #templateSettingsButton:hover {
+            background: rgba(70, 70, 70, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            opacity: 1;
+        }
+
+        #templateSettingsButton:active {
+            transform: translateY(0);
+        }
+
         .icon {
             width: 20px;
             height: 20px;
@@ -208,6 +241,9 @@
         #btn-template8 .template-preview { 
             background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);
         }
+        #btn-template9 .template-preview { 
+            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+        }
         
         /* Enhanced Format Template Previews */
         #btn-enhanced1 .template-preview {
@@ -224,7 +260,19 @@
         }
 
         #btn-sixshots1 .template-preview {
-            background-image: url('4R_templates/template1.png');
+            background-image: url('4R_templates/template2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #btn-sixshots2 .template-preview {
+            background-image: url('4R_templates/template3.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #btn-sixshots3 .template-preview {
+            background-image: url('4R_templates/jpia_template.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -234,13 +282,16 @@
         #btn-template4 { background: #ff0000; }
         #btn-template7 { background:rgb(80, 122, 229); }
         #btn-template8 { background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);}
+        #btn-template9 { background: #32CD32; } /* Lime green for JPIA template */
         
         /* Enhanced Format Template Buttons */
         #btn-enhanced1 { background: #ffffff !important; } /* White background for template 1 */
         #btn-enhanced2 { background: #333333 !important; } /* Greyish black background for template 2 */
         
         /* 6 Shots Format Template Buttons */
-        #btn-sixshots1 { background: linear-gradient(135deg, #ff9d00, #fa6a41) !important; }
+        #btn-sixshots1 { background: white !important; } /* White for template2 */
+        #btn-sixshots2 { background: black !important; } /* Black for template3 */
+        #btn-sixshots3 { background: #89b860 !important; } /* Lime green for JPIA template */
 
         .template-container {
             position: relative;
@@ -347,8 +398,8 @@
         }
 
         body[data-format="sixshots"] .photo-slot {
-            width: 215px !important; /* Same as classic */
-            height: 155px !important; /* 4:3 aspect ratio */
+            width: 217px !important; /* Same as classic */
+            height: 157px !important; /* 4:3 aspect ratio */
             aspect-ratio: 4 / 3 !important;
             transform: none !important; /* Remove centering transform */
         }
@@ -356,43 +407,41 @@
         /* 6 Shots format grid positions - 3 rows x 2 columns */
         /* Left column */
         body[data-format="sixshots"] .slot1 { 
-            top: 52px !important;
-            left: 10px !important;
+            top: 59px !important;
+            left: 16px !important;
             position: absolute !important;
         }
         
         body[data-format="sixshots"] .slot3 { 
-            top: 216px !important;
-            left: 10px !important;
+            top: 225px !important;
+            left: 16px !important;
             position: absolute !important;
         }
         
         body[data-format="sixshots"] .slot5 { 
-            top: 380px !important;
-            left: 10px !important;
+            top: 389px !important;
+            left: 16px !important;
             position: absolute !important;
         }
 
         /* Right column */
         body[data-format="sixshots"] .slot2 { 
-            top: 52px !important;
-            left: 240px !important;
+            top: 59px !important;
+            left: 228px !important;
             position: absolute !important;
         }
         
         body[data-format="sixshots"] .slot4 { 
-            top: 216px !important;
-            left: 240px !important;
+            top: 225px !important;
+            left: 228px !important;
             position: absolute !important;
         }
         
         body[data-format="sixshots"] .slot6 { 
-            top: 380px !important;
-            left: 240px !important;
+            top: 389px !important;
+            left: 228px !important;
             position: absolute !important;
         }
-
-
 
         .template {
             position: absolute;
@@ -405,8 +454,6 @@
             z-index: 1;
           
         }
-
-     
 
         .btn-download {
             background: linear-gradient(45deg, #1a237e, #3f51b5, #2196f3, #00bcd4, #2196f3, #3f51b5, #1a237e);
@@ -1003,6 +1050,106 @@
     font-size: 13px;
 }
 
+/* Template Settings Modal */
+.template-settings-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 6000;
+    animation: fadeIn 0.3s ease;
+}
+
+.template-settings-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.template-settings-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.template-settings-option:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.template-settings-option-info {
+    flex: 1;
+}
+
+.template-settings-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #f0f0f0;
+    margin: 0 0 4px 0;
+    display: block;
+}
+
+.template-settings-sublabel {
+    font-size: 13px;
+    color: #b0b0b0;
+    display: block;
+    line-height: 1.4;
+}
+
+/* Toggle Switch for Templates */
+.template-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 28px;
+    margin-left: 15px;
+}
+
+.template-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.template-toggle-switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #555;
+    border-radius: 14px;
+    transition: all 0.3s ease;
+}
+
+.template-toggle-switch label:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    top: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.template-toggle-switch input:checked + label {
+    background-color: #37ba20;
+}
+
+.template-toggle-switch input:checked + label:before {
+    transform: translateX(26px);
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -1378,6 +1525,13 @@
     </style>
 </head>
 <body>
+    <!-- Template Settings Button -->
+    <button id="templateSettingsButton" onclick="openTemplateSettings()">
+        <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+        </svg>
+    </button>
+
         <!-- ✅ QR Code Modal -->
     <div id="qrModal" class="modal">
         <div class="modal-content">
@@ -1553,7 +1707,29 @@
                     </div>
                 </div>
 
-   
+                <!-- Template Settings Modal -->
+                <div id="templateSettingsModal" class="template-settings-modal">
+                    <div class="settings-modal-content">
+                        <div class="settings-modal-header">
+                            <h2>Template Visibility</h2>
+                            <button class="settings-close" onclick="closeTemplateSettings()">&times;</button>
+                        </div>
+                        <div class="settings-modal-body">
+                            <div class="settings-section">
+                                <h3>Manage Templates</h3>
+                                <p class="settings-description">Show or hide templates from the selection</p>
+                                
+                                <div id="templateSettingsContainer">
+                                    <!-- Template toggles will be dynamically generated here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-modal-footer">
+                            <button class="settings-btn settings-btn-secondary" onclick="resetTemplateSettings()">Reset All</button>
+                            <button class="settings-btn settings-btn-primary" onclick="closeTemplateSettings()">Done</button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- ✅ QR Code Modal -->
                 <div id="qrModal" class="modal">
@@ -2347,7 +2523,7 @@
                     changeTemplate(savedTemplate);
                 }, 50);
             } else if (selectedFormat === "old" && !localStorage.getItem("selectedTemplate")) {
-                savedTemplate = "template1.png";
+                savedTemplate = "template2.png";
                 localStorage.setItem("selectedTemplate", savedTemplate);
                 
                 // Automatically trigger template selection
@@ -3014,6 +3190,139 @@ async function makeFilePublic(fileId) {
             updateModalLoginStatus();
         };
 
+        // Template Settings Functions
+        function getTemplateSettings() {
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            let defaultSettings = {};
+            
+            // Set default settings based on format
+            if (selectedFormat === "old") {
+                defaultSettings = {
+                    'template2': true,
+                    'template3': true,
+                    'template4': true,
+                    'template7': true,
+                    'template8': true,
+                    'jpia_template': true
+                };
+            } else if (selectedFormat === "enhanced") {
+                defaultSettings = {
+                    'new_template1': true,
+                    'new_template2': true
+                };
+            } else if (selectedFormat === "sixshots") {
+                defaultSettings = {
+                    'template2': true,
+                    'jpia_template': true,
+                    'template3': true
+                };
+            } else {
+                defaultSettings = {
+                    'TechCon_Template': true,
+                    'template1_169': true
+                };
+            }
+            
+            const saved = localStorage.getItem('templateSettings_' + selectedFormat);
+            return saved ? JSON.parse(saved) : defaultSettings;
+        }
+
+        function saveTemplateSettings(settings) {
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            localStorage.setItem('templateSettings_' + selectedFormat, JSON.stringify(settings));
+        }
+
+        function openTemplateSettings() {
+            const modal = document.getElementById('templateSettingsModal');
+            const container = document.getElementById('templateSettingsContainer');
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            
+            // Clear existing content
+            container.innerHTML = "";
+            
+            // Generate template toggles based on format
+            const templateSettings = getTemplateSettings();
+            let templates = [];
+            
+            if (selectedFormat === "old") {
+                templates = [
+                    { key: 'template2', name: 'Template 2', description: 'White background' },
+                    { key: 'template3', name: 'Template 3', description: 'Black background' },
+                    { key: 'template4', name: 'Template 4', description: 'Red background' },
+                    { key: 'template7', name: 'Template 7', description: 'Blue background' },
+                    { key: 'template8', name: 'Template 8', description: 'Black with orange' },
+                    { key: 'jpia_template', name: 'JPIA Template', description: 'Lime green design' }
+                ];
+            } else if (selectedFormat === "enhanced") {
+                templates = [
+                    { key: 'new_template1', name: 'Enhanced 1', description: 'Purple gradient' },
+                    { key: 'new_template2', name: 'Enhanced 2', description: 'Blue gradient' }
+                ];
+            } else if (selectedFormat === "sixshots") {
+                templates = [
+                    { key: 'template2', name: '4R Template 2', description: 'White background' },
+                    { key: 'template3', name: '4R Template 3', description: 'Black background' },
+                    { key: 'jpia_template', name: 'JPIA 4R Template', description: 'Lime green design' }
+                ];
+            } else {
+                templates = [
+                    { key: 'TechCon_Template', name: 'TechCon', description: 'Blue design' },
+                    { key: 'template1_169', name: 'Stories 1', description: 'Blue gradient' }
+                ];
+            }
+            
+            // Create toggle for each template
+            templates.forEach(template => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'template-settings-option';
+                
+                const isChecked = templateSettings[template.key] !== false;
+                
+                optionDiv.innerHTML = `
+                    <div class="template-settings-option-info">
+                        <label class="template-settings-label">${template.name}</label>
+                        <span class="template-settings-sublabel">${template.description}</span>
+                    </div>
+                    <div class="template-toggle-switch">
+                        <input type="checkbox" id="toggle-${template.key}" ${isChecked ? 'checked' : ''} 
+                            onchange="toggleTemplate('${template.key}')">
+                        <label for="toggle-${template.key}"></label>
+                    </div>
+                `;
+                
+                container.appendChild(optionDiv);
+            });
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeTemplateSettings() {
+            const modal = document.getElementById('templateSettingsModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            
+            // Regenerate template buttons to reflect changes
+            generateTemplateButtons();
+        }
+
+        function toggleTemplate(templateKey) {
+            const toggle = document.getElementById('toggle-' + templateKey);
+            const templateSettings = getTemplateSettings();
+            
+            templateSettings[templateKey] = toggle.checked;
+            saveTemplateSettings(templateSettings);
+        }
+
+        function resetTemplateSettings() {
+            const selectedFormat = localStorage.getItem("selectedFormat") || "new";
+            localStorage.removeItem('templateSettings_' + selectedFormat);
+            
+            // Reload the modal to show reset state
+            closeTemplateSettings();
+            setTimeout(() => openTemplateSettings(), 100);
+        }
+
         // ✅ Function to Reset and Go Back to Index Page
         function goBack() {
         window.location.href = "main.html" ;
@@ -3028,17 +3337,25 @@ async function makeFilePublic(fileId) {
             templateButtonsContainer.innerHTML = "";
             
             if (selectedFormat === "old") {
-                // Classic templates (template1.png to template4.png, template7.png, template8.png)
+                // Classic templates (template2.png, template3.png, template4.png, template7.png, template8.png, jpia_template.png)
                 const classicTemplates = [
-                    { name: "template1.png", color: "white" },
-                    { name: "template2.png", color: "black" },
-                    { name: "template3.png", color: "#c8b6b3" },
+                    { name: "template2.png", color: "white" },
+                    { name: "template3.png", color: "black" },
                     { name: "template4.png", color: "#ff0000" },
                     { name: "template7.png", color: "rgb(80, 122, 229)" },
-                    { name: "template8.png", color: "black" }
+                    { name: "template8.png", color: "black" },
+                    { name: "jpia_template.png", color: "#89b860" } // Lime green for JPIA
                 ];
                 
+                const templateSettings = getTemplateSettings();
+                const buttonIdMap = ['template2', 'template3', 'template4', 'template7', 'template8', 'template9'];
                 classicTemplates.forEach((template, index) => {
+                    // Check if template is enabled in settings
+                    const templateKey = template.name.replace('.png', '');
+                    if (!templateSettings[templateKey]) {
+                        return; // Skip disabled templates
+                    }
+                    
                     const button = document.createElement("button");
                     button.className = "template-btn";
                     button.setAttribute("data-template", template.name);
@@ -3047,7 +3364,7 @@ async function makeFilePublic(fileId) {
                         // Force immediate photo load
                         setTimeout(() => loadPhotos(), 0);
                     };
-                    button.id = `btn-template${index + 1}`;
+                    button.id = `btn-${buttonIdMap[index]}`;
                     button.style.background = template.color;
                     button.style.border = "3px solid #606460";
                     templateButtonsContainer.appendChild(button);
@@ -3069,6 +3386,35 @@ async function makeFilePublic(fileId) {
                         setTimeout(() => loadPhotos(), 0);
                     };
                     button.id = `btn-enhanced${index + 1}`;
+                    button.style.background = template.color;
+                    button.style.border = "3px solid #606460";
+                    templateButtonsContainer.appendChild(button);
+                });
+            } else if (selectedFormat === "sixshots") {
+                // 6 Shots 4R templates (template2.png, template3.png, and jpia_template.png)
+                const sixshotsTemplates = [
+                    { name: "template2.png", color: "white" }, // White for template2
+                    { name: "template3.png", color: "black" }, // Black for template3
+                    { name: "jpia_template.png", color: "#89b860" } // Lime green for JPIA
+                ];
+                
+                const templateSettings = getTemplateSettings();
+                sixshotsTemplates.forEach((template, index) => {
+                    // Check if template is enabled in settings
+                    const templateKey = template.name.replace('.png', '');
+                    if (!templateSettings[templateKey]) {
+                        return; // Skip disabled templates
+                    }
+                    
+                    const button = document.createElement("button");
+                    button.className = "template-btn";
+                    button.setAttribute("data-template", template.name);
+                    button.onclick = () => {
+                        changeTemplate(template.name);
+                        // Force immediate photo load
+                        setTimeout(() => loadPhotos(), 0);
+                    };
+                    button.id = `btn-sixshots${index + 1}`;
                     button.style.background = template.color;
                     button.style.border = "3px solid #606460";
                     templateButtonsContainer.appendChild(button);
@@ -3124,7 +3470,7 @@ async function makeFilePublic(fileId) {
                 document.querySelector(".slot3").style.top = "375px";
                 
                 // Set old template image
-                const defaultOldTemplate = "template1.png";
+                const defaultOldTemplate = "template2.png";
                 templateImage.style.backgroundImage = `url('${getTemplatePath(defaultOldTemplate)}')`;
                 currentTemplate = defaultOldTemplate;
                 localStorage.setItem("selectedTemplate", defaultOldTemplate);
@@ -3135,7 +3481,7 @@ async function makeFilePublic(fileId) {
                 }, 50);
                 
                 // Update template button
-                document.getElementById("btn-template7").onclick = () => changeTemplate(defaultOldTemplate);
+                document.getElementById("btn-template2").onclick = () => changeTemplate(defaultOldTemplate);
                 
             } else if (selectedFormat === "enhanced") {
                 // Apply enhanced format settings
@@ -3187,7 +3533,7 @@ async function makeFilePublic(fileId) {
                 document.querySelector(".slot6")?.setAttribute('style', 'position: absolute; top: 375px; left: 240px; width: 210px; height: 150px; transform: none;');
                 
                 // Set 6 shots template image
-                const defaultSixshotsTemplate = "template1.png";
+                const defaultSixshotsTemplate = "template2.png";
                 templateImage.style.backgroundImage = `url('${getTemplatePath(defaultSixshotsTemplate)}')`;
                 currentTemplate = defaultSixshotsTemplate;
                 localStorage.setItem("selectedTemplate", defaultSixshotsTemplate);
@@ -3272,18 +3618,20 @@ async function makeFilePublic(fileId) {
                 // Grid layout: 1 2
                 //              3 4
                 //              5 6
+                // UI: 460x690 container, photos 217x157, scaled 8.43x for print (3880x5817)
+                const scale = 8.43; // 3880/460
                 return {
-                    originalWidth: 3880, // Double width of classic format for 2 columns
-                    originalHeight: 5490, // Same height as classic format
-                    photoWidth: 1700, // Same as classic format
-                    photoHeight: 1275, // Same as classic format
+                    originalWidth: 3880, // 460px * 8.43
+                    originalHeight: 5817, // 690px * 8.43
+                    photoWidth: 1829, // 217px * 8.43
+                    photoHeight: 1324, // 157px * 8.43
                     photoPositions: [
-                        { x: 120, y: 383, width: 1700, height: 1275 },   // Photo 1 (index 0) - top left
-                        { x: 2060, y: 383, width: 1700, height: 1275 },  // Photo 2 (index 1) - top right
-                        { x: 120, y: 1700, width: 1700, height: 1275 },  // Photo 3 (index 2) - middle left
-                        { x: 2060, y: 1700, width: 1700, height: 1275 }, // Photo 4 (index 3) - middle right
-                        { x: 120, y: 3013, width: 1700, height: 1275 },  // Photo 5 (index 4) - bottom left
-                        { x: 2060, y: 3013, width: 1700, height: 1275 }  // Photo 6 (index 5) - bottom right
+                        { x: 135, y: 505, width: 1829, height: 1324 },   // Slot1: left 16px, top 59px (scaled)
+                        { x: 1922, y: 505, width: 1829, height: 1324 },  // Slot2: left 228px, top 59px (scaled)
+                        { x: 135, y: 1895, width: 1829, height: 1324 },  // Slot3: left 16px, top 224px (scaled)
+                        { x: 1922, y: 1895, width: 1829, height: 1324 }, // Slot4: left 228px, top 224px (scaled)
+                        { x: 135, y: 3285, width: 1829, height: 1324 },  // Slot5: left 16px, top 389px (scaled)
+                        { x: 1922, y: 3285, width: 1829, height: 1324 }  // Slot6: left 228px, top 389px (scaled)
                     ]
                 };
             } else {
