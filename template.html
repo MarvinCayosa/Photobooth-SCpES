@@ -244,6 +244,12 @@
         #btn-template9 .template-preview { 
             background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
         }
+        #btn-brod .template-preview {
+            background-image: url('classic_templates/brod_template.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
         
         /* Enhanced Format Template Previews */
         #btn-enhanced1 .template-preview {
@@ -283,6 +289,7 @@
         #btn-template7 { background:rgb(80, 122, 229); }
         #btn-template8 { background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);}
         #btn-template9 { background: #32CD32; } /* Lime green for JPIA template */
+        #btn-brod { background: #8B0000; } /* Dark red for brod template */
         
         /* Enhanced Format Template Buttons */
         #btn-enhanced1 { background: #ffffff !important; } /* White background for template 1 */
@@ -1943,6 +1950,10 @@
         
         // Helper function to get correct template path
         function getTemplatePath(templateName) {
+            // Special handling for brod_template
+            if (templateName === "brod_template.png") {
+                return `classic_templates/${templateName}`;
+            }
             if (selectedFormat === "old") {
                 return `classic_templates/${templateName}`;
             } else if (selectedFormat === "enhanced") {
@@ -3203,7 +3214,8 @@ async function makeFilePublic(fileId) {
                     'template4': true,
                     'template7': true,
                     'template8': true,
-                    'jpia_template': true
+                    'jpia_template': true,
+                    'brod_template': true
                 };
             } else if (selectedFormat === "enhanced") {
                 defaultSettings = {
@@ -3251,7 +3263,8 @@ async function makeFilePublic(fileId) {
                     { key: 'template4', name: 'Template 4', description: 'Red background' },
                     { key: 'template7', name: 'Template 7', description: 'Blue background' },
                     { key: 'template8', name: 'Template 8', description: 'Black with orange' },
-                    { key: 'jpia_template', name: 'JPIA Template', description: 'Lime green design' }
+                    { key: 'jpia_template', name: 'JPIA Template', description: 'Lime green design' },
+                    { key: 'brod_template', name: 'Brod Template', description: 'Dark red design' }
                 ];
             } else if (selectedFormat === "enhanced") {
                 templates = [
@@ -3337,18 +3350,19 @@ async function makeFilePublic(fileId) {
             templateButtonsContainer.innerHTML = "";
             
             if (selectedFormat === "old") {
-                // Classic templates (template2.png, template3.png, template4.png, template7.png, template8.png, jpia_template.png)
+                // Classic templates (template2.png, template3.png, template4.png, template7.png, template8.png, jpia_template.png, brod_template.png)
                 const classicTemplates = [
                     { name: "template2.png", color: "white" },
                     { name: "template3.png", color: "black" },
                     { name: "template4.png", color: "#ff0000" },
                     { name: "template7.png", color: "rgb(80, 122, 229)" },
                     { name: "template8.png", color: "black" },
-                    { name: "jpia_template.png", color: "#89b860" } // Lime green for JPIA
+                    { name: "jpia_template.png", color: "#89b860" }, // Lime green for JPIA
+                    { name: "brod_template.png", color: "#8B0000" } // Dark red for Brod
                 ];
                 
                 const templateSettings = getTemplateSettings();
-                const buttonIdMap = ['template2', 'template3', 'template4', 'template7', 'template8', 'template9'];
+                const buttonIdMap = ['template2', 'template3', 'template4', 'template7', 'template8', 'template9', 'brod'];
                 classicTemplates.forEach((template, index) => {
                     // Check if template is enabled in settings
                     const templateKey = template.name.replace('.png', '');
