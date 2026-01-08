@@ -855,15 +855,78 @@ function proceedToTemplate() {
         return;
     }
     
+    // Compress images before saving to avoid quota exceeded error
+    console.log("🔄 Compressing images...");
+    compressImagesAndSave(capturedData);
+}
+
+// Compress images to reduce localStorage usage
+async function compressImagesAndSave(imageDataArray) {
     try {
-        localStorage.setItem("capturedPhotos", JSON.stringify(capturedData));
-        console.log("💾 Saved captured photos to localStorage");
+        const compressedImages = [];
+        
+        for (let i = 0; i < imageDataArray.length; i++) {
+            const imageData = imageDataArray[i];
+            console.log(`📸 Compressing image ${i + 1}/${imageDataArray.length}...`);
+            
+            // Create an image element
+            const img = new Image();
+            img.src = imageData;
+            
+            // Wait for image to load
+            await new Promise((resolve) => {
+                img.onload = resolve;
+            });
+            
+            // Create a canvas to compress the image
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate new dimensions (max 1200px width while maintaining aspect ratio)
+            const maxWidth = 1200;
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > maxWidth) {
+                height = (maxWidth / width) * height;
+                width = maxWidth;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw and compress to JPEG with 0.7 quality
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+            
+            compressedImages.push(compressedData);
+            
+            // Calculate size reduction
+            const originalSize = (imageData.length * 0.75 / 1024).toFixed(2);
+            const compressedSize = (compressedData.length * 0.75 / 1024).toFixed(2);
+            console.log(`✅ Image ${i + 1}: ${originalSize}KB → ${compressedSize}KB (${((1 - compressedData.length / imageData.length) * 100).toFixed(1)}% reduction)`);
+        }
+        
+        // Calculate total size
+        const totalSize = compressedImages.reduce((sum, img) => sum + img.length, 0);
+        const totalSizeKB = (totalSize * 0.75 / 1024).toFixed(2);
+        console.log(`📦 Total compressed size: ${totalSizeKB}KB`);
+        
+        // Save to localStorage
+        localStorage.setItem("capturedPhotos", JSON.stringify(compressedImages));
+        console.log("💾 Saved compressed photos to localStorage");
         
         console.log("🔄 Redirecting to template.html...");
         window.location.href = "template.html";
+        
     } catch (error) {
-        console.error("❌ Error saving to localStorage or redirecting:", error);
-        alert("Error saving photos. Please try again.");
+        console.error("❌ Error compressing or saving photos:", error);
+        
+        if (error.name === 'QuotaExceededError') {
+            alert("Storage quota exceeded! Photos are too large. Try capturing photos with better lighting or lower resolution.");
+        } else {
+            alert("Error saving photos. Please try again.");
+        }
     }
 }
 
