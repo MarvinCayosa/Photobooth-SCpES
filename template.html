@@ -250,6 +250,12 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+        #btn-educ .template-preview {
+            background-image: url('classic_templates/educ_template.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
         
         /* Enhanced Format Template Previews */
         #btn-enhanced1 .template-preview {
@@ -290,6 +296,11 @@
         #btn-template8 { background: linear-gradient(135deg, #2c2c2c 0%, #ff8c00 100%);}
         #btn-template9 { background: #32CD32; } /* Lime green for JPIA template */
         #btn-brod { background: #8B0000; } /* Dark red for brod template */
+        #btn-educ { 
+            background: linear-gradient(135deg, #000080 0%, #4169E1 50%, #87CEEB 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
         
         /* Enhanced Format Template Buttons */
         #btn-enhanced1 { background: #ffffff !important; } /* White background for template 1 */
@@ -1362,6 +1373,18 @@
         }
     }
 
+    @keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
     @keyframes pulseGlow {
         0%, 100% {
             box-shadow: 0 0 20px rgba(0, 255, 215, 0.3), 0 0 40px rgba(0, 255, 215, 0.2), 0 0 60px rgba(255, 237, 0, 0.1);
@@ -1527,6 +1550,208 @@
     body[data-format="enhanced"] .slot3 { top: 280px !important; }
     body[data-format="enhanced"] .slot4 { top: 420px !important; }
 
+    /* Download Configuration Modal */
+    .download-config-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 7000;
+        animation: fadeIn 0.3s ease;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .download-config-modal.show {
+        display: flex;
+    }
+
+    .download-config-content {
+        background: rgba(30, 30, 30, 0.95);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 0;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh;
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .download-config-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(50, 50, 50, 0.2);
+    }
+
+    .download-config-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f0f0f0;
+        margin: 0;
+    }
+
+    .download-config-body {
+        padding: 30px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .config-field {
+        margin-bottom: 20px;
+    }
+
+    .config-field:last-child {
+        margin-bottom: 0;
+    }
+
+    .config-field label {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        color: #f0f0f0;
+        margin-bottom: 6px;
+    }
+
+    .config-field .field-description {
+        font-size: 12px;
+        color: #b0b0b0;
+        margin-bottom: 10px;
+    }
+
+    .config-field input {
+        width: 100%;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #f0f0f0;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .codes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .code-input-wrapper {
+        position: relative;
+    }
+
+    .code-input-wrapper input {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .code-input-wrapper input.invalid {
+        border-color: #ff4757;
+        background: rgba(255, 71, 87, 0.1);
+    }
+
+    .code-input-label {
+        font-size: 11px;
+        color: #999;
+        margin-bottom: 4px;
+        display: block;
+        font-weight: 500;
+    }
+
+    #codesError {
+        display: none;
+    }
+
+    .stub-notice {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .stub-notice-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stub-notice-text {
+        flex: 1;
+    }
+
+    .config-field input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .config-field .error-message {
+        display: none;
+        color: #ff4757;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .config-field input.invalid + .error-message {
+        display: block;
+    }
+
+    .download-config-footer {
+        display: flex;
+        gap: 15px;
+        padding: 25px 30px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(50, 50, 50, 0.2);
+    }
+
+    .config-btn {
+        flex: 1;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .config-btn-secondary {
+        background: rgba(107, 114, 128, 0.1);
+        color: #6b7280;
+    }
+
+    .config-btn-secondary:hover {
+        background: rgba(107, 114, 128, 0.15);
+        transform: translateY(-1px);
+    }
+
+    .config-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .config-btn-primary:hover {
+        transform: translateY(-2px);
+    }
 
     
     </style>
@@ -1662,7 +1887,7 @@
                 <button class="template-btn" onclick="changeTemplate('template5.png'); setTimeout(() => loadPhotos(), 0);" id="btn-template5"></button> -->
             </div>
             <div class="button-container">
-                <button class="btn btn-download" onclick="downloadImage()">
+                <button class="btn btn-download" onclick="openDownloadConfig()">
                     <span class="btn-text">Download</span>
                     <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21 15V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1798,13 +2023,8 @@
                 console.error("❌ Logout button not found!");
             }
 
-            // Auto Logout if Script Fails
-            setTimeout(function () {
-                if (document.readyState !== "complete") {
-                    alert("System encountered an issue. Logging out...");
-                    logout();
-                }
-            }, 5000); // Checks after 5 seconds
+            // Note: Removed aggressive auto-logout check to preserve login session
+            // Users will stay signed in across sessions unless they manually log out
             
             // Initialize templates and photos on page load
             setTimeout(() => {
@@ -1950,8 +2170,8 @@
         
         // Helper function to get correct template path
         function getTemplatePath(templateName) {
-            // Special handling for brod_template
-            if (templateName === "brod_template.png") {
+            // Special handling for brod_template and educ_template
+            if (templateName === "brod_template.png" || templateName === "educ_template.png") {
                 return `classic_templates/${templateName}`;
             }
             if (selectedFormat === "old") {
@@ -2110,9 +2330,9 @@
                     if (userInfo) {
                         userInfo.innerText = "✅ Signed in and ready to upload!";
                     }
-                } else {
-                    // Token expired or invalid
-                    console.log("❌ Token expired or invalid, clearing stored token");
+                } else if (response.status === 400 || response.status === 401) {
+                    // Only clear token on explicit authentication errors (400 Bad Request or 401 Unauthorized)
+                    console.log("❌ Token expired or invalid (status: " + response.status + "), clearing stored token");
                     accessToken = "";
                     localStorage.removeItem("googleAccessToken");
                     
@@ -2129,24 +2349,39 @@
                     if (logoutOption) {
                         logoutOption.style.display = "none";
                     }
+                } else {
+                    // For other errors (network issues, server errors), keep the token and assume user is still logged in
+                    console.log("⚠️ Unable to verify token (status: " + response.status + "), but keeping login session");
+                    const signInOption = document.getElementById("signInOption");
+                    const logoutOption = document.getElementById("logoutOption");
+                    const userInfo = document.getElementById("userInfo");
+                    
+                    if (signInOption) {
+                        signInOption.style.display = "none";
+                    }
+                    if (logoutOption) {
+                        logoutOption.style.display = "flex";
+                    }
+                    if (userInfo) {
+                        userInfo.innerText = "✅ Signed in (offline mode)";
+                    }
                 }
             } catch (error) {
-                console.error("❌ Error verifying token:", error);
-                accessToken = "";
-                localStorage.removeItem("googleAccessToken");
+                // Network error - keep the user logged in (they might be offline)
+                console.error("⚠️ Error verifying token (network issue), keeping login session:", error);
                 
                 const userInfo = document.getElementById("userInfo");
                 const signInOption = document.getElementById("signInOption");
                 const logoutOption = document.getElementById("logoutOption");
                 
                 if (userInfo) {
-                    userInfo.innerText = "Please sign in to upload to Google Drive";
+                    userInfo.innerText = "✅ Signed in (offline mode)";
                 }
                 if (signInOption) {
-                    signInOption.style.display = "flex";
+                    signInOption.style.display = "none";
                 }
                 if (logoutOption) {
-                    logoutOption.style.display = "none";
+                    logoutOption.style.display = "flex";
                 }
             }
         }
@@ -2553,8 +2788,184 @@
             }, 100);
         }
     
+        // ✅ Download Configuration Modal Functions
+        function openDownloadConfig() {
+            const modal = document.getElementById("downloadConfigModal");
+            const copiesInput = document.getElementById("numCopies");
+            const nicknameInput = document.getElementById("nickname");
+            
+            // Reset inputs
+            copiesInput.value = "1";
+            nicknameInput.value = "";
+            copiesInput.classList.remove("invalid");
+            
+            // Generate initial code field
+            generateCodeFields(1);
+            
+            modal.classList.add("show");
+        }
+
+        function closeDownloadConfig() {
+            const modal = document.getElementById("downloadConfigModal");
+            modal.classList.remove("show");
+        }
+
+        function generateCodeFields(numCopies) {
+            const codesGrid = document.getElementById("codesGrid");
+            const codesFieldContainer = document.getElementById("codesFieldContainer");
+            
+            // Clear existing fields
+            codesGrid.innerHTML = "";
+            
+            if (numCopies > 0) {
+                codesFieldContainer.style.display = "block";
+                
+                for (let i = 0; i < numCopies; i++) {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "code-input-wrapper";
+                    
+                    const label = document.createElement("label");
+                    label.className = "code-input-label";
+                    label.textContent = `Stub ${i + 1}`;
+                    
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.className = "code-input";
+                    input.placeholder = "0XX";
+                    input.maxLength = 3;
+                    input.pattern = "0\\d{2}";
+                    input.dataset.index = i;
+                    
+                    // Add input event listener for validation
+                    input.addEventListener("input", function() {
+                        validateSingleCode(this);
+                    });
+                    
+                    wrapper.appendChild(label);
+                    wrapper.appendChild(input);
+                    codesGrid.appendChild(wrapper);
+                }
+            } else {
+                codesFieldContainer.style.display = "none";
+            }
+        }
+
+        function validateSingleCode(input) {
+            const pattern = /^0\d{2}$/;
+            if (input.value.length === 3) {
+                if (!pattern.test(input.value)) {
+                    input.classList.add("invalid");
+                    return false;
+                } else {
+                    input.classList.remove("invalid");
+                    return true;
+                }
+            } else {
+                input.classList.remove("invalid");
+                return input.value.length === 0; // Empty is valid (not yet filled)
+            }
+        }
+
+        function validateAllCodes() {
+            const codeInputs = document.querySelectorAll(".code-input");
+            const codesError = document.getElementById("codesError");
+            let allValid = true;
+            
+            codeInputs.forEach(input => {
+                const pattern = /^0\d{2}$/;
+                if (!pattern.test(input.value)) {
+                    input.classList.add("invalid");
+                    allValid = false;
+                } else {
+                    input.classList.remove("invalid");
+                }
+            });
+            
+            if (!allValid && codesError) {
+                codesError.style.display = "block";
+            } else if (codesError) {
+                codesError.style.display = "none";
+            }
+            
+            return allValid;
+        }
+
+        function validateCodeFormat() {
+            // Legacy function - now validates all codes
+            return validateAllCodes();
+        }
+
+        function validateCopies() {
+            const copiesInput = document.getElementById("numCopies");
+            const value = parseInt(copiesInput.value);
+            
+            if (isNaN(value) || value < 1 || value > 999) {
+                copiesInput.classList.add("invalid");
+                return false;
+            }
+            
+            copiesInput.classList.remove("invalid");
+            return true;
+        }
+
+        async function proceedWithDownload() {
+            const isCopiesValid = validateCopies();
+            const isCodesValid = validateAllCodes();
+            
+            if (!isCopiesValid || !isCodesValid) {
+                return;
+            }
+            
+            // Get all codes
+            const codeInputs = document.querySelectorAll(".code-input");
+            const codes = Array.from(codeInputs).map(input => input.value);
+            
+            // Get first code and number of copies
+            const firstCode = codes[0];
+            const numCopies = codes.length;
+            
+            // Get nickname (optional)
+            const nickname = document.getElementById("nickname").value.trim();
+            
+            // Build filename: firstCode_numCopies or firstCode_numCopies_nickname
+            let filename = `${firstCode}_${numCopies}`;
+            if (nickname) {
+                // Replace spaces and special characters with underscores
+                const sanitizedNickname = nickname.replace(/[^a-zA-Z0-9]/g, '_');
+                filename += `_${sanitizedNickname}`;
+            }
+            
+            console.log("📝 Generated filename:", filename);
+            console.log("📝 All codes:", codes.join(", "));
+            
+            // Close modal
+            closeDownloadConfig();
+            
+            // Proceed with download using the custom filename
+            await downloadImage(filename);
+        }
+
+        // Add event listeners for real-time validation
+        document.addEventListener("DOMContentLoaded", function() {
+            const copiesInput = document.getElementById("numCopies");
+            
+            if (copiesInput) {
+                copiesInput.addEventListener("input", function() {
+                    if (this.value) {
+                        const numCopies = parseInt(this.value);
+                        if (!isNaN(numCopies) && numCopies > 0 && numCopies <= 999) {
+                            validateCopies();
+                            generateCodeFields(numCopies);
+                        }
+                    } else {
+                        this.classList.remove("invalid");
+                    }
+                });
+            }
+        });
+
         // ✅ Process & Upload Image
-        async function downloadImage() {
+        async function downloadImage(customFilename = null) {
             console.log("🎯 Download image function called");
             
             // Refresh token from localStorage first
@@ -2651,12 +3062,14 @@
                 }
                 
                 updateProgress(40, "Preparing download...");
-                const file = new File([blob], `photobooth-${Date.now()}.jpg`, { type: "image/jpeg" });
+                const timestamp = Date.now();
+                const filename = customFilename ? `${customFilename}.jpg` : `photobooth-${timestamp}.jpg`;
+                const file = new File([blob], filename, { type: "image/jpeg" });
 
                 // Save locally first
                 let link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = `photobooth-${Date.now()}.jpg`;
+                link.download = filename;
                 link.click();
 
                 // Upload to Google Drive immediately (no delay)
@@ -3215,7 +3628,8 @@ async function makeFilePublic(fileId) {
                     'template7': true,
                     'template8': true,
                     'jpia_template': true,
-                    'brod_template': true
+                    'brod_template': true,
+                    'educ_template': true
                 };
             } else if (selectedFormat === "enhanced") {
                 defaultSettings = {
@@ -3264,7 +3678,8 @@ async function makeFilePublic(fileId) {
                     { key: 'template7', name: 'Template 7', description: 'Blue background' },
                     { key: 'template8', name: 'Template 8', description: 'Black with orange' },
                     { key: 'jpia_template', name: 'JPIA Template', description: 'Lime green design' },
-                    { key: 'brod_template', name: 'Brod Template', description: 'Dark red design' }
+                    { key: 'brod_template', name: 'Brod Template', description: 'Dark red design' },
+                    { key: 'educ_template', name: 'Educ Template', description: 'Navy blue design' }
                 ];
             } else if (selectedFormat === "enhanced") {
                 templates = [
@@ -3350,7 +3765,7 @@ async function makeFilePublic(fileId) {
             templateButtonsContainer.innerHTML = "";
             
             if (selectedFormat === "old") {
-                // Classic templates (template2.png, template3.png, template4.png, template7.png, template8.png, jpia_template.png, brod_template.png)
+                // Classic templates (template2.png, template3.png, template4.png, template7.png, template8.png, jpia_template.png, brod_template.png, educ_template.png)
                 const classicTemplates = [
                     { name: "template2.png", color: "white" },
                     { name: "template3.png", color: "black" },
@@ -3358,11 +3773,12 @@ async function makeFilePublic(fileId) {
                     { name: "template7.png", color: "rgb(80, 122, 229)" },
                     { name: "template8.png", color: "black" },
                     { name: "jpia_template.png", color: "#89b860" }, // Lime green for JPIA
-                    { name: "brod_template.png", color: "#8B0000" } // Dark red for Brod
+                    { name: "brod_template.png", color: "#8B0000" }, // Dark red for Brod
+                    { name: "educ_template.png", color: "#000080" } // Navy blue for Educ
                 ];
                 
                 const templateSettings = getTemplateSettings();
-                const buttonIdMap = ['template2', 'template3', 'template4', 'template7', 'template8', 'template9', 'brod'];
+                const buttonIdMap = ['template2', 'template3', 'template4', 'template7', 'template8', 'template9', 'brod', 'educ'];
                 classicTemplates.forEach((template, index) => {
                     // Check if template is enabled in settings
                     const templateKey = template.name.replace('.png', '');
@@ -3664,6 +4080,39 @@ async function makeFilePublic(fileId) {
         }
     </script>
     
+    <!-- Download Configuration Modal -->
+    <div id="downloadConfigModal" class="download-config-modal">
+        <div class="download-config-content">
+            <div class="download-config-header">
+                <h2>Download Configuration</h2>
+            </div>
+            <div class="download-config-body">
+                <div class="config-field">
+                    <label for="numCopies">Number of Copies</label>
+                    <div class="field-description">How many copies to print (generates stub number fields automatically)</div>
+                    <input type="number" id="numCopies" placeholder="1" min="1" max="999" value="1">
+                    <div class="error-message">Please enter a valid number (1-999)</div>
+                </div>
+                <div class="config-field">
+                    <label for="nickname">Nickname</label>
+                    <div class="field-description">Add a nickname to identify this batch (optional)</div>
+                    <input type="text" id="nickname" maxlength="50">
+                </div>
+                <div class="config-field" id="codesFieldContainer" style="display: none;">
+                    <label>Stubs</label>
+                    <div class="field-description">One stub = One copy. Enter 3-digit stub numbers starting with 0 (e.g., 001, 042)</div>
+                    <div id="codesGrid" class="codes-grid">
+                        <!-- Code inputs will be generated here -->
+                    </div>
+                    <div class="error-message" id="codesError">Please fill all stub number fields with valid 3-digit codes starting with 0</div>
+                </div>
+            </div>
+            <div class="download-config-footer">
+                <button class="config-btn config-btn-secondary" onclick="closeDownloadConfig()">Cancel</button>
+                <button class="config-btn config-btn-primary" onclick="proceedWithDownload()">Download</button>
+            </div>
+        </div>
+    </div>
     
 </body>
 </html>
