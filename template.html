@@ -256,6 +256,12 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+        #btn-ce .template-preview {
+            background-image: url('classic_templates/ce_template.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
         
         /* Enhanced Format Template Previews */
         #btn-enhanced1 .template-preview {
@@ -301,6 +307,7 @@
             background-size: 200% 200%;
             animation: gradientShift 3s ease infinite;
         }
+        #btn-ce { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); } /* Gold/orange for CE template */
         
         /* Enhanced Format Template Buttons */
         #btn-enhanced1 { background: #ffffff !important; } /* White background for template 1 */
@@ -2171,7 +2178,7 @@
         // Helper function to get correct template path
         function getTemplatePath(templateName) {
             // Special handling for brod_template and educ_template
-            if (templateName === "brod_template.png" || templateName === "educ_template.png") {
+            if (templateName === "brod_template.png" || templateName === "educ_template.png" || templateName === "ce_template.png") {
                 return `classic_templates/${templateName}`;
             }
             if (selectedFormat === "old") {
@@ -2831,9 +2838,9 @@
                     const input = document.createElement("input");
                     input.type = "text";
                     input.className = "code-input";
-                    input.placeholder = "0XX";
+                    input.placeholder = "XXX";
                     input.maxLength = 3;
-                    input.pattern = "0\\d{2}";
+                    input.pattern = "\\d{3}";
                     input.dataset.index = i;
                     
                     // Add input event listener for validation
@@ -2851,7 +2858,7 @@
         }
 
         function validateSingleCode(input) {
-            const pattern = /^0\d{2}$/;
+            const pattern = /^\d{3}$/;
             if (input.value.length === 3) {
                 if (!pattern.test(input.value)) {
                     input.classList.add("invalid");
@@ -2872,7 +2879,7 @@
             let allValid = true;
             
             codeInputs.forEach(input => {
-                const pattern = /^0\d{2}$/;
+                const pattern = /^\d{3}$/;
                 if (!pattern.test(input.value)) {
                     input.classList.add("invalid");
                     allValid = false;
@@ -3629,7 +3636,8 @@ async function makeFilePublic(fileId) {
                     'template8': true,
                     'jpia_template': true,
                     'brod_template': true,
-                    'educ_template': true
+                    'educ_template': true,
+                    'ce_template': true
                 };
             } else if (selectedFormat === "enhanced") {
                 defaultSettings = {
@@ -3679,7 +3687,8 @@ async function makeFilePublic(fileId) {
                     { key: 'template8', name: 'Template 8', description: 'Black with orange' },
                     { key: 'jpia_template', name: 'JPIA Template', description: 'Lime green design' },
                     { key: 'brod_template', name: 'Brod Template', description: 'Dark red design' },
-                    { key: 'educ_template', name: 'Educ Template', description: 'Navy blue design' }
+                    { key: 'educ_template', name: 'Educ Template', description: 'Navy blue design' },
+                    { key: 'ce_template', name: 'CE Template', description: 'Gold design' }
                 ];
             } else if (selectedFormat === "enhanced") {
                 templates = [
@@ -3774,11 +3783,12 @@ async function makeFilePublic(fileId) {
                     { name: "template8.png", color: "black" },
                     { name: "jpia_template.png", color: "#89b860" }, // Lime green for JPIA
                     { name: "brod_template.png", color: "#8B0000" }, // Dark red for Brod
-                    { name: "educ_template.png", color: "#000080" } // Navy blue for Educ
+                    { name: "educ_template.png", color: "#000080" }, // Navy blue for Educ
+                    { name: "ce_template.png", color: "#FFD700" } // Gold for CE
                 ];
                 
                 const templateSettings = getTemplateSettings();
-                const buttonIdMap = ['template2', 'template3', 'template4', 'template7', 'template8', 'template9', 'brod', 'educ'];
+                const buttonIdMap = ['template2', 'template3', 'template4', 'template7', 'template8', 'template9', 'brod', 'educ', 'ce'];
                 classicTemplates.forEach((template, index) => {
                     // Check if template is enabled in settings
                     const templateKey = template.name.replace('.png', '');
@@ -4100,11 +4110,11 @@ async function makeFilePublic(fileId) {
                 </div>
                 <div class="config-field" id="codesFieldContainer" style="display: none;">
                     <label>Stubs</label>
-                    <div class="field-description">One stub = One copy. Enter 3-digit stub numbers starting with 0 (e.g., 001, 042)</div>
+                    <div class="field-description">One stub = One copy. Enter any 3-digit stub numbers (e.g., 001, 042, 123, 999)</div>
                     <div id="codesGrid" class="codes-grid">
                         <!-- Code inputs will be generated here -->
                     </div>
-                    <div class="error-message" id="codesError">Please fill all stub number fields with valid 3-digit codes starting with 0</div>
+                    <div class="error-message" id="codesError">Please fill all stub number fields with valid 3-digit codes</div>
                 </div>
             </div>
             <div class="download-config-footer">
